@@ -1,0 +1,43 @@
+MaxCoordinate: 3000
+MinCoordinate: 1000
+CooldownTime: 5
+InvulTime: 10
+TimeBeforeTeleport: 5
+MaxAttempts: 20
+CheckingRadius: 20
+Factions: false
+GriefPrevention: false
+AvoidPlayers: false
+Towny: false
+WorldBorder: false
+WorldGuard: false
+VanillaBorder: true
+Limit: 0
+OnJoin: true
+OnJoinCommand: none
+RandomOrg: false
+StopOnMove: true
+StopOnCombat: true
+ChunkLoader: false
+BonusChest: false
+Sound: ENTITY_ENDERDRAGON_FLAP
+Effect: ENDER_SIGNAL
+Command: random
+All: random
+Others: random
+Portals: random
+Signs: random
+Join: random
+CommandCost: 0
+PortalCost: 0
+WarpCrossWorld: true
+LimitSign: true
+LimitPortals: true
+LimitWarps: true
+LimitCommand: true
+Regions:
+ - example
+BannedWorlds:
+ - world_the_end
+BonusChestItems:
+ - WOODEN_SWORD
