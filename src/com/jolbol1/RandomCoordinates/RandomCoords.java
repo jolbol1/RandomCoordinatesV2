@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -62,6 +63,9 @@ public class RandomCoords extends JavaPlugin {
     private File warpFile;
     private Essentials ess3 = null;
     private MessageManager messages = new MessageManager();
+    public String ANSI_RESET = "\u001B[0m";
+    public String ANSI_BLUE = "\u001B[34m";
+    public String ANSI_BOLD = "\u001B[1m";
 
     public static RandomCoords getPlugin() {
         return JavaPlugin.getPlugin(RandomCoords.class);
@@ -72,6 +76,9 @@ public class RandomCoords extends JavaPlugin {
         plugin = this;
         PluginManager pm = getServer().getPluginManager();
         CommandHandler handler = new CommandHandler();
+        PluginDescriptionFile pdf = getDescription();
+        logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD+ pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
+
         if(Bukkit.getServer().getPluginManager().getPlugin("Essentials") != null) {
             ess3 = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
         }

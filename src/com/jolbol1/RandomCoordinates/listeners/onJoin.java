@@ -17,6 +17,7 @@ public class onJoin implements Listener {
     private Coordinates coordinates = new Coordinates();
     private MessageManager messages = new MessageManager();
 
+
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
