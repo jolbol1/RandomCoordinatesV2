@@ -152,6 +152,7 @@ public class RandomCoords extends JavaPlugin {
         handler.register("portal", new PortalCommand());
         handler.register("player", new Others());
         handler.register("warp", new Warp());
+        handler.register("help", new HelpCommand());
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
 

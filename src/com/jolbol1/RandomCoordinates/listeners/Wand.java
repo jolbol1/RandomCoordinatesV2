@@ -36,6 +36,8 @@ public class Wand implements Listener {
                             return;
                         }
                     }
+
+
                     Block b = e.getClickedBlock();
                     int x = b.getX();
                     int y = b.getY();

@@ -1,17 +1,9 @@
 package com.jolbol1.RandomCoordinates.managers;
 
 
-import com.earth2me.essentials.Essentials;
-import com.earth2me.essentials.Kit;
-import com.earth2me.essentials.MetaItemStack;
-import com.earth2me.essentials.User;
-import com.earth2me.essentials.textreader.IText;
-import com.earth2me.essentials.textreader.KeywordReplacer;
-import com.earth2me.essentials.textreader.SimpleTextInput;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.checks.*;
 import com.jolbol1.RandomCoordinates.cooldown.Cooldown;
-import net.ess3.api.IEssentials;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -32,6 +24,7 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Level;
 
 /**
  * Created by James on 01/07/2016.
@@ -373,13 +366,16 @@ public class Coordinates {
                                         Inventory chestInv = chest.getInventory();
                                         for (String material : RandomCoords.getPlugin().config.getStringList("BonusChestItems")) {
                                             if (material.contains("Essentials,")) {
-                                                String[] kits = material.split(",");
-                                                for (String kit : kits) {
-                                                    if (!kit.equals("Essentials")) {
-                                                        getKit(player, chest, kit);
-                                                        RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
-                                                        RandomCoords.getPlugin().saveLimiter();
+                                                if(Bukkit.getPluginManager().getPlugin("Essentials") != null) {
+                                                    KitManager kitManager = new KitManager();
+                                                    String[] kits = material.split(",");
+                                                    for (String kit : kits) {
+                                                        if (!kit.equals("Essentials")) {
+                                                            kitManager.getKit(player, chest, kit);
+                                                            RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
+                                                            RandomCoords.getPlugin().saveLimiter();
 
+                                                        }
                                                     }
                                                 }
                                             } else {
@@ -495,13 +491,15 @@ public class Coordinates {
                                         Inventory chestInv = chest.getInventory();
                                         for (String material : RandomCoords.getPlugin().config.getStringList("BonusChestItems")) {
                                             if (material.contains("Essentials,")) {
-                                                String[] kits = material.split(",");
+                                                if(Bukkit.getServer().getPluginManager().getPlugin("Essentials") != null) {
+                                                    KitManager kitManager = new KitManager();
+                                                    String[] kits = material.split(",");
                                                 for (String kit : kits) {
                                                     if (!kit.equals("Essentials")) {
-                                                        getKit(player, chest, kit);
+                                                        kitManager.getKit(player, chest, kit);
                                                         RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
                                                         RandomCoords.getPlugin().saveLimiter();
-
+                                                    }
                                                     }
                                                 }
                                             } else {
@@ -625,74 +623,7 @@ public class Coordinates {
         }
     }
 
-    public void getKit(Player p, Chest c, String name)
-    {
-        IEssentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-        ForkJoinPool.commonPool().execute(new Runnable()
-        {
-            public void run()
-            {
-                if (ess != null)
-                {
-                    Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
-                    User u = ess.getUser(p);
-                    List<String> items;
-                    try
-                    {
-                        Kit kitMe = new Kit(name, ess);
-                        items = kitMe.getItems();
 
-                        Inventory inv = c.getInventory();
-
-
-                        inv.addItem(deSerialize(items, u).get());
-                    }
-                    catch (Exception e)
-                    {
-                        Bukkit.getServer().getLogger().severe("[RandomCoords] Kit " + name + " does not exist");
-                        return;
-                    }
-                }
-                else
-                {
-                    System.out.println("essentials was null when getting kits!");
-                }
-            }
-        });
-    }
-
-    public CompletableFuture<ItemStack[]> deSerialize(List<String> items, User user)
-    {
-        Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-
-        CompletableFuture<ItemStack[]> finalList = new CompletableFuture<>();
-        List<ItemStack> itemList = new ArrayList<ItemStack>();
-        IText input = new SimpleTextInput(items);
-        IText output = new KeywordReplacer(input, user.getSource(), ess);
-        for (String kitItem : output.getLines())
-        {
-            String[] parts = kitItem.split(" +");
-            try
-            {
-                ItemStack parseStack = ess.getItemDb().get(parts[0], parts.length > 1 ? Integer.parseInt(parts[1]) : 1);
-                if (parseStack != null && parseStack.getType() != Material.AIR)
-                {
-                    MetaItemStack metaStack = new MetaItemStack(parseStack);
-                    if (parts.length > 2)
-                    {
-                        metaStack.parseStringMeta(null, true, parts, 2, ess);
-                    }
-                    itemList.add(metaStack.getItemStack());
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        finalList.complete(itemList.toArray(new ItemStack[itemList.size()]));
-        return finalList;
-    }
 
 
     public Location warpTP(Player p, World world) {
