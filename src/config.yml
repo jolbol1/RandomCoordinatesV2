@@ -1,10 +1,28 @@
-MaxCoordinate: 3000
-MinCoordinate: 1000
+#Teleport Settings
+MaxCoordinate: 5000
+MinCoordinate: 0
 CooldownTime: 5
+CooldownApplys:
+ - Command
+ - Warps
 InvulTime: 10
 TimeBeforeTeleport: 5
+TimeBeforeApplys:
+ - Command
+ - Warps
+ - Signs
 MaxAttempts: 20
-CheckingRadius: 20
+RandomOrg: false
+StopOnMove: true
+StopOnCombat: true
+ChunkLoader: false
+Sound: ENTITY_ENDERDRAGON_FLAP
+Effect: ENDER_SIGNAL
+BannedWorlds:
+ - world_the_end
+
+#Safety Checks
+CheckingRadius: 100
 Factions: false
 GriefPrevention: false
 AvoidPlayers: false
@@ -12,32 +30,39 @@ Towny: false
 WorldBorder: false
 WorldGuard: false
 VanillaBorder: true
-Limit: 0
-OnJoin: true
+Regions:
+ - example
+
+#On Join Features
+OnJoin: false
 OnJoinCommand: none
-RandomOrg: false
-StopOnMove: true
-StopOnCombat: true
-ChunkLoader: false
 BonusChest: false
-Sound: ENTITY_ENDERDRAGON_FLAP
-Effect: ENDER_SIGNAL
+BonusChestItems:
+ - WOODEN_SWORD
+
+# Teleport Method, Can be random or warps
 Command: random
 All: random
 Others: random
 Portals: random
 Signs: random
 Join: random
+
+#Economy Settings
 CommandCost: 0
 PortalCost: 0
+
+#Warp Settings
 WarpCrossWorld: true
-LimitSign: true
-LimitPortals: true
-LimitWarps: true
-LimitCommand: true
-Regions:
- - example
-BannedWorlds:
- - world_the_end
-BonusChestItems:
- - WOODEN_SWORD
+
+#Limiter Settings
+Limit: 0
+LimiterApplys:
+ - Command
+ - Warps
+
+
+
+
+
+

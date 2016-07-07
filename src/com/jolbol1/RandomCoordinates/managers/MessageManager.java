@@ -34,7 +34,7 @@ public class MessageManager {
         String message = RandomCoords.getPlugin().language.getString("TeleportMessage");
         String locX =  String.valueOf(location.getX());
         String locY =  String.valueOf(location.getBlockY());
-        String locZ = String.valueOf(location.getBlockZ());
+        String locZ = String.valueOf(location.getZ());
         String newMessage = message.replaceAll("%coordinates", ChatColor.GREEN + (locX + ", " + good + locY + ", " + good +  locZ));
         new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&', newMessage)).tooltip(good + "By RandomCoords plugin").send(player);
     }
@@ -55,7 +55,7 @@ public class MessageManager {
 
     public void TeleportingIn(CommandSender sender, int Time) {
         String message = RandomCoords.getPlugin().language.getString("TeleportingIn");
-        String messageFinal = message.replaceAll("%time", String.valueOf(Time));
+        String messageFinal = ChatColor.translateAlternateColorCodes('&', message.replaceAll("%time", String.valueOf(Time)));
         new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',messageFinal)).tooltip(good + "To a random location!").send(sender);
     }
 

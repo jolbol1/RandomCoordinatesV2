@@ -30,11 +30,11 @@ public class SignClick implements Listener {
                 if(e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN || e.getClickedBlock().getType() == Material.SIGN_POST) {
                     Sign sign = (Sign) e.getClickedBlock().getState();
                 if(sign.getLine(0).equalsIgnoreCase(ChatColor.GREEN + "[RandomCoords]")) {
-                    if((RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Sign") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) && e.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    if((RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Sign") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) && e.getAction() == Action.LEFT_CLICK_BLOCK) {
                         e.setCancelled(false);
                         return;
                     }
-                    if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.SignUse")) {
+                    if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.SignUse") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Basic")) {
                         World world = sign.getWorld();
                         if(sign.getLine(1) != null) {
                             line1 = sign.getLine(1).replaceAll("\uF701", "");

@@ -26,7 +26,7 @@ public class All implements CommandInterface {
             if (!args[0].equalsIgnoreCase("all")) {
                 return;
             }
-            if (RandomCoords.getPlugin().hasPermission(sender, "Random.All") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+            if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.All") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
                 if (args.length == 1) {
                     teleportAll(sender, 574272099, 574272099, null);
                 } else if (args.length == 2) {

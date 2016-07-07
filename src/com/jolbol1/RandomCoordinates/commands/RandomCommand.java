@@ -56,88 +56,8 @@ public class RandomCommand implements CommandInterface {
                     }
                 }
 
-                int cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
-                int timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
-                if(RandomCoords.getPlugin().config.getDouble("CommandCost") != 0) {
-                  if(!RandomCoords.getPlugin().hasMoney(p, RandomCoords.getPlugin().config.getDouble("CommandCost"))) {
-                      messages.cost(p, RandomCoords.getPlugin().config.getDouble("CommandCost"));
-                      return;
-                  }
-                }
-                if (Cooldown.isInCooldown(((Player) sender).getUniqueId(), "TimeBefore")) {
-                    messages.aboutTo(sender, Cooldown.getTimeLeft(((Player) sender).getUniqueId(), "TimeBefore"));
-                    return;
-                }
-                if (cooldown != 0) {
-                    if (!Cooldown.isInCooldown(((Player) sender).getUniqueId(), "Command")) {
-                        if (!Cooldown.isInCooldown(((Player) sender).getUniqueId(), "TimeBefore")) {
-                            Cooldown cTb = new Cooldown(((Player) sender).getUniqueId(), "TimeBefore", RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport"));
-                            cTb.start();
-                            messages.TeleportingIn(sender, timeBefore);
-                        }
-                        Cooldown c = new Cooldown(((Player) sender).getUniqueId(), "Command", cooldown + timeBefore);
-                        c.start();
-                        BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
-                        s.scheduleSyncDelayedTask(RandomCoords.getPlugin().getInstance(), new Runnable() {
-                            @Override
-                            public void run() {
-                                if (RandomCoords.getPlugin().config.getString("StopOnMove").equalsIgnoreCase("true")) {
-                                    if (start.distance(p.getLocation()) > 1) {
-                                        messages.youMoved(sender);
-                                        return;
-                                    }
-                                }
-                                if (RandomCoords.getPlugin().config.getString("StopOnCombat").equalsIgnoreCase("true")) {
-                                    if (health > p.getHealth()) {
-                                        messages.tookDamage(sender);
-                                        return;
-                                    }
-                                }
-                                coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.COMMAND, 0);
-                            }
-                        }, timeBefore * 20L);
+                coordinates.finalCoordinates((Player) sender, 574272099, 574272099, ((Player) sender).getWorld(), CoordType.COMMAND, 0);
 
-                    } else {
-                        int secondsLeft = Cooldown.getTimeLeft(((Player) sender).getUniqueId(), "Command");
-                        messages.cooldownMessage(sender, secondsLeft);
-                        return;
-                    }
-
-
-                } else {
-                    if (!Cooldown.isInCooldown(((Player) sender).getUniqueId(), "TimeBefore")) {
-                        Cooldown cTb = new Cooldown(((Player) sender).getUniqueId(), "TimeBefore", RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport"));
-                        cTb.start();
-                        messages.TeleportingIn(sender, timeBefore);
-                        BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
-
-
-
-                        s.scheduleSyncDelayedTask(RandomCoords.getPlugin().getInstance(), new Runnable() {
-                            @Override
-                            public void run() {
-                                if (RandomCoords.getPlugin().config.getString("StopOnMove").equalsIgnoreCase("true")) {
-                                    if (start.distance(p.getLocation()) > 1) {
-                                        messages.youMoved(sender);
-                                        return;
-                                    }
-                                }
-                                if (RandomCoords.getPlugin().config.getString("StopOnCombat").equalsIgnoreCase("true")) {
-                                    if (health > p.getHealth()) {
-                                        messages.tookDamage(sender);
-                                        return;
-                                    }
-                                }
-                                coordinates.finalCoordinates((Player) sender, 574272099, 574272099, ((Player) sender).getWorld(), CoordType.COMMAND, 0);
-                            }
-                        }, timeBefore * 20L);
-                    } else {
-                        messages.aboutTo(sender, Cooldown.getTimeLeft(((Player) sender).getUniqueId(), "TimeBefore"));
-                        return;
-                    }
-
-
-                }
             }
         } else {
             messages.noPermission(sender);

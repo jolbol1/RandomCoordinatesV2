@@ -22,6 +22,7 @@ public class BlockPortal implements Listener {
     private InNetherPortal inNetherPortal = new InNetherPortal();
     @EventHandler
     public void blockPhysics(BlockPhysicsEvent e) {
+        if(RandomCoords.getPlugin().portals.get("Portal")== null) { return; }
         Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
         for (String name : portals) {
 

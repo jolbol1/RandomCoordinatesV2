@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -55,13 +56,14 @@ public class Coordinates {
         int randomZ;
         int spawnX;
         int spawnZ;
+
         if(RandomCoords.getPlugin().config.get(world.getName() + ".Center.X") != null ) {
             spawnX = RandomCoords.getPlugin().config.getInt(world.getName() + ".Center.X");
         } else {
             spawnX = world.getSpawnLocation().getBlockX();
         }
         if( RandomCoords.getPlugin().config.get(world.getName() + ".Center.Z") != null) {
-            spawnZ = RandomCoords.getPlugin().config.getInt(world.getName() + ".Center.X");
+            spawnZ = RandomCoords.getPlugin().config.getInt(world.getName() + ".Center.Z");
         } else {
             spawnZ = world.getSpawnLocation().getBlockZ();
         }
@@ -117,6 +119,10 @@ public class Coordinates {
     public void finalCoordinates(Player player, int max, int min, World world, CoordType type, double cost) {
         boolean limiter = false;
         double thisCost = cost;
+        Location start = player.getLocation();
+        double health = player.getHealth();
+        int timeBefore = 0;
+        int cooldown = 0;
         for (String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
             if (player.getWorld().getName().equals(worlds)) {
                 messages.worldBanned(player);
@@ -168,11 +174,23 @@ public class Coordinates {
                         if(RandomCoords.getPlugin().config.getString("Command").equalsIgnoreCase("warps")) {
                             locationTP = warpTP(player, world);
                         }
-                        if(RandomCoords.getPlugin().config.getString("LimitCommand").equalsIgnoreCase("true")) {
+                        if(RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains("Command")) {
                             limiter = isLimiter(player);
                         }
                         if(RandomCoords.getPlugin().config.getDouble("CommandCost") != 0) {
                             thisCost= RandomCoords.getPlugin().config.getDouble("CommandCost");
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("Command")) {
+                                timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
+                            }
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("Command")) {
+                                cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
+                            } else {
+                                Bukkit.broadcastMessage("FUCKEDITUP");
+                            }
                         }
 
                         break;
@@ -180,17 +198,54 @@ public class Coordinates {
                         if(RandomCoords.getPlugin().config.getString("All").equalsIgnoreCase("warps")) {
                             locationTP = warpTP(player, world);
                         }
+                        if(RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains("All")) {
+                            limiter = isLimiter(player);
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("All")) {
+                                timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
+                            }
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("All")) {
+                                cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
+                            }
+                        }
                         break;
                     case PLAYER:
                         if(RandomCoords.getPlugin().config.getString("Others").equalsIgnoreCase("warps")) {
                             locationTP = warpTP(player, world);
                         }
+                        if(RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains("Others")) {
+                            limiter = isLimiter(player);
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("Others")) {
+                                timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
+                            }
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("Others")) {
+                                cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
+                            }
+                        }
                         break;
                     case SIGN:
                         if(RandomCoords.getPlugin().config.getString("Signs").equalsIgnoreCase("warps")) {
                             locationTP = warpTP(player, world);
-                            if(RandomCoords.getPlugin().config.getString("LimitSign").equalsIgnoreCase("true")) {
+
+                            if(RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains("Sign")) {
                                 limiter = isLimiter(player);
+                            }
+                            if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
+                                if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("Sign")) {
+                                    timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
+                                }
+                            }
+                            if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
+                                if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("Sign")) {
+                                    cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
+                                }
                             }
 
                         }
@@ -204,109 +259,307 @@ public class Coordinates {
                         if(RandomCoords.getPlugin().config.getString("Portals").equalsIgnoreCase("warps")) {
                             locationTP = warpTP(player, world);
                         }
+                        if(RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains("Portal")) {
+                            limiter = isLimiter(player);
+                        }
                         if(RandomCoords.getPlugin().config.getDouble("PortalCost") != 0) {
                             thisCost = RandomCoords.getPlugin().config.getDouble("CommandCost");
                         }
-                        if(RandomCoords.getPlugin().config.getString("LimitPortals").equalsIgnoreCase("true")) {
-                            limiter = isLimiter(player);
+
+                        if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("Portals")) {
+                                timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
+                            }
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("Portals")) {
+                                cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
+                            }
                         }
 
                         break;
                     case WARPS:
                         locationTP = warpTP(player, world);
-                        if(RandomCoords.getPlugin().config.getString("LimitWarps").equalsIgnoreCase("true")) {
+                        if(RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains("Warps")) {
                             limiter = isLimiter(player);
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("Warps")) {
+                                timeBefore = RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport");
+                            }
+                        }
+                        if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
+                            if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("Warps")) {
+                                cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
+                            }
                         }
 
                         break;
 
                 }
-
-               if(player.hasPermission("Random.Limit.Bypass")) {
-                   limiter = false;
-               }
-                boolean exit = false;
-                while(!exit) {
-                    if(RandomCoords.getPlugin().config.getString("ChunkLoader").equalsIgnoreCase("false")) {
-                        exit = true;
-                    } else {
-                        exit = generateChunk(player, locationTP);
-                    }
-                    if(exit) {
-                        player.teleport(locationTP);
-                    } else {
-
-                    }
+                if(locationTP == null) {
+                    return;
+                }
+                if(player.hasPermission("Random.Cooldown.Bypass") || player.hasPermission("Random.*")) {
+                    cooldown = 0;
+                }
+                if(player.hasPermission("Random.TBT.Bypass") || player.hasPermission("Random.*")) {
+                    timeBefore = 0;
                 }
 
-                //Bonus Chests?
-                if(RandomCoords.getPlugin().config.getString("BonusChest").equalsIgnoreCase("true")) {
-                    if(RandomCoords.getPlugin().limiter.getString(player.getUniqueId() + ".Chest") == null) {
 
-                        Location chestLoc = new Location(locationTP.getWorld(), locationTP.getBlockX() + 1.0, locationTP.getBlockY() -2 , locationTP.getBlockZ() + 1.0);
-                    Location airLoc = new Location(chestLoc.getWorld(), chestLoc.getBlockX(), chestLoc.getBlockY() + 1, chestLoc.getBlockZ());
-                    World chestWorld = chestLoc.getWorld();
-                    Block chestBlock = chestLoc.getBlock();
-                    Block airBlock = airLoc.getBlock();
-                    airBlock.setType(Material.AIR);
-                    chestBlock.setType(Material.CHEST);
-                    Chest chest = (Chest) chestBlock.getState();
-                    Inventory chestInv = chest.getInventory();
-                        for (String material : RandomCoords.getPlugin().config.getStringList("BonusChestItems")) {
-                            if (material.contains("Essentials,")) {
-                                String[] kits = material.split(",");
-                                for (String kit : kits) {
-                                    if (!kit.equals("Essentials")) {
-                                        getKit(player, chest, kit);
-                                        RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
-                                        RandomCoords.getPlugin().saveLimiter();
+                //Test
+                if (Cooldown.isInCooldown((player).getUniqueId(), "TimeBefore")) {
+                    messages.aboutTo(player, Cooldown.getTimeLeft((player).getUniqueId(), "TimeBefore"));
+                    return;
+                }
+                if (cooldown != 0) {
+                    if (!Cooldown.isInCooldown((player).getUniqueId(), "Command")) {
+                        if (!Cooldown.isInCooldown((player).getUniqueId(), "TimeBefore")) {
+                            if(timeBefore != 0) {
+                                Cooldown cTb = new Cooldown((player).getUniqueId(), "TimeBefore", timeBefore);
+                                cTb.start();
+                                messages.TeleportingIn(player, timeBefore);
+                            }
+                        }
+                        Cooldown c = new Cooldown((player).getUniqueId(), "Command", cooldown + timeBefore);
+                        c.start();
+                        BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
+                        Location finalLocationTP = locationTP;
+                        double finalThisCost = thisCost;
+                        s.scheduleSyncDelayedTask(RandomCoords.getPlugin().getInstance(), new Runnable() {
+                            @Override
+                            public void run() {
+                                if (RandomCoords.getPlugin().config.getString("StopOnMove").equalsIgnoreCase("true")) {
+                                    if (start.distance(player.getLocation()) > 1) {
+                                        messages.youMoved(player);
+                                        return;
+                                    }
+                                }
+                                if (RandomCoords.getPlugin().config.getString("StopOnCombat").equalsIgnoreCase("true")) {
+                                    if (health > player.getHealth()) {
+                                        messages.tookDamage(player);
+                                        return;
+                                    }
+                                }
+                                //coordinates.
+
+                                boolean exit = false;
+                                while(!exit) {
+                                    if(RandomCoords.getPlugin().config.getString("ChunkLoader").equalsIgnoreCase("false")) {
+                                        exit = true;
+                                    } else {
+                                        exit = generateChunk(player, finalLocationTP);
+                                    }
+                                    if(exit) {
+                                        player.teleport(finalLocationTP);
+                                    } else {
 
                                     }
                                 }
-                            } else {
-                                ItemStack itemStack = new ItemStack(Material.getMaterial(material));
-                                chestInv.addItem(itemStack);
-                                RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
-                                RandomCoords.getPlugin().saveLimiter();
+
+                                //Bonus Chests?
+                                if(RandomCoords.getPlugin().config.getString("BonusChest").equalsIgnoreCase("true")) {
+                                    if(RandomCoords.getPlugin().limiter.getString(player.getUniqueId() + ".Chest") == null) {
+
+                                        Location chestLoc = new Location(finalLocationTP.getWorld(), finalLocationTP.getBlockX() + 1.0, finalLocationTP.getBlockY() -2 , finalLocationTP.getBlockZ() + 1.0);
+                                        Location airLoc = new Location(chestLoc.getWorld(), chestLoc.getBlockX(), chestLoc.getBlockY() + 1, chestLoc.getBlockZ());
+                                        World chestWorld = chestLoc.getWorld();
+                                        Block chestBlock = chestLoc.getBlock();
+                                        Block airBlock = airLoc.getBlock();
+                                        airBlock.setType(Material.AIR);
+                                        chestBlock.setType(Material.CHEST);
+                                        Chest chest = (Chest) chestBlock.getState();
+                                        Inventory chestInv = chest.getInventory();
+                                        for (String material : RandomCoords.getPlugin().config.getStringList("BonusChestItems")) {
+                                            if (material.contains("Essentials,")) {
+                                                String[] kits = material.split(",");
+                                                for (String kit : kits) {
+                                                    if (!kit.equals("Essentials")) {
+                                                        getKit(player, chest, kit);
+                                                        RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
+                                                        RandomCoords.getPlugin().saveLimiter();
+
+                                                    }
+                                                }
+                                            } else {
+                                                ItemStack itemStack = new ItemStack(Material.getMaterial(material));
+                                                chestInv.addItem(itemStack);
+                                                RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
+                                                RandomCoords.getPlugin().saveLimiter();
+                                            }
+
+                                        }
+                                    }
+
+
+
+                                }
+                                if(RandomCoords.getPlugin().hasPayed(player, finalThisCost)) {
+                                    player.teleport(finalLocationTP);
+                                } else {
+                                    return;
+                                }
+                                if(!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {
+                                    String soundName = RandomCoords.getPlugin().config.getString("Sound");
+                                    if(Sound.valueOf(soundName) != null) {
+                                        player.playSound(finalLocationTP, Sound.valueOf(soundName), 1, 1);
+                                    }
+
+
+                                }
+                                if(!RandomCoords.getPlugin().config.getString("Effect").equalsIgnoreCase("false")) {
+                                    String effectName = RandomCoords.getPlugin().config.getString("Effect");
+                                    if(Effect.valueOf(effectName) != null) {
+                                        finalLocationTP.getWorld().playEffect(finalLocationTP, Effect.valueOf(effectName), 1);
+                                    }
+
+
+                                }
+
+                                // Start the Suffocation cooldown check
+                                Cooldown c = new Cooldown(player.getUniqueId(), "Invul", 30);
+                                c.start();
+
+                                //Start the InvulnerableTime cooldown
+                                Cooldown cT = new Cooldown(player.getUniqueId(), "InvulTime", RandomCoords.getPlugin().config.getInt("InvulTime"));
+                                cT.start();
+
+
+                                messages.teleportMessage(player, finalLocationTP);
                             }
+                        }, timeBefore * 20L);
 
-                        }
+                    } else {
+                        int secondsLeft = Cooldown.getTimeLeft((player).getUniqueId(), "Command");
+                        messages.cooldownMessage(player, secondsLeft);
+                        return;
                     }
 
 
-
-                }
-                if(RandomCoords.getPlugin().hasPayed(player, thisCost)) {
-                    player.teleport(locationTP);
                 } else {
-                    return;
-                }
-                if(!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {
-                    String soundName = RandomCoords.getPlugin().config.getString("Sound");
-                    if(Sound.valueOf(soundName) != null) {
-                        player.playSound(locationTP, Sound.valueOf(soundName), 1, 1);
+                    if (!Cooldown.isInCooldown((player).getUniqueId(), "TimeBefore")) {
+                        if(timeBefore != 0) {
+                            Cooldown cTb = new Cooldown((player).getUniqueId(), "TimeBefore", RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport"));
+                            cTb.start();
+                            messages.TeleportingIn(player, timeBefore);
+                        }
+                        BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
+
+
+                        Location finalLocationTP1 = locationTP;
+                        double finalThisCost1 = thisCost;
+                        s.scheduleSyncDelayedTask(RandomCoords.getPlugin().getInstance(), new Runnable() {
+                            @Override
+                            public void run() {
+                                if (RandomCoords.getPlugin().config.getString("StopOnMove").equalsIgnoreCase("true")) {
+                                    if (start.distance(player.getLocation()) > 1) {
+                                        messages.youMoved(player);
+                                        return;
+                                    }
+                                }
+                                if (RandomCoords.getPlugin().config.getString("StopOnCombat").equalsIgnoreCase("true")) {
+                                    if (health > player.getHealth()) {
+                                        messages.tookDamage(player);
+                                        return;
+                                    }
+                                }
+                                // coordinates.finalCoordinates((Player) sender, 574272099, 574272099, ((Player) sender).getWorld(), CoordType.COMMAND, 0);
+
+                                boolean exit = false;
+                                while(!exit) {
+                                    if(RandomCoords.getPlugin().config.getString("ChunkLoader").equalsIgnoreCase("false")) {
+                                        exit = true;
+                                    } else {
+                                        exit = generateChunk(player, finalLocationTP1);
+                                    }
+                                    if(exit) {
+                                        player.teleport(finalLocationTP1);
+                                    } else {
+
+                                    }
+                                }
+
+                                //Bonus Chests?
+                                if(RandomCoords.getPlugin().config.getString("BonusChest").equalsIgnoreCase("true")) {
+                                    if(RandomCoords.getPlugin().limiter.getString(player.getUniqueId() + ".Chest") == null) {
+
+                                        Location chestLoc = new Location(finalLocationTP1.getWorld(), finalLocationTP1.getBlockX() + 1.0, finalLocationTP1.getBlockY() -2 , finalLocationTP1.getBlockZ() + 1.0);
+                                        Location airLoc = new Location(chestLoc.getWorld(), chestLoc.getBlockX(), chestLoc.getBlockY() + 1, chestLoc.getBlockZ());
+                                        World chestWorld = chestLoc.getWorld();
+                                        Block chestBlock = chestLoc.getBlock();
+                                        Block airBlock = airLoc.getBlock();
+                                        airBlock.setType(Material.AIR);
+                                        chestBlock.setType(Material.CHEST);
+                                        Chest chest = (Chest) chestBlock.getState();
+                                        Inventory chestInv = chest.getInventory();
+                                        for (String material : RandomCoords.getPlugin().config.getStringList("BonusChestItems")) {
+                                            if (material.contains("Essentials,")) {
+                                                String[] kits = material.split(",");
+                                                for (String kit : kits) {
+                                                    if (!kit.equals("Essentials")) {
+                                                        getKit(player, chest, kit);
+                                                        RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
+                                                        RandomCoords.getPlugin().saveLimiter();
+
+                                                    }
+                                                }
+                                            } else {
+                                                ItemStack itemStack = new ItemStack(Material.getMaterial(material));
+                                                chestInv.addItem(itemStack);
+                                                RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
+                                                RandomCoords.getPlugin().saveLimiter();
+                                            }
+
+                                        }
+                                    }
+
+
+
+                                }
+                                if(RandomCoords.getPlugin().hasPayed(player, finalThisCost1)) {
+                                    player.teleport(finalLocationTP1);
+                                } else {
+                                    return;
+                                }
+                                if(!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {
+                                    String soundName = RandomCoords.getPlugin().config.getString("Sound");
+                                    if(Sound.valueOf(soundName) != null) {
+                                        player.playSound(finalLocationTP1, Sound.valueOf(soundName), 1, 1);
+                                    }
+
+
+                                }
+                                if(!RandomCoords.getPlugin().config.getString("Effect").equalsIgnoreCase("false")) {
+                                    String effectName = RandomCoords.getPlugin().config.getString("Effect");
+                                    if(Effect.valueOf(effectName) != null) {
+                                        finalLocationTP1.getWorld().playEffect(finalLocationTP1, Effect.valueOf(effectName), 1);
+                                    }
+
+
+                                }
+
+                                // Start the Suffocation cooldown check
+                                Cooldown c = new Cooldown(player.getUniqueId(), "Invul", 30);
+                                c.start();
+
+                                //Start the InvulnerableTime cooldown
+                                Cooldown cT = new Cooldown(player.getUniqueId(), "InvulTime", RandomCoords.getPlugin().config.getInt("InvulTime"));
+                                cT.start();
+
+
+                                messages.teleportMessage(player, finalLocationTP1);
+                            }
+                        }, timeBefore * 20L);
+                    } else {
+                        messages.aboutTo(player, Cooldown.getTimeLeft((player).getUniqueId(), "TimeBefore"));
+                        return;
                     }
 
 
                 }
-                if(!RandomCoords.getPlugin().config.getString("Effect").equalsIgnoreCase("false")) {
-                    String effectName = RandomCoords.getPlugin().config.getString("Effect");
-                    if(Effect.valueOf(effectName) != null) {
-                         locationTP.getWorld().playEffect(locationTP, Effect.valueOf(effectName), 1);
-                    }
 
 
-                }
-
-                // Start the Suffocation cooldown check
-                Cooldown c = new Cooldown(player.getUniqueId(), "Invul", 30);
-                c.start();
-
-                //Start the InvulnerableTime cooldown
-                Cooldown cT = new Cooldown(player.getUniqueId(), "InvulTime", RandomCoords.getPlugin().config.getInt("InvulTime"));
-                cT.start();
-
-                messages.teleportMessage(player, locationTP);
 
             }
         }
@@ -444,21 +697,26 @@ public class Coordinates {
 
     public Location warpTP(Player p, World world) {
         Set<String> list = null;
+        Location lom = new Location(p.getLocation().getWorld(), p.getLocation().getX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
+
         for (String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
             if (world.getName().equals(worlds)) {
                 messages.worldBanned(p);
-                Location lom = new Location(p.getLocation().getWorld(), p.getLocation().getX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                return lom;
+                return null;
 
             }
         }
-        if(RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false) != null) {
+        if(RandomCoords.getPlugin().warps.get("Warps") != null) {
             list = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
+        }
+        if(list == null) {
+            messages.noWarps(p);
+            return null;
         }
         Set<String> listCopy = new HashSet<>(list);
         if(listCopy.size() == 0) {
             messages.noWarps(p);
-            return p.getLocation();
+            return null;
         } else if(listCopy.size() != 0) {
 
             int i = 0;
@@ -471,7 +729,6 @@ public class Coordinates {
                 for(Object obj : list) {
                     World objWorld = Bukkit.getServer().getWorld(RandomCoords.getPlugin().warps.getString("Warps." + obj.toString() + ".World"));
                     if (objWorld != world) {
-                        Bukkit.broadcastMessage(obj.toString());
                         listCopy.remove(obj);
                     }
                 }
@@ -479,7 +736,6 @@ public class Coordinates {
             int size = listCopy.size();
             int myRandom = random.nextInt(size);
             for (Object obj : listCopy) {
-                Bukkit.broadcastMessage("LIST + " + obj.toString());
                 if (i == myRandom) {
                     wName = RandomCoords.getPlugin().warps.getString("Warps." + obj.toString() + ".World");
                     x = RandomCoords.getPlugin().warps.getDouble("Warps." + obj.toString() + ".X");
@@ -499,7 +755,9 @@ public class Coordinates {
     }
 
     public boolean isLimiter(Player player) {
-        if(RandomCoords.getPlugin().config.getInt("Limit") != 0) {
+        if(player.hasPermission("Random.Limiter.Byapss")) {
+            return true;
+        } else if(RandomCoords.getPlugin().config.getInt("Limit") != 0) {
             String uuid = player.getUniqueId().toString();
             int limit = RandomCoords.getPlugin().config.getInt("Limit");
             FileConfiguration limiter = RandomCoords.getPlugin().limiter;
@@ -522,6 +780,7 @@ public class Coordinates {
             return true;
         }
     }
+
 
 
 

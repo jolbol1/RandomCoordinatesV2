@@ -63,7 +63,7 @@ public class PortalEnter extends BukkitRunnable {
                         }
                     }
                     if (isInside(player.getLocation(), l1, l2)) {
-                        if (RandomCoords.getPlugin().hasPermission(player, "Random.PortalUse") || RandomCoords.getPlugin().hasPermission(player, "Random.*")) {
+                        if (RandomCoords.getPlugin().hasPermission(player, "Random.PortalUse") || RandomCoords.getPlugin().hasPermission(player, "Random.Basic") || RandomCoords.getPlugin().hasPermission(player, "Random.*")) {
                           if(!RandomCoords.getPlugin().hasMoney(player, RandomCoords.getPlugin().config.getDouble("PortalCost"))) {
                               messages.cost(player, RandomCoords.getPlugin().config.getDouble("PortalCost"));
                               return;

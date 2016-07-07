@@ -340,7 +340,6 @@ public class RandomCoords extends JavaPlugin {
 
     public boolean hasPayed(Player p, double cost) {
         if(!setupEconomy() || cost == 0) {
-            Bukkit.broadcastMessage("Cost was 0");
             return true;
         } else {
             EconomyResponse r = econ.withdrawPlayer(p, cost);

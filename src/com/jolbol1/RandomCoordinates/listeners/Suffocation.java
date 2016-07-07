@@ -24,7 +24,6 @@ public class Suffocation implements Listener {
         int highestY = p.getWorld().getHighestBlockYAt(p.getLocation());
         Location reTry = new Location(p.getWorld(), p.getLocation().getBlockX(), highestY + 2, p.getLocation().getBlockZ());
         p.teleport(reTry);
-        p.sendMessage("SuffocationFailed!");
 
     }
 

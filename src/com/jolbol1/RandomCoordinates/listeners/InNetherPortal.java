@@ -50,13 +50,11 @@ public class InNetherPortal implements Listener {
             World w = Bukkit.getServer().getWorld(portalWorld);
             Location l1 = new Location(w, p1x, p1y, p1z);
             Location l2 = new Location(w, p2x, p2y, p2z);
-            Bukkit.broadcastMessage(l1.toString());
-            Bukkit.broadcastMessage(l2.toString());
+
 
             World worldW = Bukkit.getServer().getWorld(world);
             if(pe.isInside(e.getPlayer().getLocation(), l1, l2)) {
                 e.setCancelled(true);
-                Bukkit.broadcastMessage("FUCK YEAH");
                 return;
             }
 
@@ -96,15 +94,12 @@ public class InNetherPortal implements Listener {
             World w = Bukkit.getServer().getWorld(portalWorld);
             Location l1 = new Location(w, p1x, p1y, p1z);
             Location l2 = new Location(w, p2x, p2y, p2z);
-            Bukkit.broadcastMessage(l1.toString());
-            Bukkit.broadcastMessage(l2.toString());
+
 
             World worldW = Bukkit.getServer().getWorld(world);
             if (pe.isInside(location, l1, l2)) {
-                Bukkit.broadcastMessage("FUCK YEAH");
                 return true;
             } else {
-                Bukkit.broadcastMessage("FUCK!");
                 return false;
             }
 
