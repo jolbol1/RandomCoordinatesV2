@@ -47,7 +47,7 @@ public class RandomCoords extends JavaPlugin {
     public static Economy econ = null;
 
 
-
+   //k
     public static Plugin plugin;
 
     public FileConfiguration language;
