@@ -171,7 +171,7 @@ public class Coordinates {
                             limiter = isLimiter(player);
                         }
                         if(RandomCoords.getPlugin().config.getDouble("CommandCost") != 0) {
-                            thisCost= RandomCoords.getPlugin().config.getDouble("CommandCost");
+                            thisCost = RandomCoords.getPlugin().config.getDouble("CommandCost");
                         }
                         if(RandomCoords.getPlugin().config.getInt("TimeBeforeTeleport") != 0) {
                             if(RandomCoords.getPlugin().config.getStringList("TimeBeforeApplys").contains("Command")) {
@@ -181,8 +181,6 @@ public class Coordinates {
                         if(RandomCoords.getPlugin().config.getInt("CooldownTime") != 0) {
                             if(RandomCoords.getPlugin().config.getStringList("CooldownApplys").contains("Command")) {
                                 cooldown = RandomCoords.getPlugin().config.getInt("CooldownTime");
-                            } else {
-                                Bukkit.broadcastMessage("FUCKEDITUP");
                             }
                         }
 
@@ -345,7 +343,12 @@ public class Coordinates {
                                         exit = generateChunk(player, finalLocationTP);
                                     }
                                     if(exit) {
-                                        player.teleport(finalLocationTP);
+                                        if(RandomCoords.getPlugin().hasPayed(player, finalThisCost)) {
+                                            player.teleport(finalLocationTP);
+                                        } else {
+                                            return;
+                                        }
+
                                     } else {
 
                                     }
@@ -470,7 +473,11 @@ public class Coordinates {
                                         exit = generateChunk(player, finalLocationTP1);
                                     }
                                     if(exit) {
-                                        player.teleport(finalLocationTP1);
+                                        if(RandomCoords.getPlugin().hasPayed(player, finalThisCost1)) {
+                                            player.teleport(finalLocationTP1);
+                                        } else {
+                                            return;
+                                        }
                                     } else {
 
                                     }
@@ -515,11 +522,7 @@ public class Coordinates {
 
 
                                 }
-                                if(RandomCoords.getPlugin().hasPayed(player, finalThisCost1)) {
-                                    player.teleport(finalLocationTP1);
-                                } else {
-                                    return;
-                                }
+
                                 if(!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {
                                     String soundName = RandomCoords.getPlugin().config.getString("Sound");
                                     if(Sound.valueOf(soundName) != null) {
