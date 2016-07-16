@@ -2,14 +2,10 @@ package com.jolbol1.RandomCoordinates.managers;
 
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import mkremins.fanciful.FancyMessage;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Created by James on 01/07/2016.
@@ -17,217 +13,250 @@ import org.bukkit.plugin.Plugin;
 public class MessageManager {
 
     private final String prefix = ChatColor.GOLD + "[RandomCoords] ";
-    private final ChatColor bad = ChatColor.RED;
     private final ChatColor good = ChatColor.GREEN;
 
 
 
-    public void noPermission(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("NoPermission"))).send(sender);
+    public void noPermission(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoPermission"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void minTooLarge(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("MinTooLarge"))).send(sender);
+    public void minTooLarge(final CommandSender sender) {
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MinTooLarge"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void teleportMessage(Player player, Location location) {
-        String message = RandomCoords.getPlugin().language.getString("TeleportMessage");
-        String locX =  String.valueOf(location.getX());
-        String locY =  String.valueOf(location.getBlockY());
-        String locZ = String.valueOf(location.getZ());
-        String newMessage = message.replaceAll("%coordinates", ChatColor.GREEN + (locX + ", " + good + locY + ", " + good +  locZ));
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&', newMessage)).tooltip(good + "By RandomCoords plugin").send(player);
-    }
-
-    public void notPlayer(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("NotPlayer"))).send(sender);
-    }
-
-    public void cooldownMessage(CommandSender sender, int Time) {
-        String message = RandomCoords.getPlugin().language.getString("CooldownMessage");
-        String messageTime = message.replaceAll("%time", String.valueOf(Time));
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',messageTime)).tooltip(good + " You have " + String.valueOf(Time) + " Seconds Left!").send(sender);
-    }
-
-    public void reloadMessage(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("ReloadFiles"))).send(sender);
-    }
-
-    public void TeleportingIn(CommandSender sender, int Time) {
-        String message = RandomCoords.getPlugin().language.getString("TeleportingIn");
-        String messageFinal = ChatColor.translateAlternateColorCodes('&', message.replaceAll("%time", String.valueOf(Time)));
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',messageFinal)).tooltip(good + "To a random location!").send(sender);
-    }
-
-    public void aboutTo(CommandSender sender, int Time) {
-        String message = RandomCoords.getPlugin().language.getString("AlreadyAboutTo");
-        String messageFinal = message.replaceAll("%time", String.valueOf(Time));
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',messageFinal)).tooltip(good + "You're about to randomly teleport!").send(sender);
-    }
-
-    public void couldntFind(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("TooManyAttempts"))).send(sender);
-    }
-
-    public void reachedLimit(CommandSender sender){
-        String limit = String.valueOf(RandomCoords.getPlugin().config.getInt("Limit"));
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("ReachedLimit"))).tooltip(good + "The limit was " + limit).send(sender);
-    }
-
-    public void onJoin(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("OnJoin"))).tooltip(good + "By RandomCoords Plugin!").send(sender);
-    }
-
-    public void teleportedBy(CommandSender sender, Player target) {
-     String originator = sender.getName();
-     String targetName = target.getDisplayName();
-     String message = RandomCoords.getPlugin().language.getString("TeleportedBy");
-     String finalMessage = message.replaceAll("%player", originator);
-     new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).tooltip(good + "By RandomCoords Plugin!").send(target);
-    }
-
-    public void rcAllUsage(CommandSender sender) {
-        new FancyMessage(prefix).then("Correct Usage: /RC all {Max} {Min} {World}  - {} = Not required").suggest("/rc all").send(sender);
-    }
-
-    public void invalidWorld(CommandSender sender, String worldName) {
-        String message = RandomCoords.getPlugin().language.getString("InvalidWorld");
-        String finalMessage = message.replaceAll("%world", worldName);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
-    }
-
-    public void centerSet(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("CenterSet"))).send(sender);
+    public void teleportMessage(final Player player, final Location location) {
+        final String message = RandomCoords.getPlugin().language.getString("TeleportMessage");
+        final String locX =  String.valueOf(location.getX());
+        final String locY =  String.valueOf(location.getBlockY());
+        final String locZ = String.valueOf(location.getZ());
+        final String newMessage = message.replaceAll("%coordinates", ChatColor.GREEN + (locX + ", " + good + locY + ", " + good +  locZ));
+        player.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', newMessage));
 
     }
 
-    public void signCreated(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("SignCreated"))).send(sender);
+    public void notPlayer(final CommandSender sender) {
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NotPlayer"));
+        sender.sendMessage(prefix + message);
+
     }
 
-    public void noSelection(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("NoSelection"))).suggest("/rc wand").send(sender);
+    public void cooldownMessage(final CommandSender sender, final int Time) {
+        final String message = RandomCoords.getPlugin().language.getString("CooldownMessage");
+        final String messageTime = message.replaceAll("%time", String.valueOf(Time));
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', messageTime));
     }
 
-    public void portalCreated(CommandSender sender, String name, String wname) {
-        String message = RandomCoords.getPlugin().language.getString("PortalCreated");
-        String messageW = message.replaceAll("%world", wname);
-        String finalMessage = messageW.replaceAll("%name", name);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void reloadMessage(final CommandSender sender) {
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReloadFiles"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void incorrectUsage(CommandSender sender, String command, String correct) {
-        new FancyMessage(prefix).then("Incorrect Usage: " + correct).suggest(command).send(sender);
+    public void TeleportingIn(final CommandSender sender, final int Time) {
+        final String message = RandomCoords.getPlugin().language.getString("TeleportingIn");
+        final String messageFinal = ChatColor.translateAlternateColorCodes('&', message.replaceAll("%time", String.valueOf(Time)));
+        String messages = ChatColor.translateAlternateColorCodes('&', messageFinal);
+        sender.sendMessage(prefix + messages);
     }
 
-    public void portalNotExist(CommandSender sender, String name) {
-        String message = RandomCoords.getPlugin().language.getString("PortalNotExist");
-        String finalMessage = message.replaceAll("%name", name);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void aboutTo(final CommandSender sender, final int Time) {
+        final String message = RandomCoords.getPlugin().language.getString("AlreadyAboutTo");
+        final String messageFinal = message.replaceAll("%time", String.valueOf(Time));
+        sender.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', messageFinal));
     }
 
-    public void portalDeleted(CommandSender sender, String name) {
-        String message = RandomCoords.getPlugin().language.getString("PortalDeleted");
-        String finalMessage = message.replaceAll("%name", name);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void couldntFind(final CommandSender sender) {
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("TooManyAttempts"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void portalList(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("PortalList"))).send(sender);
+    public void reachedLimit(final CommandSender sender){
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReachedLimit"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void posInSameWorld(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("PositionInSameWorld"))).send(sender);
+    public void onJoin(final CommandSender sender) {
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("OnJoin"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void maxSet(CommandSender sender, String max, String world) {
-        String message = RandomCoords.getPlugin().language.getString("MaximumSet");
-        String stageOne = message.replaceAll("%world", world);
-        String finalMessage = stageOne.replaceAll("%max", max);
+    public void teleportedBy(final CommandSender sender, final Player target) {
+        final String originator = sender.getName();
+     //String targetName = target.getDisplayName();
+        final String message = RandomCoords.getPlugin().language.getString("TeleportedBy");
+        final String finalMessage = message.replaceAll("%player", originator);
+        target.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', finalMessage));
 
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
     }
 
-    public void minSet(CommandSender sender, String min, String world) {
-        String message = RandomCoords.getPlugin().language.getString("MinimumSet");
-        String stageOne = message.replaceAll("%world", world);
-        String finalMessage = stageOne.replaceAll("%min", min);
+    public void rcAllUsage(final CommandSender sender) {
+        String correct = ChatColor.RED +  "Correct Usage: /RC all {Max} {Min} {World}  - {} = Not required";
+        sender.sendMessage(prefix + correct);
 
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
     }
 
-    public void maxRemove(CommandSender sender, String world) {
-        String message = RandomCoords.getPlugin().language.getString("MaxRemove");
-        String finalMessage = message.replaceAll("%world", world);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void invalidWorld(final CommandSender sender, final String worldName) {
+        final String message = RandomCoords.getPlugin().language.getString("InvalidWorld");
+        final String finalMessage = message.replaceAll("%world", worldName);
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', finalMessage));
+
     }
 
-    public void minRemove(CommandSender sender, String world) {
-        String message = RandomCoords.getPlugin().language.getString("MinRemove");
-        String finalMessage = message.replaceAll("%world", world);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void centerSet(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("CenterSet"));
+        sender.sendMessage(prefix + message);
+
+    }
+    public void signCreated(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("SignCreated"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void centerRemove(CommandSender sender, String world) {
-        String message = RandomCoords.getPlugin().language.getString("CenterRemove");
-        String finalMessage = message.replaceAll("%world", world);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void noSelection(final CommandSender sender) {
+        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoSelection"));
+        sender.sendMessage(prefix + message);
+    }
+
+    public void portalCreated(final CommandSender sender, final String name, final String wname) {
+        final String message = RandomCoords.getPlugin().language.getString("PortalCreated");
+        final String messageW = message.replaceAll("%world", wname);
+        final String finalMessage = messageW.replaceAll("%name", name);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void incorrectUsage(final CommandSender sender, final String command, final  String correct) {
+        final String message = ChatColor.translateAlternateColorCodes('&', "Incorrect Usage: " + correct);
+        sender.sendMessage(prefix + ChatColor.RED  + message);
+    }
+
+    public void portalNotExist(final CommandSender sender, final String name) {
+        final String message = RandomCoords.getPlugin().language.getString("PortalNotExist");
+        final String finalMessage = message.replaceAll("%name", name);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void portalDeleted(final CommandSender sender, final String name) {
+        final String message = RandomCoords.getPlugin().language.getString("PortalDeleted");
+        final String finalMessage = message.replaceAll("%name", name);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void portalList(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("PortalList"));
+        sender.sendMessage(prefix + message);
+    }
+
+    public void posInSameWorld(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("PositionInSameWorld"));
+        sender.sendMessage(prefix + message);
+    }
+
+    public void maxSet(final CommandSender sender, final String max, final  String world) {
+        final String message = RandomCoords.getPlugin().language.getString("MaximumSet");
+        final String stageOne = message.replaceAll("%world", world);
+        final String finalMessage = stageOne.replaceAll("%max", max);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void minSet(final CommandSender sender, final String min, final String world) {
+        final String message = RandomCoords.getPlugin().language.getString("MinimumSet");
+        final String stageOne = message.replaceAll("%world", world);
+        final String finalMessage = stageOne.replaceAll("%min", min);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void maxRemove(final CommandSender sender, final String world) {
+        final String message = RandomCoords.getPlugin().language.getString("MaxRemove");
+        final String finalMessage = message.replaceAll("%world", world);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void minRemove(final CommandSender sender, final  String world) {
+        final String message = RandomCoords.getPlugin().language.getString("MinRemove");
+        final String finalMessage = message.replaceAll("%world", world);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
+    public void centerRemove(final CommandSender sender, final String world) {
+        final String message = RandomCoords.getPlugin().language.getString("CenterRemove");
+        final String finalMessage = message.replaceAll("%world", world);
+        final String messages = ChatColor.translateAlternateColorCodes('&',finalMessage);
+        sender.sendMessage(prefix + messages);
     }
 
 
-    public void youMoved(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("MovedTooFar"))).send(sender);
+    public void youMoved(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MovedTooFar"));
+        sender.sendMessage(prefix + message);
     }
 
 
-    public void tookDamage(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("CantUseInCombat"))).send(sender);
+    public void tookDamage(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("CantUseInCombat"));
+        sender.sendMessage(prefix + message);
     }
 
 
-    public void worldBanned(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("WorldBanned"))).send(sender);
+    public void worldBanned(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WorldBanned"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void warpSet(CommandSender sender, String name) {
-        String message = RandomCoords.getPlugin().language.getString("WarpSet");
-        String finalMessage = message.replaceAll("%name", name);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void warpSet(final CommandSender sender, final String name) {
+        final String message = RandomCoords.getPlugin().language.getString("WarpSet");
+        final String finalMessage = message.replaceAll("%name", name);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
     }
 
-    public void warpDelete(CommandSender sender, String name) {
-        String message = RandomCoords.getPlugin().language.getString("WarpDelete");
-        String finalMessage = message.replaceAll("%name", name);
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',finalMessage)).send(sender);
+    public void warpDelete(final CommandSender sender, final String name) {
+        final String message = RandomCoords.getPlugin().language.getString("WarpDelete");
+        final String finalMessage = message.replaceAll("%name", name);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
     }
 
-    public void noWarps(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("NoWarps"))).send(sender);
+    public void noWarps(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoWarps"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void noCommand(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("NoSuchCommand"))).send(sender);
+    public void noCommand(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoSuchCommand"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void charged(CommandSender sender, double cost) {
-        String message = RandomCoords.getPlugin().language.getString("Charged");
-        String costMessage = message.replaceAll("%cost", String.valueOf(cost));
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',costMessage)).send(sender);
+    public void charged(final CommandSender sender, final double cost) {
+        final String message = RandomCoords.getPlugin().language.getString("Charged");
+        final String costMessage = message.replaceAll("%cost", String.valueOf(cost));
+        final String messages = ChatColor.translateAlternateColorCodes('&', costMessage);
+        sender.sendMessage(prefix + messages);
     }
 
-    public void cost(CommandSender sender, double cost) {
-        String message = RandomCoords.getPlugin().language.getString("Cost");
-        String costMessage = message.replaceAll("%cost", String.valueOf(cost));
-
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',costMessage)).send(sender);
+    public void cost(final CommandSender sender, final double cost) {
+        final String message = RandomCoords.getPlugin().language.getString("Cost");
+        final String costMessage = message.replaceAll("%cost", String.valueOf(cost));
+        final String messages = ChatColor.translateAlternateColorCodes('&', costMessage);
+        sender.sendMessage(prefix + message);
     }
 
-    public void warpNotExist(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&',RandomCoords.getPlugin().language.getString("WarpNotExist"))).send(sender);
+    public void warpNotExist(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WarpNotExist"));
+        sender.sendMessage(prefix + message);
     }
 
-    public void wandGiven(CommandSender sender) {
-        new FancyMessage(prefix).then(ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WandGive"))).send(sender);
+    public void wandGiven(final CommandSender sender) {
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WandGive"));
+        sender.sendMessage(prefix + message);
     }
 
 

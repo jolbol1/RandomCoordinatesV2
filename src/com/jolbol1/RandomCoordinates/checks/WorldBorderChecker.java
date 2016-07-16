@@ -13,11 +13,11 @@ public class WorldBorderChecker {
 
 
     //Check if Random Location is in the WorldBorder
-    public boolean WorldBorderCheck(Location l) {
+    public boolean WorldBorderCheck(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("WorldBorder") == null)) {
             if (RandomCoords.getPlugin().config.getString("WorldBorder").equalsIgnoreCase("true")) {
 
-                BorderData border = Config.Border(l.getWorld().getName());
+                final BorderData border = Config.Border(l.getWorld().getName());
                 return border == null || border.insideBorder(l);
 
             } else {

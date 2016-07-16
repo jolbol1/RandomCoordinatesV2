@@ -16,23 +16,23 @@ import org.bukkit.entity.Player;
  */
 public class Others implements CommandInterface {
 
-    private Coordinates coordinates = new Coordinates();
-    private MessageManager messages = new MessageManager();
+    private final Coordinates coordinates = new Coordinates();
+    private final MessageManager messages = new MessageManager();
 
     @Override
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void onCommand(final CommandSender sender, final Command  cmd, final String commandLabel, final String[] args) {
         if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Others") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 1 && args[0].equalsIgnoreCase("player")) {
                 messages.incorrectUsage(sender, "/RC Player", "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
                 return;
             }
             if (args.length == 2 && args[0].equalsIgnoreCase("player")) {
-                String target = args[1];
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                final String target = args[1];
+                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getName().equalsIgnoreCase(target)) {
 
                         //Check if world banned
-                        for (String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
                             if (player.getWorld().getName().equals(worlds)) {
                                 messages.worldBanned(sender);
                                 return;
@@ -46,16 +46,17 @@ public class Others implements CommandInterface {
 
 
             } else if (args.length == 3 && args[0].equalsIgnoreCase("player")) {
-                String target = args[1];
-                String wName = args[2];
+                final String wName = args[2];
                 if (Bukkit.getServer().getWorld(wName) == null) {
                     messages.invalidWorld(sender, wName);
                     return;
                 }
-                World world = Bukkit.getServer().getWorld(wName);
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                final World world = Bukkit.getServer().getWorld(wName);
+                final String target = args[1];
+
+                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getName().equalsIgnoreCase(target)) {
-                        for (String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
                             if (world.getName().equals(worlds)) {
                                 messages.worldBanned(sender);
                                 return;
@@ -68,23 +69,23 @@ public class Others implements CommandInterface {
                     }
                 }
             } else if (args.length == 4 && args[0].equalsIgnoreCase("player")) {
-                String target = args[1];
-                String wName = args[2];
-                int max = 574272099;
+                final String wName = args[2];
                 if (Bukkit.getServer().getWorld(wName) == null) {
                     messages.invalidWorld(sender, wName);
                     return;
                 }
+                int max = 574272099;
                 try {
                     max = Integer.valueOf(args[3]);
                 } catch (NumberFormatException e) {
                     messages.incorrectUsage(sender, "/RC Player", "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
                     return;
                 }
-                World world = Bukkit.getServer().getWorld(wName);
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                final World world = Bukkit.getServer().getWorld(wName);
+                final String target = args[1];
+                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getName().equalsIgnoreCase(target)) {
-                        for (String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
                             if (world.getName().equals(worlds)) {
                                 messages.worldBanned(sender);
                                 return;
@@ -97,14 +98,13 @@ public class Others implements CommandInterface {
                     }
                 }
             } else if (args.length == 5) {
-                String target = args[1];
-                String wName = args[2];
-                int max = 574272099;
-                int min = 574272099;
+                final String wName = args[2];
                 if (Bukkit.getServer().getWorld(wName) == null) {
                     messages.invalidWorld(sender, wName);
                     return;
                 }
+                int min = 574272099;
+                int max = 574272099;
                 try {
                     max = Integer.valueOf(args[3]);
                     min = Integer.valueOf(args[4]);
@@ -112,10 +112,11 @@ public class Others implements CommandInterface {
                     messages.incorrectUsage(sender, "/RC Player", "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
                     return;
                 }
-                World world = Bukkit.getServer().getWorld(wName);
-                for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+                final String target = args[1];
+                final World world = Bukkit.getServer().getWorld(wName);
+                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
                     if (player.getName().equalsIgnoreCase(target)) {
-                        for (String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
                             if (world.getName().equals(worlds)) {
                                 messages.worldBanned(sender);
                                 return;
@@ -128,7 +129,6 @@ public class Others implements CommandInterface {
             }
         } else {
             messages.noPermission(sender);
-            return;
         }
     }
 }

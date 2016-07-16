@@ -2,7 +2,6 @@ package com.jolbol1.RandomCoordinates;
 
 import com.earth2me.essentials.Essentials;
 import com.jolbol1.RandomCoordinates.commands.*;
-import com.jolbol1.RandomCoordinates.commands.WandGive;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandHandler;
 import com.jolbol1.RandomCoordinates.listeners.*;
 import com.jolbol1.RandomCoordinates.managers.ConstructTabCompleter;
@@ -31,9 +30,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,13 +41,13 @@ import java.util.logging.Logger;
  */
 public class RandomCoords extends JavaPlugin {
 
-    private Logger logger;
-    public Map<Player, Location> wandSelection = new HashMap<>();
-    public static Economy econ = null;
+    public static Logger logger;
+    public final Map<Player, Location> wandSelection = new ConcurrentHashMap<>();
+    private static Economy econ;
 
 
 
-    public static Plugin plugin;
+    private static Plugin plugin;
 
     public FileConfiguration language;
     public FileConfiguration config;
@@ -61,11 +60,8 @@ public class RandomCoords extends JavaPlugin {
     private File limiterFile;
     private File portalsFile;
     private File warpFile;
-    private Essentials ess3 = null;
-    private MessageManager messages = new MessageManager();
-    public String ANSI_RESET = "\u001B[0m";
-    public String ANSI_BLUE = "\u001B[34m";
-    public String ANSI_BOLD = "\u001B[1m";
+    private Essentials ess3;
+    private final MessageManager messages = new MessageManager();
 
     public static RandomCoords getPlugin() {
         return JavaPlugin.getPlugin(RandomCoords.class);
@@ -74,10 +70,13 @@ public class RandomCoords extends JavaPlugin {
     public void onEnable() {
         logger = Bukkit.getServer().getLogger();
         plugin = this;
-        PluginManager pm = getServer().getPluginManager();
-        CommandHandler handler = new CommandHandler();
-        PluginDescriptionFile pdf = getDescription();
-        logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD+ pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
+        final PluginManager pm = getServer().getPluginManager();
+        final CommandHandler handler = new CommandHandler();
+        final PluginDescriptionFile pdf = getDescription();
+        final String ANSI_RESET = "\u001B[0m";
+        final String ANSI_BOLD = "\u001B[1m";
+        final String ANSI_BLUE = "\u001B[34m";
+        logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
 
         if(Bukkit.getServer().getPluginManager().getPlugin("Essentials") != null) {
             ess3 = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
@@ -143,7 +142,7 @@ public class RandomCoords extends JavaPlugin {
         pm.registerEvents(new SignClick(), this);
         pm.registerEvents(new BlockPortal(), this);
         pm.registerEvents(new InNetherPortal(), this);
-        pm.registerEvents(new com.jolbol1.RandomCoordinates.listeners.Wand(), this);
+        pm.registerEvents(new Wand(), this);
         handler.register("rc", new RandomCommand());
         handler.register("wand", new WandGive());
         handler.register("reload", new Reload());
@@ -157,30 +156,30 @@ public class RandomCoords extends JavaPlugin {
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
 
 
-        PortalEnter pe = new PortalEnter();
+        final PortalEnter pe = new PortalEnter();
         pe.runTaskTimer(this, 0L, 20L);
 
 
 
     }
 
-    void matchLanguage() {
+    private void matchLanguage() {
 
-        InputStream is = getResource("language-defaults.yml");
+        final InputStream is = getResource("language-defaults.yml");
         if (is != null) {
 
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource("language-defaults.yml")));
+            final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource("language-defaults.yml")));
+            final File updateConfig = new File(getDataFolder(), "language.yml");
 
-            for (String key : defConfig.getConfigurationSection("").getKeys(false)) {
+            for (final String key : defConfig.getConfigurationSection("").getKeys(false)) {
 
-                File updateConfig = new File(getDataFolder(), "language.yml");
-                YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
+                final YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
                 if (!newConfig.contains(key)) {
                     language.set(key, defConfig.get(key));
                     try {
                         language.save(languageFile);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE, "There was an error matching the language.yml file!");
                     }
 
                 }
@@ -189,23 +188,23 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
-    void matchConfig() {
+    private void matchConfig() {
 
-        InputStream is = getResource("config-defaults.yml");
+        final InputStream is = getResource("config-defaults.yml");
         if (is != null) {
 
-            YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource("config-defaults.yml")));
+            final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource("config-defaults.yml")));
+            final File updateConfig = new File(getDataFolder(), "config.yml");
 
-            for (String key : defConfig.getConfigurationSection("").getKeys(false)) {
+            for (final String key : defConfig.getConfigurationSection("").getKeys(false)) {
 
-                File updateConfig = new File(getDataFolder(), "config.yml");
-                YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
+                final YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
                 if (!newConfig.contains(key)) {
                     config.set(key, defConfig.get(key));
                     try {
                         config.save(configFile);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.log(Level.SEVERE, " There was a problem matching the config.yml!");
                     }
 
                 }
@@ -223,9 +222,9 @@ public class RandomCoords extends JavaPlugin {
             languageFile = new File(plugin.getDataFolder(), "language.yml");
         }
         language = YamlConfiguration.loadConfiguration(languageFile);
-        InputStream defLanguageStream = plugin.getResource("language.yml");
+        final InputStream defLanguageStream = plugin.getResource("language.yml");
         if(defLanguageStream != null) {
-            YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
+            final YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
             language.setDefaults(defLanguage);
         }
 
@@ -236,9 +235,9 @@ public class RandomCoords extends JavaPlugin {
             configFile = new File(plugin.getDataFolder(), "config.yml");
         }
         config = YamlConfiguration.loadConfiguration(configFile);
-        InputStream defLanguageStream = plugin.getResource("config.yml");
+        final InputStream defLanguageStream = plugin.getResource("config.yml");
         if(defLanguageStream != null) {
-            YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
+            final YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
             config.setDefaults(defLanguage);
         }
 
@@ -291,10 +290,10 @@ public class RandomCoords extends JavaPlugin {
 
 
     public WorldGuardPlugin getWorldGuard() {
-        Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+        final Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
 
         // WorldGuard may not be loaded
-        if (plugin == null || !(plugin instanceof WorldGuardPlugin)) {
+        if (!(plugin instanceof WorldGuardPlugin)) {
             return null; // Maybe you want throw an exception instead
         }
 
@@ -308,33 +307,29 @@ public class RandomCoords extends JavaPlugin {
 
 
     public ItemStack wand() {
-        ItemStack wand = new ItemStack(Material.GOLD_AXE);
-        ItemMeta itemMeta = wand.getItemMeta();
+        final ItemStack wand = new ItemStack(Material.GOLD_AXE);
+        final ItemMeta itemMeta = wand.getItemMeta();
         itemMeta.setDisplayName(ChatColor.GOLD + "Random Wand");
-        List<String> lore = new ArrayList<String>();
+        final List<String> lore = new ArrayList<>();
         lore.add("Wand for portal creation!");
         itemMeta.setLore(lore);
         wand.setItemMeta(itemMeta);
         return wand;
     }
 
-    public String PortalMap(String position, Player p) {
+    public String PortalMap(final String position, final Player p) {
         return position + p.getName();
     }
 
-    public boolean hasPermission(CommandSender sender, String permission) {
-        if(sender.hasPermission(permission)) {
-            return true;
-        } else {
-            return false;
-        }
+    public boolean hasPermission(final CommandSender sender, final String permission) {
+        return sender.hasPermission(permission);
     }
 
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
-        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        final RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
             return false;
         }
@@ -346,11 +341,11 @@ public class RandomCoords extends JavaPlugin {
         return econ;
     }
 
-    public boolean hasPayed(Player p, double cost) {
+    public boolean hasPayed(final Player p, final double cost) {
         if(!setupEconomy() || cost == 0) {
             return true;
         } else {
-            EconomyResponse r = econ.withdrawPlayer(p, cost);
+            final EconomyResponse r = econ.withdrawPlayer(p, cost);
             if(r.transactionSuccess()) {
                 messages.charged(p, cost);
                 return true;
@@ -363,19 +358,17 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
-    public boolean hasMoney(Player p, double cost) {
+    public boolean hasMoney(final Player p, final double cost) {
         if(!setupEconomy() || cost == 0) {
             return true;
         } else {
-            if(cost > econ.getBalance(p)) {
-                return false;
-            } else {
-                return true;
+            return cost > econ.getBalance(p);
             }
         }
 
-    }
+
 
 
 
 }
+

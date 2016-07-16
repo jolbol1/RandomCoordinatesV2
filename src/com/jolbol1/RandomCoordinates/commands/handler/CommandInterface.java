@@ -7,6 +7,6 @@ import org.bukkit.command.CommandSender;
 public interface CommandInterface {
 
     //Every time I make a command, I will use this same method.
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args);
+    void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args);
 
 }

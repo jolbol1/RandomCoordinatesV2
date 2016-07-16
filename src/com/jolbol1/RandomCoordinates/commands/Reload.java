@@ -11,10 +11,10 @@ import org.bukkit.command.CommandSender;
  */
 public class Reload implements CommandInterface {
 
-    MessageManager messages = new MessageManager();
+    private final MessageManager messages = new MessageManager();
 
     @Override
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void onCommand(final CommandSender sender, final Command  cmd, final String commandLabel, final String[] args) {
         if(args.length == 1) {
             if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Reload") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if(args[0].equalsIgnoreCase("reload")) {
@@ -25,7 +25,6 @@ public class Reload implements CommandInterface {
             }
         } else {
                 messages.noPermission(sender);
-                return;
 
             }
         }

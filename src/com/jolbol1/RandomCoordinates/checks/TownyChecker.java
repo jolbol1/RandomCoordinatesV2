@@ -12,28 +12,28 @@ import org.bukkit.block.Block;
  */
 public class TownyChecker {
 
-    public boolean TownyCheck(Location l) {
+    public boolean TownyCheck(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("Towny") == null)) {
             if (RandomCoords.getPlugin().config.getString("Towny").equals("true")) {
-                int X = l.getBlockX();
-                int Y = l.getBlockY();
-                int Z = l.getBlockZ();
+                final int X = l.getBlockX();
+                final int Y = l.getBlockY();
+                final int Z = l.getBlockZ();
 
-                int r = RandomCoords.getPlugin().config.getInt("CheckingRadius");
+                final int r = RandomCoords.getPlugin().config.getInt("CheckingRadius");
 
                 int x = X - r;
                 int y = Y - r;
                 int z = Z - r;
 
-                int bx = x;
-                int bz = z;
+                final int bx = x;
+                final int bz = z;
 
 
                 for (int i = 0; i < r * 2 + 1; i++) {
                     for (int j = 0; j < r * 2 + 1; j++) {
                         for (int k = 0; k < r * 2 + 1; k++) {
-                            Block b = l.getWorld().getBlockAt(x, y, z);
-                            TownBlock tb = TownyUniverse.getTownBlock(b.getLocation());
+                            final Block b = l.getWorld().getBlockAt(x, y, z);
+                            final TownBlock tb = TownyUniverse.getTownBlock(b.getLocation());
                             if(tb != null) {
                                 return false;
                             }

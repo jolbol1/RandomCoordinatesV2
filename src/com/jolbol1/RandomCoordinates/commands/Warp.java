@@ -21,17 +21,16 @@ import java.util.Set;
  */
 public class Warp implements CommandInterface {
 
-    private MessageManager messages = new MessageManager();
-    private Coordinates coordinates = new Coordinates();
+    private final MessageManager messages = new MessageManager();
+    private final Coordinates coordinates = new Coordinates();
 
     @Override
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
        if(sender instanceof ConsoleCommandSender) { messages.notPlayer(sender); return; }
 
-        if(args.length == 1) {
-            if(args[0].equalsIgnoreCase("warp")) {
+        if(args.length == 1 && args[0].equalsIgnoreCase("warp")) {
                 if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-                    Player p = (Player) sender;
+                    final Player p = (Player) sender;
                     coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.WARPS, 0);
                     return;
                 } else {
@@ -39,58 +38,53 @@ public class Warp implements CommandInterface {
                     return;
 
                 }
-            }
+
         }
 
 
-        Player p = (Player) sender;
+        final Player p = (Player) sender;
         if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Warp") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("set") && args[2] != null) {
-                    String warpName = args[2].toString();
-                    Location location = p.getLocation();
-                    double xD = location.getX();
-                    double yD = location.getBlockY();
-                    double zD = location.getBlockZ();
-                    double x = Math.floor(xD) + 0.5;
-                    double y = Math.floor(yD);
-                    double z = Math.floor(zD) + 0.5;
-                    World world = location.getWorld();
+                    final String warpName = args[2];
+                    final Location location = p.getLocation();
+                    final double xD = location.getX();
+                    final double yD = location.getBlockY();
+                    final double zD = location.getBlockZ();
+                    final double x = Math.floor(xD) + 0.5;
+                    final double y = Math.floor(yD);
+                    final double z = Math.floor(zD) + 0.5;
+                    final World world = location.getWorld();
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".X", x);
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Y", y);
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Z", z);
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".World", world.getName());
                     RandomCoords.getPlugin().saveWarps();
                     messages.warpSet(sender, warpName);
-                    return;
                 } else if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("delete") && args[2] != null) {
-                    String warpName = args[2].toString();
+                    final String warpName = args[2];
                     if(RandomCoords.getPlugin().warps.getString("Warps." + warpName) != null) {
                         RandomCoords.getPlugin().warps.set("Warps." + warpName, null);
                         RandomCoords.getPlugin().saveWarps();
                         messages.warpDelete(sender, warpName);
-                        return;
                     } else {
                         messages.warpNotExist(sender);
-                        return;
                     }
                 }
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("list")) {
-                    Set<String> warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
+                    final Set<String> warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
                     sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Warps:");
 
-                    for (String name : warps) {
+                    for (final String name : warps) {
                         sender.sendMessage(ChatColor.GREEN + name);
                     }
-                } else if(args[0].equalsIgnoreCase("warp") && Bukkit.getServer().getWorld(args[1].toString()) != null) {
-                    World world = Bukkit.getServer().getWorld(args[1].toString());
+                } else if(args[0].equalsIgnoreCase("warp") && Bukkit.getServer().getWorld(args[1]) != null) {
+                    final World world = Bukkit.getServer().getWorld(args[1]);
                     if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
                         coordinates.finalCoordinates(p, 574272099, 574272099, world, CoordType.WARPS, 0);
-                        return;
                     } else {
                         messages.noPermission(sender);
-                        return;
 
                     }
                 }
@@ -98,7 +92,6 @@ public class Warp implements CommandInterface {
             }
         } else {
             messages.noPermission(sender);
-            return;
 
         }
     }

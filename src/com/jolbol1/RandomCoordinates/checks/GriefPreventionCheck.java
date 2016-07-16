@@ -13,33 +13,33 @@ import org.bukkit.block.Block;
 public class GriefPreventionCheck {
 
 
-    public boolean griefPrevent(Location l) {
+    public boolean griefPrevent(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention") == null)) {
             if (RandomCoords.getPlugin().config.getString("GriefPrevention").equals("true")) {
 
-                GriefPrevention gp = GriefPrevention.instance;
+                final GriefPrevention gp = GriefPrevention.instance;
 
 
-                int X = l.getBlockX();
-                int Y = l.getBlockY();
-                int Z = l.getBlockZ();
+                final int X = l.getBlockX();
+                final int Y = l.getBlockY();
+                final int Z = l.getBlockZ();
 
-                int r = RandomCoords.getPlugin().config.getInt("CheckingRadius");
+                final int r = RandomCoords.getPlugin().config.getInt("CheckingRadius");
 
                 int x = X - r;
                 int y = Y - r;
                 int z = Z - r;
 
-                int bx = x;
-                int bz = z;
+                final int bx = x;
+                final int bz = z;
 
 
                 for (int i = 0; i < r * 2 + 1; i++) {
                     for (int j = 0; j < r * 2 + 1; j++) {
                         for (int k = 0; k < r * 2 + 1; k++) {
 
-                            Block b = l.getWorld().getBlockAt(x, y, z);
-                            Claim myClaim = gp.dataStore
+                            final Block b = l.getWorld().getBlockAt(x, y, z);
+                            final Claim myClaim = gp.dataStore
                                     .getClaimAt(b.getLocation(), false, null);
                             if (!(myClaim == null)) {
                                 return false;

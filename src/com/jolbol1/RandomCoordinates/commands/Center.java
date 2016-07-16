@@ -15,55 +15,53 @@ import org.bukkit.entity.Player;
  */
 public class Center implements CommandInterface {
 
-    private MessageManager messages = new MessageManager();
+    private final MessageManager messages = new MessageManager();
 
 
     @Override
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
         if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Settings") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 3) {
                 if (!args[0].equalsIgnoreCase("set")) {
                     return;
                 }
                 World world;
-                if (Bukkit.getServer().getWorld(args[1].toString()) != null) {
-                    world = Bukkit.getServer().getWorld(args[1].toString());
+                if (Bukkit.getServer().getWorld(args[1]) != null) {
+                    world = Bukkit.getServer().getWorld(args[1]);
                 } else {
-                    messages.invalidWorld(sender, args[1].toString());
+                    messages.invalidWorld(sender, args[1]);
                     return;
                 }
                 if (args[2].equalsIgnoreCase("center")) {
                     if (sender instanceof Player) {
-                        Player p = (Player) sender;
-                        Location pLoc = p.getLocation();
-                        int x = pLoc.getBlockX();
-                        int y = pLoc.getBlockY();
-                        int z = pLoc.getBlockZ();
-                        String wName = world.getName();
+                        final Player p = (Player) sender;
+                        final Location pLoc = p.getLocation();
+                        final int x = pLoc.getBlockX();
+                        final int y = pLoc.getBlockY();
+                        final int z = pLoc.getBlockZ();
+                        final String wName = world.getName();
                         RandomCoords.getPlugin().config.set(wName + ".Center.X", x);
                         RandomCoords.getPlugin().config.set(wName + ".Center.Y", y);
                         RandomCoords.getPlugin().config.set(wName + ".Center.Z", z);
                         RandomCoords.getPlugin().saveCustomConfig();
                         messages.centerSet(sender);
-                        return;
                     }
 
 
                 } else {
                     messages.incorrectUsage(sender, "/RC set", "/RC set {World} Center/Max/Min {Max/Min}");
-                    return;
 
                 }
             } else if (args.length == 4) {
                 if (args[2].equalsIgnoreCase("max")) {
                     World world;
-                    if (Bukkit.getServer().getWorld(args[1].toString()) != null) {
-                        world = Bukkit.getServer().getWorld(args[1].toString());
+                    if (Bukkit.getServer().getWorld(args[1]) != null) {
+                        world = Bukkit.getServer().getWorld(args[1]);
                     } else {
-                        messages.invalidWorld(sender, args[1].toString());
+                        messages.invalidWorld(sender, args[1]);
                         return;
                     }
-                    int max;
+
                     if (args[3].equalsIgnoreCase("global")) {
                         RandomCoords.getPlugin().config.set(world.getName() + ".Max", null);
                         RandomCoords.getPlugin().saveCustomConfig();
@@ -71,6 +69,7 @@ public class Center implements CommandInterface {
 
                         return;
                     }
+                    int max;
                     try {
                         max = Integer.valueOf(args[3]);
                     } catch (NumberFormatException e) {
@@ -78,27 +77,26 @@ public class Center implements CommandInterface {
                         return;
                     }
 
-                    String wName = world.getName();
+                    final String wName = world.getName();
                     RandomCoords.getPlugin().config.set(wName + ".Max", max);
                     RandomCoords.getPlugin().saveCustomConfig();
                     messages.maxSet(sender, String.valueOf(max), world.getName());
-                    return;
 
                 } else if (args[2].equalsIgnoreCase("min")) {
                     World world;
-                    if (Bukkit.getServer().getWorld(args[1].toString()) != null) {
-                        world = Bukkit.getServer().getWorld(args[1].toString());
+                    if (Bukkit.getServer().getWorld(args[1]) != null) {
+                        world = Bukkit.getServer().getWorld(args[1]);
                     } else {
-                        messages.invalidWorld(sender, args[1].toString());
+                        messages.invalidWorld(sender, args[1]);
                         return;
                     }
-                    int min;
                     if (args[3].equalsIgnoreCase("global")) {
                         RandomCoords.getPlugin().config.set(world.getName() + ".Min", null);
                         RandomCoords.getPlugin().saveCustomConfig();
                         messages.minRemove(sender, world.getName());
                         return;
                     }
+                    int min;
                     try {
                         min = Integer.valueOf(args[3]);
                     } catch (NumberFormatException e) {
@@ -106,32 +104,28 @@ public class Center implements CommandInterface {
                         return;
                     }
 
-                    String wName = world.getName();
+                    final String wName = world.getName();
                     RandomCoords.getPlugin().config.set(wName + ".Min", min);
                     RandomCoords.getPlugin().saveCustomConfig();
                     messages.minSet(sender, String.valueOf(min), world.getName());
-                    return;
-                } else if (args[2].equalsIgnoreCase("center")) {
-                    if (args[3].equalsIgnoreCase("remove")) {
+                } else if (args[2].equalsIgnoreCase("center") && args[3].equalsIgnoreCase("remove")) {
                         World world;
-                        if (Bukkit.getServer().getWorld(args[1].toString()) != null) {
-                            world = Bukkit.getServer().getWorld(args[1].toString());
+                        if (Bukkit.getServer().getWorld(args[1]) != null) {
+                            world = Bukkit.getServer().getWorld(args[1]);
                         } else {
-                            messages.invalidWorld(sender, args[1].toString());
+                            messages.invalidWorld(sender, args[1]);
                             return;
                         }
                         RandomCoords.getPlugin().config.set(world.getName() + ".Center", null);
                         RandomCoords.getPlugin().saveCustomConfig();
                         messages.centerRemove(sender, world.getName());
-                    }
+
                 }
             } else {
                 messages.incorrectUsage(sender, "/RC set", "/RC set {World} Center/Max/Min {Max/Min}");
-                return;
             }
         } else {
             messages.noPermission(sender);
-            return;
         }
     }
 }

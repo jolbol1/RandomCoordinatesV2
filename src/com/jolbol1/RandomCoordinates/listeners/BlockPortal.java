@@ -3,13 +3,10 @@ package com.jolbol1.RandomCoordinates.listeners;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Set;
 
@@ -18,38 +15,37 @@ import java.util.Set;
  */
 public class BlockPortal implements Listener {
 
-    private PortalEnter pe = new PortalEnter();
-    private InNetherPortal inNetherPortal = new InNetherPortal();
     @EventHandler
-    public void blockPhysics(BlockPhysicsEvent e) {
+    public void blockPhysics(final BlockPhysicsEvent e) {
         if(RandomCoords.getPlugin().portals.get("Portal")== null) { return; }
-        Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
-        for (String name : portals) {
+        final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
+        for (final String name : portals) {
 
-            int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
-            int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
-            int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
 
-            int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
-            int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
-            int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
-            String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
-            String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
+            final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
             if(Bukkit.getServer().getWorld(world) == null) {
                 Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
                 return;
 
             }
+            final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
+
             if(Bukkit.getServer().getWorld(portalWorld) == null) {
                 Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
                 return;
 
             }
-            World w = Bukkit.getServer().getWorld(portalWorld);
-            Location l1 = new Location(w, p1x, p1y, p1z);
-            Location l2 = new Location(w, p2x, p2y, p2z);
+            final World w = Bukkit.getServer().getWorld(portalWorld);
+            final int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
+            final int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
+            final int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
 
-                World worldW = Bukkit.getServer().getWorld(world);
+            final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
+            final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
+            final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
+            final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
+            final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
+
                 if(isInside(e.getBlock().getLocation(), l1, l2)) {
                     e.setCancelled(true);
                     return;
@@ -60,16 +56,16 @@ public class BlockPortal implements Listener {
     }
 
     //Written by desht
-    private boolean isInside(Location loc, Location l1, Location l2) {
-        int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
-        int y1 = Math.min(l1.getBlockY(), l2.getBlockY());
-        int z1 = Math.min(l1.getBlockZ(), l2.getBlockZ());
-        int x2 = Math.max(l1.getBlockX(), l2.getBlockX());
-        int y2 = Math.max(l1.getBlockY(), l2.getBlockY());
-        int z2 = Math.max(l1.getBlockZ(), l2.getBlockZ());
-        int x = loc.getBlockX();
-        int y = loc.getBlockY();
-        int z = loc.getBlockZ();
+    private boolean isInside(final Location loc, final Location l1, final Location l2) {
+        final int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
+        final int y1 = Math.min(l1.getBlockY(), l2.getBlockY());
+        final int z1 = Math.min(l1.getBlockZ(), l2.getBlockZ());
+        final int x2 = Math.max(l1.getBlockX(), l2.getBlockX());
+        final int y2 = Math.max(l1.getBlockY(), l2.getBlockY());
+        final int z2 = Math.max(l1.getBlockZ(), l2.getBlockZ());
+        final int x = loc.getBlockX();
+        final int y = loc.getBlockY();
+        final int z = loc.getBlockZ();
 
         return x >= x1 && x <= x2 && y >= y1 && y <= y2 && z >= z1 && z <= z2;
     }

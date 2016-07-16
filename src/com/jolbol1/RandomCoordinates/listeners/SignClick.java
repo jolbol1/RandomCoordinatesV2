@@ -19,16 +19,16 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 public class SignClick implements Listener {
 
-   private MessageManager messages = new MessageManager();
-    private Coordinates coordinates = new Coordinates();
+   private final MessageManager messages = new MessageManager();
+    private final Coordinates coordinates = new Coordinates();
 
     @EventHandler
-    public void onClickEvent(PlayerInteractEvent e) {
+    public void onClickEvent(final PlayerInteractEvent e) {
         double cost = 0;
         String line1 = null;
             if(e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 if(e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN || e.getClickedBlock().getType() == Material.SIGN_POST) {
-                    Sign sign = (Sign) e.getClickedBlock().getState();
+                    final Sign sign = (Sign) e.getClickedBlock().getState();
                 if(sign.getLine(0).equalsIgnoreCase(ChatColor.GREEN + "[RandomCoords]")) {
                     if((RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Sign") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) && e.getAction() == Action.LEFT_CLICK_BLOCK) {
                         e.setCancelled(false);
@@ -48,7 +48,9 @@ public class SignClick implements Listener {
 
 
                         }
-                        if(sign.getLine(2).length() != 0 || sign.getLine(2) != null ) {
+                        if(sign.getLine(2).replaceAll("\uF701", "").length() == 0 || sign.getLine(2).replaceAll("\uF701", "") == null || sign.getLine(2).replaceAll("\uF701", "") == "" || sign.getLine(2).replaceAll("\uF701", "") == " ") {
+
+                        } else {
                             try {
                                 cost = Double.valueOf(sign.getLine(2).replaceAll("\uF701", ""));
                             } catch (NumberFormatException Ne) {
@@ -60,7 +62,6 @@ public class SignClick implements Listener {
                             coordinates.finalCoordinates(e.getPlayer(), 574272099, 574272099, world, CoordType.SIGN, cost);
                         } else {
                             messages.cost(e.getPlayer(), cost);
-                            return;
                         }
 
                     } else {

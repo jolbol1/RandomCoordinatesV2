@@ -13,16 +13,20 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class Suffocation implements Listener {
 
     @EventHandler
-    public void OnSuffocation(EntityDamageEvent e){
+    public void OnSuffocation(final EntityDamageEvent e){
         if(!(e.getEntity() instanceof Player)) { return; }
         if(e.getCause() != EntityDamageEvent.DamageCause.SUFFOCATION ) { return; }
-        Player p = (Player) e.getEntity();
+        final Player p = (Player) e.getEntity();
 
         //Are they in the Invul Cooldown initiated in FinalCoordinates of Coordinate Class?
         if(!Cooldown.isInCooldown(p.getUniqueId(), "Invul")) { return; }
         e.setCancelled(true);
-        int highestY = p.getWorld().getHighestBlockYAt(p.getLocation());
-        Location reTry = new Location(p.getWorld(), p.getLocation().getBlockX(), highestY + 2, p.getLocation().getBlockZ());
+        final int highestY = p.getWorld().getHighestBlockYAt(p.getLocation());
+        double x = p.getLocation().getX();
+        double z = p.getLocation().getZ();
+        double xR = Math.floor(x) + 0.5;
+        double zR = Math.floor(z) + 0.5;
+        final Location reTry = new Location(p.getWorld(), xR, highestY + 2, zR);
         p.teleport(reTry);
 
     }

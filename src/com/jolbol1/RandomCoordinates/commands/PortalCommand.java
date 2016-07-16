@@ -20,16 +20,15 @@ import java.util.Map;
 public class PortalCommand implements CommandInterface {
 
 
-    private MessageManager messages = new MessageManager();
-    private Map selection = RandomCoords.getPlugin().wandSelection;
+    private final MessageManager messages = new MessageManager();
+    private final Map selection = RandomCoords.getPlugin().wandSelection;
 
     @Override
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
         if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-            if (args.length == 1) {
-                if (args[0].equalsIgnoreCase("portal")) {
+            if (args.length == 1 && args[0].equalsIgnoreCase("portal")) {
                     messages.incorrectUsage(sender, "/rc portal", "/RC Portal Create {Name} {World} or /RC Portal Delete {Name}");
-                }
+
             }
             if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("portal") && args[1].equalsIgnoreCase("create")) {
@@ -40,9 +39,9 @@ public class PortalCommand implements CommandInterface {
                     messages.incorrectUsage(sender, "/rc portal create", "/RC Portal Create {Name} {World}");
                     return;
                 } else if (args[0].equalsIgnoreCase("portal") && args[1].equalsIgnoreCase("list")) {
-                    ConfigurationSection cs = RandomCoords.getPlugin().portals.getConfigurationSection("Portal");
+                    final ConfigurationSection cs = RandomCoords.getPlugin().portals.getConfigurationSection("Portal");
                     messages.portalList(sender);
-                    for (String a : cs.getKeys(false)) {
+                    for (final String a : cs.getKeys(false)) {
                         sender.sendMessage(ChatColor.RED + a);
                     }
                 } else {
@@ -59,36 +58,35 @@ public class PortalCommand implements CommandInterface {
                         messages.notPlayer(sender);
                         return;
                     }
-                    Player p = (Player) sender;
+                    final Player p = (Player) sender;
                     World world = p.getWorld();
-                    if (args.length == 4) {
-                        if (args[3] != null) {
-                            if (p.getServer().getWorld(args[3].toString()) == null) {
-                                messages.invalidWorld(sender, args[3].toString());
+                    if (args.length == 4 && args[3] != null) {
+
+                         if (p.getServer().getWorld(args[3]) == null) {
+                                messages.invalidWorld(sender, args[3]);
                                 return;
                             } else {
-                                world = p.getServer().getWorld(args[3].toString());
+                                world = p.getServer().getWorld(args[3]);
                             }
-                        }
+
                     }
                     if (selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) == null || selection.get(RandomCoords.getPlugin().PortalMap("pos2", p)) == null) {
                         messages.noSelection(sender);
-                        return;
                     } else if (selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) != null && selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) != null) {
-                        Location pos1 = (Location) selection.get(RandomCoords.getPlugin().PortalMap("pos1", p));
-                        Location pos2 = (Location) selection.get(RandomCoords.getPlugin().PortalMap("pos2", p));
+                        final Location pos1 = (Location) selection.get(RandomCoords.getPlugin().PortalMap("pos1", p));
+                        final Location pos2 = (Location) selection.get(RandomCoords.getPlugin().PortalMap("pos2", p));
                         if (pos1.getWorld() != pos2.getWorld()) {
                             messages.posInSameWorld(sender);
                             return;
                         }
-                        int p1x = pos1.getBlockX();
-                        int p1y = pos1.getBlockY();
-                        int p1z = pos1.getBlockZ();
-                        int p2x = pos2.getBlockX();
-                        int p2y = pos2.getBlockY();
-                        int p2z = pos2.getBlockZ();
-                        String wName = world.getName();
-                        String pName = args[2].toString();
+                        final int p1x = pos1.getBlockX();
+                        final int p1y = pos1.getBlockY();
+                        final int p1z = pos1.getBlockZ();
+                        final int p2x = pos2.getBlockX();
+                        final int p2y = pos2.getBlockY();
+                        final int p2z = pos2.getBlockZ();
+                        final String wName = world.getName();
+                        final String pName = args[2];
                         RandomCoords.getPlugin().portals.set("Portal." + pName + "." + "p1x", p1x);
                         RandomCoords.getPlugin().portals.set("Portal." + pName + "." + "p1y", p1y);
                         RandomCoords.getPlugin().portals.set("Portal." + pName + "." + "p1z", p1z);
@@ -106,7 +104,7 @@ public class PortalCommand implements CommandInterface {
 
                 } else {
                     if (args[0].equalsIgnoreCase("portal") && args[1].equalsIgnoreCase("delete") && args[2] != null) {
-                        String pName = args[2].toString();
+                        final String pName = args[2];
                         if (RandomCoords.getPlugin().portals.get("Portal." + pName) != null) {
                             RandomCoords.getPlugin().portals.set("Portal." + pName, null);
                             messages.portalDeleted(sender, pName);
@@ -123,7 +121,6 @@ public class PortalCommand implements CommandInterface {
             }
         } else {
             messages.noPermission(sender);
-            return;
         }
     }
 }

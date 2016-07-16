@@ -2,7 +2,6 @@ package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
-import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -18,14 +17,14 @@ import java.util.Map;
  */
 public class Wand implements Listener {
 
-    private Map selection = RandomCoords.getPlugin().wandSelection;
-    private MessageManager messages = new MessageManager();
+    private final Map selection = RandomCoords.getPlugin().wandSelection;
+    private final MessageManager messages = new MessageManager();
 
 
     @EventHandler
-    public void onWandClick(PlayerInteractEvent e) {
-        Player p = e.getPlayer();
+    public void onWandClick(final PlayerInteractEvent e) {
         if(e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_AIR) { return; }
+        final Player p = e.getPlayer();
         if(p.getInventory().getItemInMainHand().equals(RandomCoords.getPlugin().wand())) {
             if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
 
@@ -38,10 +37,10 @@ public class Wand implements Listener {
                     }
 
 
-                    Block b = e.getClickedBlock();
-                    int x = b.getX();
-                    int y = b.getY();
-                    int z = b.getZ();
+                    final Block b = e.getClickedBlock();
+                    final int x = b.getX();
+                    final int y = b.getY();
+                    final int z = b.getZ();
                     p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Pos 1 Set at " + x + " " + y + " " + z);
                     selection.put(PortalMap("pos1", p), b.getLocation());
                     e.setCancelled(true);
@@ -53,10 +52,10 @@ public class Wand implements Listener {
                         }
                     }
                     if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                        Block b = e.getClickedBlock();
-                        int x = b.getX();
-                        int y = b.getY();
-                        int z = b.getZ();
+                        final Block b = e.getClickedBlock();
+                        final int x = b.getX();
+                        final int y = b.getY();
+                        final int z = b.getZ();
                         p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Pos 2 Set at " + x + " " + y + " " + z);
                         selection.put(PortalMap("pos2", p), b.getLocation());
                         e.setCancelled(true);
@@ -69,7 +68,7 @@ public class Wand implements Listener {
         }
     }
 
-    private String PortalMap(String position, Player p) {
+    private String PortalMap(final String position, final Player p) {
         return RandomCoords.getPlugin().PortalMap(position, p);
     }
 

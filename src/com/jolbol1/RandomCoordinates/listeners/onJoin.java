@@ -14,19 +14,19 @@ import org.bukkit.event.player.PlayerJoinEvent;
  */
 public class onJoin implements Listener {
 
-    private Coordinates coordinates = new Coordinates();
-    private MessageManager messages = new MessageManager();
+    private final Coordinates coordinates = new Coordinates();
+    private final MessageManager messages = new MessageManager();
 
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent e) {
-        Player p = e.getPlayer();
+    public void onPlayerJoin(final PlayerJoinEvent e) {
         if(RandomCoords.getPlugin().config.getString("OnJoin").equalsIgnoreCase("false")) { return; }
         if(RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.OnJoin") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
+            final Player p = e.getPlayer();
             if (p.hasPlayedBefore()) {
                 return;
             }
-            String command = RandomCoords.getPlugin().config.getString("OnJoinCommand");
+            final String command = RandomCoords.getPlugin().config.getString("OnJoinCommand");
             coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.JOIN, 0);
             messages.onJoin(p);
             if (command.equalsIgnoreCase("none")) {

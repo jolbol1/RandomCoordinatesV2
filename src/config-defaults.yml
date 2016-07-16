@@ -31,7 +31,7 @@ OnJoin: false
 OnJoinCommand: none
 BonusChest: false
 BonusChestItems:
- - WOODEN_SWORD
+ - WOOD_SWORD
 
 # Teleport Method, Can be random or warps
 Command: random

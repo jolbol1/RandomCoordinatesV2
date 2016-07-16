@@ -1,3 +1,4 @@
+#RandomCoords: Need Help Setting Up? See the Wiki! http://randomwiki.jolbol1.com/
 #Teleport Settings
 MaxCoordinate: 5000
 MinCoordinate: 0
@@ -38,7 +39,7 @@ OnJoin: false
 OnJoinCommand: none
 BonusChest: false
 BonusChestItems:
- - WOODEN_SWORD
+ - WOOD_SWORD
 
 # Teleport Method, Can be random or warps
 Command: random

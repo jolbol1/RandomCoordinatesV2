@@ -7,31 +7,33 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 //The class will implement CommandExecutor.
 public class CommandHandler implements CommandExecutor {
 
     //This is where we will store the commands
-    private static final HashMap<String, CommandInterface> commands = new HashMap<>();
-    private MessageManager messages = new MessageManager();
+    private static final Map<String, CommandInterface> commands = new ConcurrentHashMap<>();
+    private final MessageManager messages = new MessageManager();
 
 
     //Register method. When we register commands in our onEnable() we will use this.
-    public void register(String name, CommandInterface cmd) {
+    public void register(final String name, final CommandInterface cmd) {
 
         //When we register the command, this is what actually will put the command in the hashmap.
         commands.put(name, cmd);
     }
 
     //This will be used to check if a string exists or not.
-    boolean exists(String name) {
+    private boolean exists(final String name) {
 
         //To actually check if the string exists, we will return the hashmap
         return commands.containsKey(name);
     }
 
     //Getter method for the Executor.
-    CommandInterface getExecutor(String name) {
+    private CommandInterface getExecutor(final String name) {
 
         //Returns a command in the hashmap of the same name.
         return commands.get(name);
@@ -39,7 +41,7 @@ public class CommandHandler implements CommandExecutor {
 
     //This will be a template. All commands will have this in common.
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public boolean onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
 
         //For example, in each command, it will check if the sender is a player and if not, send an error message.
 

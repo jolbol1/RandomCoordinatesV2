@@ -7,6 +7,7 @@ import com.earth2me.essentials.User;
 import com.earth2me.essentials.textreader.IText;
 import com.earth2me.essentials.textreader.KeywordReplacer;
 import com.earth2me.essentials.textreader.SimpleTextInput;
+import com.jolbol1.RandomCoordinates.RandomCoords;
 import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,65 +18,62 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Level;
 
 /**
  * Created by James on 07/07/2016.
  */
-public class KitManager {
+class KitManager {
 
 
-    public void getKit(Player p, Chest c, String name)
+    public void getKit(final Player p, final Chest c, final String name)
     {
         if(Bukkit.getPluginManager().getPlugin("Essentials") == null) {
-            return;
         } else {
-            IEssentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-            ForkJoinPool.commonPool().execute(new Runnable() {
-                public void run() {
-                    if (ess != null) {
-                        Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
-                        User u = ess.getUser(p);
-                        List<String> items;
-                        try {
-                            Kit kitMe = new Kit(name, ess);
-                            items = kitMe.getItems();
+            final IEssentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+            ForkJoinPool.commonPool().execute(() -> {
+                if (ess != null) {
+                  //  Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
+                    final User u = ess.getUser(p);
+                    List<String> items;
+                    try {
+                        final Kit kitMe = new Kit(name, ess);
+                        items = kitMe.getItems();
 
-                            Inventory inv = c.getInventory();
+                        final Inventory inv = c.getInventory();
 
 
-                            inv.addItem(deSerialize(items, u).get());
-                        } catch (Exception e) {
-                            Bukkit.getServer().getLogger().severe("[RandomCoords] Kit " + name + " does not exist");
-                            return;
-                        }
-                    } else {
-                        System.out.println("essentials was null when getting kits!");
+                        inv.addItem(deSerialize(items, u).get());
+                    } catch (Exception e) {
+                        RandomCoords.logger.severe("Essnetials unable to deserialize kit (RandomCoords)");
+
                     }
+                } else {
+                    RandomCoords.logger.severe("Essnetials was null when getting kit. (RandomCoords)");
                 }
             });
         }
     }
 
-    public CompletableFuture<ItemStack[]> deSerialize(List<String> items, User user)
+    private CompletableFuture<ItemStack[]> deSerialize(final List<String> items, final User user)
     {
-        Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+        final Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
-        CompletableFuture<ItemStack[]> finalList = new CompletableFuture<>();
-        List<ItemStack> itemList = new ArrayList<ItemStack>();
-        IText input = new SimpleTextInput(items);
-        IText output = new KeywordReplacer(input, user.getSource(), ess);
-        for (String kitItem : output.getLines())
+        final CompletableFuture<ItemStack[]> finalList = new CompletableFuture<>();
+        final List<ItemStack> itemList = new ArrayList<>();
+        final IText input = new SimpleTextInput(items);
+        final IText output = new KeywordReplacer(input, user.getSource(), ess);
+        for (final String kitItem : output.getLines())
         {
-            String[] parts = kitItem.split(" +");
+            final String[] parts = kitItem.split(" +");
             try
             {
-                ItemStack parseStack = ess.getItemDb().get(parts[0], parts.length > 1 ? Integer.parseInt(parts[1]) : 1);
+                final ItemStack parseStack = ess.getItemDb().get(parts[0], parts.length > 1 ? Integer.parseInt(parts[1]) : 1);
                 if (parseStack != null && parseStack.getType() != Material.AIR)
                 {
-                    MetaItemStack metaStack = new MetaItemStack(parseStack);
+                    final MetaItemStack metaStack = new MetaItemStack(parseStack);//NOPMD
                     if (parts.length > 2)
                     {
                         metaStack.parseStringMeta(null, true, parts, 2, ess);
@@ -85,7 +83,7 @@ public class KitManager {
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                RandomCoords.logger.log(Level.SEVERE, "There was an error serializing the essentials kit! (RandomCoords)");
             }
         }
         finalList.complete(itemList.toArray(new ItemStack[itemList.size()]));

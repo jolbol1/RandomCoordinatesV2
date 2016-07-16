@@ -17,11 +17,11 @@ import org.bukkit.entity.Player;
  */
 public class All implements CommandInterface {
 
-    private Coordinates coordinates = new Coordinates();
-    private MessageManager messages = new MessageManager();
+    private final Coordinates coordinates = new Coordinates();
+    private final MessageManager messages = new MessageManager();
 
     @Override
-    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
         if (args.length >= 1) {
             if (!args[0].equalsIgnoreCase("all")) {
                 return;
@@ -32,24 +32,24 @@ public class All implements CommandInterface {
                 } else if (args.length == 2) {
                     if (args[0].equalsIgnoreCase("all")) {
                         if (Bukkit.getServer().getWorld(args[1]) != null) {
-                            World world = Bukkit.getServer().getWorld(args[1]);
-                            int max = 574272099;
-                            int min = 574272099;
+                            final World world = Bukkit.getServer().getWorld(args[1]);
+                            final int max = 574272099;
+                            final int min = 574272099;
                             teleportAll(sender, max, min, world);
                         } else {
-                            messages.invalidWorld(sender, args[1].toString());
+                            messages.invalidWorld(sender, args[1]);
                         }
                     }
                 } else if (args.length == 3) {
                     World world;
                     if (Bukkit.getServer().getWorld(args[1]) != null) {
-                        world = Bukkit.getServer().getWorld(args[1].toString());
+                        world = Bukkit.getServer().getWorld(args[1]);
                     } else {
                         messages.invalidWorld(sender, args[1]);
                         return;
                     }
                     int max = 574272099;
-                    int min = 574272099;
+                    final int min = 574272099;
 
                     try {
                         max = Integer.valueOf(args[2]);
@@ -59,7 +59,7 @@ public class All implements CommandInterface {
                     teleportAll(sender, max, min, world);
                 } else if (args.length == 4) {
                     if (Bukkit.getServer().getWorld(args[1]) != null) {
-                        World world = Bukkit.getServer().getWorld(args[3]);
+                        final World world = Bukkit.getServer().getWorld(args[3]);
                         int max = 574272099;
                         int min = 574272099;
                         try {
@@ -70,7 +70,7 @@ public class All implements CommandInterface {
                         }
                         teleportAll(sender, max, min, world);
                     } else {
-                        messages.invalidWorld(sender, args[1].toString());
+                        messages.invalidWorld(sender, args[1]);
                     }
                 } else {
                     messages.incorrectUsage(sender, "/rc all", "/RC All {World} {Max} {Min} - {World/Max/Min} = Not Required!");
@@ -84,14 +84,14 @@ public class All implements CommandInterface {
 
 
 
-    public void teleportAll(CommandSender sender, int max, int min, World world) {
-        for(Player p : Bukkit.getServer().getOnlinePlayers()) {
+    private void teleportAll(final CommandSender sender, final int max, final int min, World world) {
+        for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
             if(world == null) {
                 world = p.getWorld();
             }
 
             //Check if world blacklisted
-            for(String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+            for(final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
                 if(world.getName().equals(worlds)) {
                    messages.worldBanned(sender);
                     return;
@@ -99,7 +99,7 @@ public class All implements CommandInterface {
                 }
             }
             if(!(sender instanceof ConsoleCommandSender)) {
-                Player player = (Player) sender;
+                final Player player = (Player) sender;
                 if(p != player ) {
                  coordinates.finalCoordinates(p,max, min, world, CoordType.ALL, 0);
                     messages.teleportedBy(sender, p);

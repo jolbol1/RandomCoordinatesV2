@@ -13,19 +13,19 @@ import org.bukkit.entity.Player;
  */
 public class PlayerRadCheck {
 
-    public boolean isPlayerNear(Location l) {
-        int X = l.getBlockX();
-        int Y = l.getBlockY();
-        int Z = l.getBlockZ();
+    public boolean isPlayerNear(final Location l) {
+        final int X = l.getBlockX();
+        final int Y = l.getBlockY();
+        final int Z = l.getBlockZ();
 
-        int r = RandomCoords.getPlugin().config.getInt("CheckingRadius");
+        final int r = RandomCoords.getPlugin().config.getInt("CheckingRadius");
 
         int x = X - r;
         int y = Y - r;
         int z = Z - r;
 
-        int bx = x;
-        int bz = z;
+        final int bx = x;
+        final int bz = z;
 
         if (RandomCoords.getPlugin().config.getString("AvoidPlayers").equals("false")) {
             return true;
@@ -35,9 +35,9 @@ public class PlayerRadCheck {
                 for (int j = 0; j < r * 2 + 1; j++) {
                     for (int k = 0; k < r * 2 + 1; k++) {
                         //noinspection LoopStatementThatDoesntLoop
-                        for (Player p : Bukkit.getOnlinePlayers()) {
+                        for (final Player p : Bukkit.getOnlinePlayers()) {
                             //Code here
-                            Block b = l.getWorld().getBlockAt(x, y, z);
+                            final Block b = l.getWorld().getBlockAt(x, y, z);
                             return p.getLocation().getBlock().getRelative(BlockFace.DOWN) != b;
                         }
                         x++;

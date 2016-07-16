@@ -12,9 +12,9 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class Invulnerable implements Listener {
 
     @EventHandler
-    public void onAnyDamage(EntityDamageEvent e) {
+    public void onAnyDamage(final EntityDamageEvent e) {
         if(!(e.getEntity() instanceof Player)) { return; }
-        Player p = (Player) e.getEntity();
+        final Player p = (Player) e.getEntity();
         if(!Cooldown.isInCooldown(p.getUniqueId(), "InvulTime")) { return; }
         e.setCancelled(true);
     }
