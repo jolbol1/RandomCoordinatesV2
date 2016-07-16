@@ -352,7 +352,7 @@ public class Coordinates {
 
                 //Start the cooldowns with the cooldown class, and time set above
                 final Cooldown cTb = new Cooldown(player.getUniqueId(), "TimeBefore", timeBefore);
-                final Cooldown c = new Cooldown(player.getUniqueId(), "Command", cooldown + timeBefore);
+
 
                 //If the cooldown isnt 0, and they are not in the timebefore cooldown, Start it!
                 if (cooldown != 0) {
@@ -365,8 +365,7 @@ public class Coordinates {
                         }
 
                         //Then start the cooldown counter
-                        c.start();
-                       scheduleStuff(player, locationTP, thisCost, health, start, timeBefore);
+                       scheduleStuff(player, locationTP, thisCost, health, start, timeBefore, cooldown);
                     } else {
                         //Returns that they are in the cooldown, So cannot use the command.
                         final int secondsLeft = Cooldown.getTimeLeft(player.getUniqueId(), "Command");
@@ -385,7 +384,7 @@ public class Coordinates {
                             cTb.start();
                             messages.TeleportingIn(player, timeBefore);
                         }
-                        scheduleStuff(player, locationTP, thisCost, health, start, timeBefore);
+                        scheduleStuff(player, locationTP, thisCost, health, start, timeBefore, cooldown);
                     } else {
                         //Otherwise send them a message alerting them they are about to TP
                         messages.aboutTo(player, Cooldown.getTimeLeft(player.getUniqueId(), "TimeBefore"));
@@ -602,9 +601,9 @@ public class Coordinates {
     }
 
     //Used to shcedule the main basis, to avoid code duplication in the coordinates class.
-    private void scheduleStuff(final Player player, final Location locationTP, final double thisCost, final double health, final Location start, final int timeBefore) {
+    private void scheduleStuff(final Player player, final Location locationTP, final double thisCost, final double health, final Location start, final int timeBefore, final int cooldown) {
         final BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
-
+        final Cooldown cool = new Cooldown(player.getUniqueId(), "Command", cooldown);
         //Start the scheduler :) (Lambda)
         s.scheduleSyncDelayedTask(RandomCoords.getPlugin().getInstance(), () -> {
 
@@ -612,6 +611,7 @@ public class Coordinates {
             if (RandomCoords.getPlugin().config.getString("StopOnMove").equalsIgnoreCase("true")) {
                 if (start.distance(player.getLocation()) > 1) {
                     messages.youMoved(player);
+
                     return;
                 }
             }
@@ -636,6 +636,7 @@ public class Coordinates {
                 if(exit) {
                     if(RandomCoords.getPlugin().hasPayed(player, thisCost)) {
                         player.teleport(locationTP);
+                        cool.start();
                     } else {
                         return;
                     }
@@ -647,11 +648,11 @@ public class Coordinates {
             bonusChests(player, locationTP);
 
             //Check that they have paid
-            if(RandomCoords.getPlugin().hasPayed(player, thisCost)) {
-                player.teleport(locationTP);
-            } else {
-                return;
-            }
+           // if(RandomCoords.getPlugin().hasPayed(player, thisCost)) {
+            //    player.teleport(locationTP);
+            //} else {
+             //   return;
+           // }
 
             //Play the sound
             if(!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {

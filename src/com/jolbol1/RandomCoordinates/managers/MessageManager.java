@@ -46,7 +46,7 @@ public class MessageManager {
     public void cooldownMessage(final CommandSender sender, final int Time) {
         final String message = RandomCoords.getPlugin().language.getString("CooldownMessage");
         final String messageTime = message.replaceAll("%time", String.valueOf(Time));
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', messageTime));
+        sender.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', messageTime));
     }
 
     public void reloadMessage(final CommandSender sender) {
