@@ -33,28 +33,25 @@ class KitManager {
         if(Bukkit.getPluginManager().getPlugin("Essentials") == null) {
         } else {
             final IEssentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
-            ForkJoinPool.commonPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    if (ess != null) {
-                        //  Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
-                        final User u = ess.getUser(p);
-                        List<String> items;
-                        try {
-                            final Kit kitMe = new Kit(name, ess);
-                            items = kitMe.getItems();
+            ForkJoinPool.commonPool().execute(() -> {
+                if (ess != null) {
+                  //  Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
+                    final User u = ess.getUser(p);
+                    List<String> items;
+                    try {
+                        final Kit kitMe = new Kit(name, ess);
+                        items = kitMe.getItems();
 
-                            final Inventory inv = c.getInventory();
+                        final Inventory inv = c.getInventory();
 
 
-                            inv.addItem(deSerialize(items, u).get());
-                        } catch (Exception e) {
-                            RandomCoords.logger.severe("Essnetials unable to deserialize kit (RandomCoords)");
+                        inv.addItem(deSerialize(items, u).get());
+                    } catch (Exception e) {
+                        RandomCoords.logger.severe("Essnetials unable to deserialize kit (RandomCoords)");
 
-                        }
-                    } else {
-                        RandomCoords.logger.severe("Essnetials was null when getting kit. (RandomCoords)");
                     }
+                } else {
+                    RandomCoords.logger.severe("Essnetials was null when getting kit. (RandomCoords)");
                 }
             });
         }
