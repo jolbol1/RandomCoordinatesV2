@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
  * Created by James on 01/07/2016.
  */
 public class MessageManager {
-
+   //
     private final String prefix = ChatColor.GOLD + "[RandomCoords] ";
     private final ChatColor good = ChatColor.GREEN;
 
