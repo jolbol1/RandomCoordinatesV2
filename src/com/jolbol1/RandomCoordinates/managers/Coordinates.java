@@ -646,7 +646,7 @@ public class Coordinates {
 
             //Bonus Chests?
             bonusChests(player, locationTP);
-
+//
             //Check that they have paid
            // if(RandomCoords.getPlugin().hasPayed(player, thisCost)) {
             //    player.teleport(locationTP);
