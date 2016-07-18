@@ -12,6 +12,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -37,6 +38,8 @@ public class Coordinates {
     private final WorldGuardCheck wgc = new WorldGuardCheck();
     private final Nether nether = new Nether();
     private final End end = new End();
+
+
 
 
 
@@ -636,6 +639,7 @@ public class Coordinates {
                 if(exit) {
                     if(RandomCoords.getPlugin().hasPayed(player, thisCost)) {
                         player.teleport(locationTP);
+
                         cool.start();
                     } else {
                         return;
