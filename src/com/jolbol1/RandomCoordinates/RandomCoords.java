@@ -25,10 +25,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +42,7 @@ public class RandomCoords extends JavaPlugin {
     public static Logger logger;
     public final Map<Player, Location> wandSelection = new ConcurrentHashMap<>();
     private static Economy econ;
+    private double version = 0.4;
 
 
 
@@ -158,6 +157,11 @@ public class RandomCoords extends JavaPlugin {
 
         final PortalEnter pe = new PortalEnter();
         pe.runTaskTimer(this, 0L, 20L);
+
+        String latest = getLatestVersion();
+        if(!latest.equalsIgnoreCase(pdf.getVersion())) {
+            Bukkit.broadcastMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "You are using an outdated version of this plugin the latest is " + latest);
+        }
 
 
 
@@ -365,6 +369,27 @@ public class RandomCoords extends JavaPlugin {
             return cost > econ.getBalance(p);
             }
         }
+
+    private String getLatestVersion() {
+        URL site;
+        String version = null;
+
+        try {
+            final String web = "https://raw.githubusercontent.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
+            site = new URL(web);
+
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(site.openStream()))) {
+                String line;
+                while ((line = in.readLine()) != null) {
+                    version = line;
+                }
+            }
+        } catch (IOException ignored) {
+            RandomCoords.logger.severe("Couldnt grab coordinates from Random.ORG!");
+        }
+
+        return version;
+    }
 
 
 

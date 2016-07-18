@@ -57,6 +57,7 @@ PortalCost: 0
 WarpCrossWorld: true
 
 #Limiter Settings
+UpdateAlert: true
 Limit: 0
 LimiterApplys:
  - Command
