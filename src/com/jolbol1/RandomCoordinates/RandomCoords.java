@@ -160,7 +160,8 @@ public class RandomCoords extends JavaPlugin {
 
         String latest = getLatestVersion();
         if(!latest.equalsIgnoreCase(pdf.getVersion())) {
-            Bukkit.broadcastMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "You are using an outdated version of this plugin the latest is " + latest);
+            logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " may be outdated. The latest version is " + latest + ANSI_RESET);
+
         }
 
 
@@ -375,7 +376,7 @@ public class RandomCoords extends JavaPlugin {
         String version = null;
 
         try {
-            final String web = "https://raw.githubusercontent.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
+            final String web = "https://rawgit.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
             site = new URL(web);
 
             try (BufferedReader in = new BufferedReader(new InputStreamReader(site.openStream()))) {
@@ -385,7 +386,7 @@ public class RandomCoords extends JavaPlugin {
                 }
             }
         } catch (IOException ignored) {
-            RandomCoords.logger.severe("Couldnt grab coordinates from Random.ORG!");
+           logger.severe("Could not get the latest version of RandomCoords!");
         }
 
         return version;
