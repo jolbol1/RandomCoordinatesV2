@@ -17,7 +17,7 @@ RandomOrg: false
 StopOnMove: true
 StopOnCombat: true
 ChunkLoader: false
-Sound: ENTITY_ENDERDRAGON_FLAP
+Sound: ENDERDRAGON_WINGS
 Effect: ENDER_SIGNAL
 BannedWorlds:
  - world_the_end

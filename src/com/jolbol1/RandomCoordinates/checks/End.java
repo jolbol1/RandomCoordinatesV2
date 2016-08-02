@@ -30,7 +30,7 @@ public class End {
                         for (int k = 0; k < r * 2 + 1; k++) {
                             //Code here
                             final Block b = l.getWorld().getBlockAt(x, y, z);
-                            if(b.getType() == Material.ENDER_STONE || b.getType() == Material.END_BRICKS) {
+                            if(b.getType() == Material.ENDER_STONE ) {
                                 return b.getLocation().add(0, 2.5, 0);
                             }
 

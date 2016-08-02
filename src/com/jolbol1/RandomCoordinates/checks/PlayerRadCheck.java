@@ -35,7 +35,7 @@ public class PlayerRadCheck {
                 for (int j = 0; j < r * 2 + 1; j++) {
                     for (int k = 0; k < r * 2 + 1; k++) {
                         //noinspection LoopStatementThatDoesntLoop
-                        for (final Player p : Bukkit.getOnlinePlayers()) {
+                        for (final Player p : Bukkit.getServer().getOnlinePlayers()) {
                             //Code here
                             final Block b = l.getWorld().getBlockAt(x, y, z);
                             return p.getLocation().getBlock().getRelative(BlockFace.DOWN) != b;

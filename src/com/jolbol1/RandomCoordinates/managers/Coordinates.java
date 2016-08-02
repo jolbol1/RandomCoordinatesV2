@@ -62,17 +62,7 @@ public class Coordinates {
         }
 
         //Is there a world border setting? If so, Max make center WB center (Vanilla World Border)
-        if(RandomCoords.getPlugin().config.getString("VanillaBorder").equalsIgnoreCase("true")) {
-            final WorldBorder border = world.getWorldBorder();
-            final Location center = border.getCenter();
-            spawnX = center.getBlockX();
-            spawnZ = center.getBlockZ();
-            final double size = border.getSize();
-            final int radius = (int) size / 2;
-            if(max > radius) {
-                max = radius;
-            }
-        }
+
 
         //Should the coordinates be generated via the RandomOrg site? Its more "Random"
         if(RandomCoords.getPlugin().config.getString("RandomOrg").equalsIgnoreCase("true")) {

@@ -40,7 +40,7 @@ class KitManager {
                     List<String> items;
                     try {
                         final Kit kitMe = new Kit(name, ess);
-                        items = kitMe.getItems();
+                        items = kitMe.getItems(u);
 
                         final Inventory inv = c.getInventory();
 

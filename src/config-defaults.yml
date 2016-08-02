@@ -1,15 +1,23 @@
+#RandomCoords: Need Help Setting Up? See the Wiki! http://randomwiki.jolbol1.com/
 #Teleport Settings
 MaxCoordinate: 5000
 MinCoordinate: 0
 CooldownTime: 5
+CooldownApplys:
+ - Command
+ - Warps
 InvulTime: 10
 TimeBeforeTeleport: 5
+TimeBeforeApplys:
+ - Command
+ - Warps
+ - Signs
 MaxAttempts: 20
 RandomOrg: false
 StopOnMove: true
 StopOnCombat: true
 ChunkLoader: false
-Sound: ENTITY_ENDERDRAGON_FLAP
+Sound: ENDERDRAGON_WINGS
 Effect: ENDER_SIGNAL
 BannedWorlds:
  - world_the_end
@@ -49,17 +57,8 @@ PortalCost: 0
 WarpCrossWorld: true
 
 #Limiter Settings
+UpdateAlert: true
 Limit: 0
 LimiterApplys:
  - Command
  - Warps
-
-TimeBeforeApplys:
- - Command
- - Warps
- - Signs
-
-CooldownApplys:
- - Command
- - Warps
-

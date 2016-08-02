@@ -1,5 +1,6 @@
 package com.jolbol1.RandomCoordinates.commands.handler;
 
+
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
