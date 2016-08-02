@@ -1,0 +1,20 @@
+<component name="libraryTable">
+  <library name="WorldBorder">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/Downloads/WorldBorder.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/GriefPrevention.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/Vault.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/worldguard-6.1.2.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/worldedit-bukkit-6.1.3.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/EssentialsX-2.0.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/Factions-2.8.19/Factions-2.8.19/Factions.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/Factions-2.8.19/Factions-2.8.19/MassiveCore.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/Downloads/Factions-2.8.19/Factions-2.8.19/Factions.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/Factions-2.8.19/Factions-2.8.19/MassiveCore.jar!/" />
+      <root url="file://$PROJECT_DIR$/src" />
+    </SOURCES>
+  </library>
+</component>

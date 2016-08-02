@@ -21,6 +21,8 @@ public class InNetherPortal implements Listener {
     @EventHandler
     public void onPlayerTP(final PlayerTeleportEvent e) {
         if(e.getCause() != PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) { return; }
+        if(RandomCoords.getPlugin().portals == null) {return;}
+        if(RandomCoords.getPlugin().portals.getConfigurationSection("Portal") == null) {return;}
         if(RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false) == null) {return;}
         final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
         for (final String name : portals) {
