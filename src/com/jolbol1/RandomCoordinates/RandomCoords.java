@@ -158,12 +158,6 @@ public class RandomCoords extends JavaPlugin {
         final PortalEnter pe = new PortalEnter();
         pe.runTaskTimer(this, 0L, 20L);
 
-        String latest = getLatestVersion();
-        if(!latest.equalsIgnoreCase(pdf.getVersion())) {
-            logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " may be outdated. The latest version is " + latest + ANSI_RESET);
-
-        }
-
 
 
     }
@@ -370,29 +364,6 @@ public class RandomCoords extends JavaPlugin {
             return cost > econ.getBalance(p);
             }
         }
-
-    private String getLatestVersion() {
-        URL site;
-        String version = null;
-
-        try {
-            final String web = "https://rawgit.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
-            site = new URL(web);
-
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(site.openStream()))) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    version = line;
-                }
-            }
-        } catch (IOException ignored) {
-           logger.severe("Could not get the latest version of RandomCoords!");
-        }
-
-        return version;
-    }
-
-
 
 
 
