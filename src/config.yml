@@ -62,6 +62,10 @@ Limit: 0
 LimiterApplys:
  - Command
  - Warps
+Metrics: true
+CircleRadiusDefault: false
+CircleRadiusWorlds:
+  - example
 
 
 

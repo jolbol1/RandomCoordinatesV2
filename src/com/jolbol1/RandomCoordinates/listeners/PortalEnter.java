@@ -30,13 +30,13 @@ public class PortalEnter extends BukkitRunnable {
 
 
             final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
-            if(Bukkit.getServer().getWorld(world) == null) {
+            if (Bukkit.getServer().getWorld(world) == null) {
                 Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
                 return;
 
             }
             final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
-            if(Bukkit.getServer().getWorld(portalWorld) == null) {
+            if (Bukkit.getServer().getWorld(portalWorld) == null) {
                 Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
                 return;
 
@@ -53,34 +53,34 @@ public class PortalEnter extends BukkitRunnable {
             final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
             for (final Player player : Bukkit.getServer().getWorld(portalWorld).getPlayers()) {
                 final World worldW = Bukkit.getServer().getWorld(world);
-                    for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
-                        if (worldW.getName().equals(worlds)) {
-                            messages.worldBanned(player);
-                            return;
+                for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+                    if (worldW.getName().equals(worlds)) {
+                        messages.worldBanned(player);
+                        return;
 
-                        }
                     }
-                    if (isInside(player.getLocation(), l1, l2)) {
-                        if (RandomCoords.getPlugin().hasPermission(player, "Random.PortalUse") || RandomCoords.getPlugin().hasPermission(player, "Random.Basic") || RandomCoords.getPlugin().hasPermission(player, "Random.*")) {
-                          if(!RandomCoords.getPlugin().hasMoney(player, RandomCoords.getPlugin().config.getDouble("PortalCost"))) {
-                              messages.cost(player, RandomCoords.getPlugin().config.getDouble("PortalCost"));
-                              return;
-                          }
-                            coordinates.finalCoordinates(player, 574272099, 574272099, worldW, CoordType.PORTAL, 0);
-                        } else {
-                            messages.noPermission(player);
+                }
+                if (isInside(player.getLocation(), l1, l2)) {
+                    if (RandomCoords.getPlugin().hasPermission(player, "Random.PortalUse") || RandomCoords.getPlugin().hasPermission(player, "Random.Basic") || RandomCoords.getPlugin().hasPermission(player, "Random.*")) {
+                        if (!RandomCoords.getPlugin().hasMoney(player, RandomCoords.getPlugin().config.getDouble("PortalCost"))) {
+                            messages.cost(player, RandomCoords.getPlugin().config.getDouble("PortalCost"));
                             return;
                         }
+                        coordinates.finalCoordinates(player, 574272099, 574272099, worldW, CoordType.PORTAL, 0);
+                    } else {
+                        messages.noPermission(player);
                         return;
                     }
-
+                    return;
                 }
+
+            }
 
         }
     }
 
     //Written by desht
-    public boolean isInside(final Location loc, final Location l1, final  Location l2) {
+    public boolean isInside(final Location loc, final Location l1, final Location l2) {
         final int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
         final int y1 = Math.min(l1.getBlockY(), l2.getBlockY());
         final int z1 = Math.min(l1.getBlockZ(), l2.getBlockZ());

@@ -73,7 +73,7 @@ public class All implements CommandInterface {
                         messages.invalidWorld(sender, args[1]);
                     }
                 } else {
-                    messages.incorrectUsage(sender, "/rc all", "/RC All {World} {Max} {Min} - {World/Max/Min} = Not Required!");
+                    messages.incorrectUsage(sender, "/RC All {World} {Max} {Min} - {World/Max/Min} = Not Required!");
                 }
 
             } else {
@@ -83,29 +83,28 @@ public class All implements CommandInterface {
     }
 
 
-
     private void teleportAll(final CommandSender sender, final int max, final int min, World world) {
-        for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
-            if(world == null) {
+        for (final Player p : Bukkit.getServer().getOnlinePlayers()) {
+            if (world == null) {
                 world = p.getWorld();
             }
 
             //Check if world blacklisted
-            for(final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
-                if(world.getName().equals(worlds)) {
-                   messages.worldBanned(sender);
+            for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
+                if (world.getName().equals(worlds)) {
+                    messages.worldBanned(sender);
                     return;
 
                 }
             }
-            if(!(sender instanceof ConsoleCommandSender)) {
+            if (!(sender instanceof ConsoleCommandSender)) {
                 final Player player = (Player) sender;
-                if(p != player ) {
-                 coordinates.finalCoordinates(p,max, min, world, CoordType.ALL, 0);
+                if (p != player) {
+                    coordinates.finalCoordinates(p, max, min, world, CoordType.ALL, 0);
                     messages.teleportedBy(sender, p);
                 }
             } else {
-                coordinates.finalCoordinates(p,max, min, world, CoordType.ALL, 0);
+                coordinates.finalCoordinates(p, max, min, world, CoordType.ALL, 0);
                 messages.teleportedBy(sender, p);
             }
 

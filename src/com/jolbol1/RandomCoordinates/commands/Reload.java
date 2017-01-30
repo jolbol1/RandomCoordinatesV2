@@ -14,16 +14,16 @@ public class Reload implements CommandInterface {
     private final MessageManager messages = new MessageManager();
 
     @Override
-    public void onCommand(final CommandSender sender, final Command  cmd, final String commandLabel, final String[] args) {
-        if(args.length == 1) {
-            if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Reload") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-            if(args[0].equalsIgnoreCase("reload")) {
-                RandomCoords.getPlugin().reloadLanguageFile();
-                RandomCoords.getPlugin().reloadConfigFile();
-                messages.reloadMessage(sender);
+    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
+        if (args.length == 1) {
+            if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Reload") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+                if (args[0].equalsIgnoreCase("reload")) {
+                    RandomCoords.getPlugin().reloadLanguageFile();
+                    RandomCoords.getPlugin().reloadConfigFile();
+                    messages.reloadMessage(sender);
 
-            }
-        } else {
+                }
+            } else {
                 messages.noPermission(sender);
 
             }

@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  */
 public class ConstructTabCompleter implements TabCompleter {
     @Override
-    public List<String> onTabComplete(final CommandSender commandSender, final Command command, final  String s, final String[] args) {
-        if(args.length == 1) {
+    public List<String> onTabComplete(final CommandSender commandSender, final Command command, final String s, final String[] args) {
+        if (args.length == 1) {
             final List<String> list = new ArrayList<>();
             list.add("set");
             list.add("player");
@@ -32,19 +32,18 @@ public class ConstructTabCompleter implements TabCompleter {
 
 
             return newList;
-        } else if(args.length == 2) {
-            if(args[0].equalsIgnoreCase("set")) {
-                final List<String> worlds = Bukkit.getServer().getWorlds().stream().map(World::getName).collect(Collectors.toList());
-                return worlds;
+        } else if (args.length == 2) {
+            if (args[0].equalsIgnoreCase("set")) {
+                return Bukkit.getServer().getWorlds().stream().map(World::getName).collect(Collectors.toList());
 
-            } else if(args[0].equalsIgnoreCase("player")) {
+            } else if (args[0].equalsIgnoreCase("player")) {
                 final List<String> players = new ArrayList<>();
-                for(final Player p : Bukkit.getServer().getOnlinePlayers()) {
+                for (final Player p : Bukkit.getServer().getOnlinePlayers()) {
                     final String name = p.getName();
                     players.add(name);
                 }
                 return players;
-            } else if(args[0].equalsIgnoreCase("portal")) {
+            } else if (args[0].equalsIgnoreCase("portal")) {
                 final List<String> options = new ArrayList<>();
                 options.add("create");
                 options.add("delete");
@@ -52,15 +51,15 @@ public class ConstructTabCompleter implements TabCompleter {
             } else {
                 return null;
             }
-        } else if(args.length == 3) {
-            if(args[0].equalsIgnoreCase("set") && Bukkit.getWorld(args[1]) != null) {
+        } else if (args.length == 3) {
+            if (args[0].equalsIgnoreCase("set") && Bukkit.getWorld(args[1]) != null) {
                 final List<String> options = new ArrayList<>();
                 options.add("center");
                 options.add("max");
                 options.add("min");
                 return options;
             }
-        }  else {
+        } else {
 
             return null;
         }

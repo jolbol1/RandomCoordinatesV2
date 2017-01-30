@@ -20,7 +20,7 @@ public class Center implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Settings") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+        if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Settings") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 3) {
                 if (!args[0].equalsIgnoreCase("set")) {
                     return;
@@ -49,7 +49,7 @@ public class Center implements CommandInterface {
 
 
                 } else {
-                    messages.incorrectUsage(sender, "/RC set", "/RC set {World} Center/Max/Min {Max/Min}");
+                    messages.incorrectUsage(sender, "/RC set {World} Center/Max/Min {Max/Min}");
 
                 }
             } else if (args.length == 4) {
@@ -73,7 +73,7 @@ public class Center implements CommandInterface {
                     try {
                         max = Integer.valueOf(args[3]);
                     } catch (NumberFormatException e) {
-                        messages.incorrectUsage(sender, "/RC set", "/rc set {World} Max {Max}");
+                        messages.incorrectUsage(sender, "/rc set {World} Max {Max}");
                         return;
                     }
 
@@ -100,7 +100,7 @@ public class Center implements CommandInterface {
                     try {
                         min = Integer.valueOf(args[3]);
                     } catch (NumberFormatException e) {
-                        messages.incorrectUsage(sender, "/RC set", "/rc set {World} Min {Min}");
+                        messages.incorrectUsage(sender, "/rc set {World} Min {Min}");
                         return;
                     }
 
@@ -109,20 +109,20 @@ public class Center implements CommandInterface {
                     RandomCoords.getPlugin().saveCustomConfig();
                     messages.minSet(sender, String.valueOf(min), world.getName());
                 } else if (args[2].equalsIgnoreCase("center") && args[3].equalsIgnoreCase("remove")) {
-                        World world;
-                        if (Bukkit.getServer().getWorld(args[1]) != null) {
-                            world = Bukkit.getServer().getWorld(args[1]);
-                        } else {
-                            messages.invalidWorld(sender, args[1]);
-                            return;
-                        }
-                        RandomCoords.getPlugin().config.set(world.getName() + ".Center", null);
-                        RandomCoords.getPlugin().saveCustomConfig();
-                        messages.centerRemove(sender, world.getName());
+                    World world;
+                    if (Bukkit.getServer().getWorld(args[1]) != null) {
+                        world = Bukkit.getServer().getWorld(args[1]);
+                    } else {
+                        messages.invalidWorld(sender, args[1]);
+                        return;
+                    }
+                    RandomCoords.getPlugin().config.set(world.getName() + ".Center", null);
+                    RandomCoords.getPlugin().saveCustomConfig();
+                    messages.centerRemove(sender, world.getName());
 
                 }
             } else {
-                messages.incorrectUsage(sender, "/RC set", "/RC set {World} Center/Max/Min {Max/Min}");
+                messages.incorrectUsage(sender, "/RC set {World} Center/Max/Min {Max/Min}");
             }
         } else {
             messages.noPermission(sender);

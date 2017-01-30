@@ -12,25 +12,29 @@ import java.util.Set;
 
 /**
  * Created by James on 04/07/2016.
+ * <p>
+ * THIS IS AN UNUSED CLASS / LISTENER
  */
 public class BlockPortal implements Listener {
 
     @EventHandler
     public void blockPhysics(final BlockPhysicsEvent e) {
-        if(RandomCoords.getPlugin().portals.get("Portal")== null) { return; }
+        if (RandomCoords.getPlugin().portals.get("Portal") == null) {
+            return;
+        }
         final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
         for (final String name : portals) {
 
 
             final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
-            if(Bukkit.getServer().getWorld(world) == null) {
+            if (Bukkit.getServer().getWorld(world) == null) {
                 Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
                 return;
 
             }
             final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
 
-            if(Bukkit.getServer().getWorld(portalWorld) == null) {
+            if (Bukkit.getServer().getWorld(portalWorld) == null) {
                 Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
                 return;
 
@@ -46,10 +50,10 @@ public class BlockPortal implements Listener {
             final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
             final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
 
-                if(isInside(e.getBlock().getLocation(), l1, l2)) {
-                    e.setCancelled(true);
-                    return;
-                }
+            if (isInside(e.getBlock().getLocation(), l1, l2)) {
+                e.setCancelled(true);
+                return;
+            }
 
 
         }

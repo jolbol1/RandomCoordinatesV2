@@ -13,13 +13,15 @@ public class Invulnerable implements Listener {
 
     @EventHandler
     public void onAnyDamage(final EntityDamageEvent e) {
-        if(!(e.getEntity() instanceof Player)) { return; }
+        if (!(e.getEntity() instanceof Player)) {
+            return;
+        }
         final Player p = (Player) e.getEntity();
-        if(!Cooldown.isInCooldown(p.getUniqueId(), "InvulTime")) { return; }
+        if (!Cooldown.isInCooldown(p.getUniqueId(), "InvulTime")) {
+            return;
+        }
         e.setCancelled(true);
     }
-
-
 
 
 }

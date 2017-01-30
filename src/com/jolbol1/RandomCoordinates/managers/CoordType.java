@@ -34,5 +34,9 @@ public enum CoordType {
      * This is used when they are teleported by using /RC Warp
      */
     WARPS,
+    /**
+     * Used for custom world teleport via /RC Warp
+     */
+    WARPWORLD,
 
 }

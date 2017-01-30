@@ -62,4 +62,8 @@ TimeBeforeApplys:
 CooldownApplys:
  - Command
  - Warps
+Metrics: true
+CircleRadiusDefault: false
+CircleRadiusWorlds:
+  - example
 

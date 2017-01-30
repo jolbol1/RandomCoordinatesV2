@@ -34,13 +34,9 @@ public class TownyChecker {
                         for (int k = 0; k < r * 2 + 1; k++) {
                             final Block b = l.getWorld().getBlockAt(x, y, z);
                             final TownBlock tb = TownyUniverse.getTownBlock(b.getLocation());
-                            if(tb != null) {
+                            if (tb != null) {
                                 return false;
                             }
-
-
-
-
 
 
                             x++;

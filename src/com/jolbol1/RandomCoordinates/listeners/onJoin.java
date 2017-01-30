@@ -20,8 +20,10 @@ public class onJoin implements Listener {
 
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
-        if(RandomCoords.getPlugin().config.getString("OnJoin").equalsIgnoreCase("false")) { return; }
-        if(RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.OnJoin") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
+        if (RandomCoords.getPlugin().config.getString("OnJoin").equalsIgnoreCase("false")) {
+            return;
+        }
+        if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.OnJoin") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
             final Player p = e.getPlayer();
             if (p.hasPlayedBefore()) {
                 return;
@@ -36,7 +38,6 @@ public class onJoin implements Listener {
         }
 
     }
-
 
 
 }

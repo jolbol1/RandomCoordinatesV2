@@ -28,14 +28,13 @@ import java.util.logging.Level;
 class KitManager {
 
 
-    public void getKit(final Player p, final Chest c, final String name)
-    {
-        if(Bukkit.getPluginManager().getPlugin("Essentials") == null) {
+    public void getKit(final Player p, final Chest c, final String name) {
+        if (Bukkit.getPluginManager().getPlugin("Essentials") == null) {
         } else {
             final IEssentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
             ForkJoinPool.commonPool().execute(() -> {
                 if (ess != null) {
-                  //  Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
+                    //  Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
                     final User u = ess.getUser(p);
                     List<String> items;
                     try {
@@ -57,42 +56,31 @@ class KitManager {
         }
     }
 
-    private CompletableFuture<ItemStack[]> deSerialize(final List<String> items, final User user)
-    {
+    private CompletableFuture<ItemStack[]> deSerialize(final List<String> items, final User user) {
         final Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 
         final CompletableFuture<ItemStack[]> finalList = new CompletableFuture<>();
         final List<ItemStack> itemList = new ArrayList<>();
         final IText input = new SimpleTextInput(items);
         final IText output = new KeywordReplacer(input, user.getSource(), ess);
-        for (final String kitItem : output.getLines())
-        {
+        for (final String kitItem : output.getLines()) {
             final String[] parts = kitItem.split(" +");
-            try
-            {
+            try {
                 final ItemStack parseStack = ess.getItemDb().get(parts[0], parts.length > 1 ? Integer.parseInt(parts[1]) : 1);
-                if (parseStack != null && parseStack.getType() != Material.AIR)
-                {
+                if (parseStack != null && parseStack.getType() != Material.AIR) {
                     final MetaItemStack metaStack = new MetaItemStack(parseStack);//NOPMD
-                    if (parts.length > 2)
-                    {
+                    if (parts.length > 2) {
                         metaStack.parseStringMeta(null, true, parts, 2, ess);
                     }
                     itemList.add(metaStack.getItemStack());
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 RandomCoords.logger.log(Level.SEVERE, "There was an error serializing the essentials kit! (RandomCoords)");
             }
         }
         finalList.complete(itemList.toArray(new ItemStack[itemList.size()]));
         return finalList;
     }
-
-
-
-
 
 
 }

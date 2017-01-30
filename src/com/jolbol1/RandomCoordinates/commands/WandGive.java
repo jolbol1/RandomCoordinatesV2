@@ -17,16 +17,16 @@ public class WandGive implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        if(args.length == 1) {
-            if(args[0].equalsIgnoreCase("wand")){
-                if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-                if(sender instanceof Player) {
-                    final Player p = (Player) sender;
+        if (args.length == 1) {
+            if (args[0].equalsIgnoreCase("wand")) {
+                if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+                    if (sender instanceof Player) {
+                        final Player p = (Player) sender;
 
-                    p.getInventory().addItem(RandomCoords.getPlugin().wand());
-                    messages.wandGiven(sender);
-                }
-            } else {
+                        p.getInventory().addItem(RandomCoords.getPlugin().wand());
+                        messages.wandGiven(sender);
+                    }
+                } else {
                     messages.noPermission(sender);
                 }
             }

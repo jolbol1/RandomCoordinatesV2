@@ -23,9 +23,11 @@ public class Wand implements Listener {
 
     @EventHandler
     public void onWandClick(final PlayerInteractEvent e) {
-        if(e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_AIR) { return; }
+        if (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_AIR) {
+            return;
+        }
         final Player p = e.getPlayer();
-        if(p.getInventory().getItemInMainHand().equals(RandomCoords.getPlugin().wand())) {
+        if (p.getInventory().getItemInMainHand().equals(RandomCoords.getPlugin().wand())) {
             if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
 
                 if (e.getAction() == Action.LEFT_CLICK_BLOCK) {
@@ -71,9 +73,6 @@ public class Wand implements Listener {
     private String PortalMap(final String position, final Player p) {
         return RandomCoords.getPlugin().PortalMap(position, p);
     }
-
-
-
 
 
 }

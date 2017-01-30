@@ -9,8 +9,8 @@ class PermissionManager {
 
     private final MessageManager messages = new MessageManager();
 
-    public boolean hasPermission(final CommandSender sender, final String permission){
-        if(sender.hasPermission(permission)) {
+    public boolean hasPermission(final CommandSender sender, final String permission) {
+        if (sender.hasPermission(permission)) {
             return true;
         } else {
             messages.noPermission(sender);

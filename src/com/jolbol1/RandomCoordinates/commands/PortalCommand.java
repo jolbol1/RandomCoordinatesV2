@@ -27,7 +27,7 @@ public class PortalCommand implements CommandInterface {
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
         if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 1 && args[0].equalsIgnoreCase("portal")) {
-                    messages.incorrectUsage(sender, "/rc portal", "/RC Portal Create {Name} {World} or /RC Portal Delete {Name}");
+                messages.incorrectUsage(sender, "/RC Portal Create {Name} {World} or /RC Portal Delete {Name}");
 
             }
             if (args.length == 2) {
@@ -36,7 +36,7 @@ public class PortalCommand implements CommandInterface {
                         messages.notPlayer(sender);
                         return;
                     }
-                    messages.incorrectUsage(sender, "/rc portal create", "/RC Portal Create {Name} {World}");
+                    messages.incorrectUsage(sender, "/RC Portal Create {Name} {World}");
                     return;
                 } else if (args[0].equalsIgnoreCase("portal") && args[1].equalsIgnoreCase("list")) {
                     final ConfigurationSection cs = RandomCoords.getPlugin().portals.getConfigurationSection("Portal");
@@ -46,7 +46,7 @@ public class PortalCommand implements CommandInterface {
                     }
                 } else {
                     if (args[0].equalsIgnoreCase("portal")) {
-                        messages.incorrectUsage(sender, "/rc portal", "/RC Portal Create {Name} {World} or /RC Portal Delete {Name}");
+                        messages.incorrectUsage(sender, "/RC Portal Create {Name} {World} or /RC Portal Delete {Name}");
 
                     }
                 }
@@ -62,12 +62,12 @@ public class PortalCommand implements CommandInterface {
                     World world = p.getWorld();
                     if (args.length == 4 && args[3] != null) {
 
-                         if (p.getServer().getWorld(args[3]) == null) {
-                                messages.invalidWorld(sender, args[3]);
-                                return;
-                            } else {
-                                world = p.getServer().getWorld(args[3]);
-                            }
+                        if (p.getServer().getWorld(args[3]) == null) {
+                            messages.invalidWorld(sender, args[3]);
+                            return;
+                        } else {
+                            world = p.getServer().getWorld(args[3]);
+                        }
 
                     }
                     if (selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) == null || selection.get(RandomCoords.getPlugin().PortalMap("pos2", p)) == null) {
@@ -115,7 +115,7 @@ public class PortalCommand implements CommandInterface {
                             return;
                         }
                     }
-                    messages.incorrectUsage(sender, "/rc portal create", "/RC Portal Create {Name} {World}");
+                    messages.incorrectUsage(sender, "/RC Portal Create {Name} {World}");
                 }
 
             }

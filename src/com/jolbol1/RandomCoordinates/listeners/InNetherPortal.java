@@ -4,7 +4,6 @@ import com.jolbol1.RandomCoordinates.RandomCoords;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -20,21 +19,29 @@ public class InNetherPortal implements Listener {
 
     @EventHandler
     public void onPlayerTP(final PlayerTeleportEvent e) {
-        if(e.getCause() != PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) { return; }
-        if(RandomCoords.getPlugin().portals == null) {return;}
-        if(RandomCoords.getPlugin().portals.getConfigurationSection("Portal") == null) {return;}
-        if(RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false) == null) {return;}
+        if (e.getCause() != PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
+            return;
+        }
+        if (RandomCoords.getPlugin().portals == null) {
+            return;
+        }
+        if (RandomCoords.getPlugin().portals.getConfigurationSection("Portal") == null) {
+            return;
+        }
+        if (RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false) == null) {
+            return;
+        }
         final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
         for (final String name : portals) {
 
             final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
-            if(Bukkit.getServer().getWorld(world) == null) {
+            if (Bukkit.getServer().getWorld(world) == null) {
                 Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
                 return;
 
             }
             final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
-            if(Bukkit.getServer().getWorld(portalWorld) == null) {
+            if (Bukkit.getServer().getWorld(portalWorld) == null) {
                 Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
                 return;
 
@@ -51,8 +58,8 @@ public class InNetherPortal implements Listener {
             final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
 
 
-          //  World worldW = Bukkit.getServer().getWorld(world);
-            if(pe.isInside(e.getPlayer().getLocation(), l1, l2)) {
+            //  World worldW = Bukkit.getServer().getWorld(world);
+            if (pe.isInside(e.getPlayer().getLocation(), l1, l2)) {
                 e.setCancelled(true);
                 return;
             }
@@ -61,10 +68,9 @@ public class InNetherPortal implements Listener {
         }
 
 
-
     }
 
-    public boolean inAll(final Location location) {
+ /*   public boolean inAll(final Location location) {
         if (RandomCoords.getPlugin().portals.get("Portal") == null) {
             return false;
         }
@@ -101,5 +107,5 @@ public class InNetherPortal implements Listener {
 
 
         return false;
-    }
+    }*/
 }

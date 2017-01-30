@@ -26,24 +26,27 @@ public class Warp implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-       if(sender instanceof ConsoleCommandSender) { messages.notPlayer(sender); return; }
+        if (sender instanceof ConsoleCommandSender) {
+            messages.notPlayer(sender);
+            return;
+        }
 
-        if(args.length == 1 && args[0].equalsIgnoreCase("warp")) {
-                if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-                    final Player p = (Player) sender;
-                    coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.WARPS, 0);
-                    return;
-                } else {
-                    messages.noPermission(sender);
-                    return;
+        if (args.length == 1 && args[0].equalsIgnoreCase("warp")) {
+            if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+                final Player p = (Player) sender;
+                coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.WARPS, 0);
+                return;
+            } else {
+                messages.noPermission(sender);
+                return;
 
-                }
+            }
 
         }
 
 
         final Player p = (Player) sender;
-        if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Warp") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+        if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Warp") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 3) {
                 if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("set") && args[2] != null) {
                     final String warpName = args[2];
@@ -63,7 +66,7 @@ public class Warp implements CommandInterface {
                     messages.warpSet(sender, warpName);
                 } else if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("delete") && args[2] != null) {
                     final String warpName = args[2];
-                    if(RandomCoords.getPlugin().warps.getString("Warps." + warpName) != null) {
+                    if (RandomCoords.getPlugin().warps.getString("Warps." + warpName) != null) {
                         RandomCoords.getPlugin().warps.set("Warps." + warpName, null);
                         RandomCoords.getPlugin().saveWarps();
                         messages.warpDelete(sender, warpName);
@@ -79,10 +82,10 @@ public class Warp implements CommandInterface {
                     for (final String name : warps) {
                         sender.sendMessage(ChatColor.GREEN + name);
                     }
-                } else if(args[0].equalsIgnoreCase("warp") && Bukkit.getServer().getWorld(args[1]) != null) {
+                } else if (args[0].equalsIgnoreCase("warp") && Bukkit.getServer().getWorld(args[1]) != null) {
                     final World world = Bukkit.getServer().getWorld(args[1]);
                     if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-                        coordinates.finalCoordinates(p, 574272099, 574272099, world, CoordType.WARPS, 0);
+                        coordinates.finalCoordinates(p, 574272099, 574272099, world, CoordType.WARPWORLD, 0);
                     } else {
                         messages.noPermission(sender);
 

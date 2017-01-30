@@ -20,10 +20,10 @@ public class Others implements CommandInterface {
     private final MessageManager messages = new MessageManager();
 
     @Override
-    public void onCommand(final CommandSender sender, final Command  cmd, final String commandLabel, final String[] args) {
-        if(RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Others") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
+    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
+        if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Others") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
             if (args.length == 1 && args[0].equalsIgnoreCase("player")) {
-                messages.incorrectUsage(sender, "/RC Player", "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
+                messages.incorrectUsage(sender, "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
                 return;
             }
             if (args.length == 2 && args[0].equalsIgnoreCase("player")) {
@@ -74,11 +74,11 @@ public class Others implements CommandInterface {
                     messages.invalidWorld(sender, wName);
                     return;
                 }
-                int max = 574272099;
+                int max;
                 try {
                     max = Integer.valueOf(args[3]);
                 } catch (NumberFormatException e) {
-                    messages.incorrectUsage(sender, "/RC Player", "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
+                    messages.incorrectUsage(sender, "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
                     return;
                 }
                 final World world = Bukkit.getServer().getWorld(wName);
@@ -103,13 +103,13 @@ public class Others implements CommandInterface {
                     messages.invalidWorld(sender, wName);
                     return;
                 }
-                int min = 574272099;
-                int max = 574272099;
+                int min;
+                int max;
                 try {
                     max = Integer.valueOf(args[3]);
                     min = Integer.valueOf(args[4]);
                 } catch (NumberFormatException e) {
-                    messages.incorrectUsage(sender, "/RC Player", "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
+                    messages.incorrectUsage(sender, "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
                     return;
                 }
                 final String target = args[1];

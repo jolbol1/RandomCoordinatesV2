@@ -1,11 +1,11 @@
 package com.jolbol1.RandomCoordinates;
 
-import com.earth2me.essentials.Essentials;
 import com.jolbol1.RandomCoordinates.commands.*;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandHandler;
 import com.jolbol1.RandomCoordinates.listeners.*;
 import com.jolbol1.RandomCoordinates.managers.ConstructTabCompleter;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
+import com.jolbol1.RandomCoordinates.managers.Metrics;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.economy.Economy;
@@ -25,8 +25,10 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,33 +42,31 @@ import java.util.logging.Logger;
 public class RandomCoords extends JavaPlugin {
 
     public static Logger logger;
-    public final Map<Player, Location> wandSelection = new ConcurrentHashMap<>();
     private static Economy econ;
-    private double version = 0.4;
-
-
-
     private static Plugin plugin;
-
+    public final Map<Player, Location> wandSelection = new ConcurrentHashMap<>();
+    private final MessageManager messages = new MessageManager();
     public FileConfiguration language;
     public FileConfiguration config;
     public FileConfiguration limiter;
     public FileConfiguration portals;
     public FileConfiguration warps;
-
+    public int successTeleports = 0;
+    public int failedTeleports = 0;
     private File languageFile;
     private File configFile;
     private File limiterFile;
     private File portalsFile;
     private File warpFile;
-    private Essentials ess3;
-    private final MessageManager messages = new MessageManager();
 
     public static RandomCoords getPlugin() {
         return JavaPlugin.getPlugin(RandomCoords.class);
     }
 
     public void onEnable() {
+        //Setup bStats Metrics
+
+
         logger = Bukkit.getServer().getLogger();
         plugin = this;
         final PluginManager pm = getServer().getPluginManager();
@@ -77,12 +77,10 @@ public class RandomCoords extends JavaPlugin {
         final String ANSI_BLUE = "\u001B[34m";
         logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
 
-        if(Bukkit.getServer().getPluginManager().getPlugin("Essentials") != null) {
-            ess3 = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
-        }
+
         //Setup Language File
         languageFile = new File(this.getDataFolder(), "language.yml");
-        if(!languageFile.exists()) {
+        if (!languageFile.exists()) {
             try {
                 languageFile.createNewFile();
             } catch (IOException e) {
@@ -93,7 +91,7 @@ public class RandomCoords extends JavaPlugin {
         matchLanguage();
 
         configFile = new File(this.getDataFolder(), "config.yml");
-        if(!configFile.exists()) {
+        if (!configFile.exists()) {
             try {
                 configFile.createNewFile();
             } catch (IOException e) {
@@ -105,7 +103,7 @@ public class RandomCoords extends JavaPlugin {
 
 
         limiterFile = new File(this.getDataFolder(), "limiter.yml");
-        if(!limiterFile.exists()) {
+        if (!limiterFile.exists()) {
             try {
                 limiterFile.createNewFile();
             } catch (IOException e) {
@@ -115,7 +113,7 @@ public class RandomCoords extends JavaPlugin {
         limiter = YamlConfiguration.loadConfiguration(limiterFile);
 
         portalsFile = new File(this.getDataFolder(), "portals.yml");
-        if(!portalsFile.exists()) {
+        if (!portalsFile.exists()) {
             try {
                 portalsFile.createNewFile();
             } catch (IOException e) {
@@ -125,7 +123,7 @@ public class RandomCoords extends JavaPlugin {
         portals = YamlConfiguration.loadConfiguration(portalsFile);
 
         warpFile = new File(this.getDataFolder(), "warps.yml");
-        if(!warpFile.exists()) {
+        if (!warpFile.exists()) {
             try {
                 warpFile.createNewFile();
             } catch (IOException e) {
@@ -153,11 +151,14 @@ public class RandomCoords extends JavaPlugin {
         handler.register("help", new HelpCommand());
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
+        if (RandomCoords.getPlugin().config.getString("Metrics").equalsIgnoreCase("true")) {
+            Metrics metrics = new Metrics(this);
+            setupCharts(metrics);
+        }
 
 
         final PortalEnter pe = new PortalEnter();
         pe.runTaskTimer(this, 0L, 20L);
-
 
 
     }
@@ -200,6 +201,7 @@ public class RandomCoords extends JavaPlugin {
                 final YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
                 if (!newConfig.contains(key)) {
                     config.set(key, defConfig.get(key));
+                    Bukkit.getLogger().log(Level.WARNING, "Set: " + defConfig.get(key));
                     try {
                         config.save(configFile);
                     } catch (IOException e) {
@@ -216,76 +218,75 @@ public class RandomCoords extends JavaPlugin {
         return plugin;
     }
 
-    public void reloadLanguageFile(){
-        if(languageFile == null) {
+    public void reloadLanguageFile() {
+        if (languageFile == null) {
             languageFile = new File(plugin.getDataFolder(), "language.yml");
         }
         language = YamlConfiguration.loadConfiguration(languageFile);
         final InputStream defLanguageStream = plugin.getResource("language.yml");
-        if(defLanguageStream != null) {
+        if (defLanguageStream != null) {
             final YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
             language.setDefaults(defLanguage);
         }
 
     }
 
-    public void reloadConfigFile(){
-        if(configFile == null) {
+    public void reloadConfigFile() {
+        if (configFile == null) {
             configFile = new File(plugin.getDataFolder(), "config.yml");
         }
         config = YamlConfiguration.loadConfiguration(configFile);
         final InputStream defLanguageStream = plugin.getResource("config.yml");
-        if(defLanguageStream != null) {
+        if (defLanguageStream != null) {
             final YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
             config.setDefaults(defLanguage);
         }
 
     }
 
-    public void saveCustomConfig(){
-        if(config == null || configFile == null){
+    public void saveCustomConfig() {
+        if (config == null || configFile == null) {
             return;
         }
-        try{
+        try {
             config.save(configFile);
-        } catch (IOException ex){
-            plugin.getLogger().log(Level.SEVERE, "Could not save to config.yml " , ex);
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Could not save to config.yml ", ex);
         }
     }
 
-    public void saveLimiter(){
-        if(limiter == null || limiterFile == null){
+    public void saveLimiter() {
+        if (limiter == null || limiterFile == null) {
             return;
         }
-        try{
+        try {
             limiter.save(limiterFile);
-        } catch (IOException ex){
-            plugin.getLogger().log(Level.SEVERE, "Could not save to limiter.yml " , ex);
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Could not save to limiter.yml ", ex);
         }
     }
 
-    public void savePortals(){
-        if(portals == null || portalsFile == null){
+    public void savePortals() {
+        if (portals == null || portalsFile == null) {
             return;
         }
-        try{
+        try {
             portals.save(portalsFile);
-        } catch (IOException ex){
-            plugin.getLogger().log(Level.SEVERE, "Could not save to portals.yml " , ex);
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Could not save to portals.yml ", ex);
         }
     }
 
-    public void saveWarps(){
-        if(warps == null || warpFile == null){
+    public void saveWarps() {
+        if (warps == null || warpFile == null) {
             return;
         }
-        try{
+        try {
             warps.save(warpFile);
-        } catch (IOException ex){
-            plugin.getLogger().log(Level.SEVERE, "Could not save to warps.yml " , ex);
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.SEVERE, "Could not save to warps.yml ", ex);
         }
     }
-
 
 
     public WorldGuardPlugin getWorldGuard() {
@@ -298,11 +299,6 @@ public class RandomCoords extends JavaPlugin {
 
         return (WorldGuardPlugin) plugin;
     }
-
-    public Essentials essentials() {
-        return ess3;
-    }
-
 
 
     public ItemStack wand() {
@@ -336,16 +332,12 @@ public class RandomCoords extends JavaPlugin {
         return econ != null;
     }
 
-    public Economy getEcon() {
-        return econ;
-    }
-
     public boolean hasPayed(final Player p, final double cost) {
-        if(!setupEconomy() || cost == 0) {
+        if (!setupEconomy() || cost == 0) {
             return true;
         } else {
             final EconomyResponse r = econ.withdrawPlayer(p, cost);
-            if(r.transactionSuccess()) {
+            if (r.transactionSuccess()) {
                 messages.charged(p, cost);
                 return true;
 
@@ -358,13 +350,26 @@ public class RandomCoords extends JavaPlugin {
     }
 
     public boolean hasMoney(final Player p, final double cost) {
-        if(!setupEconomy() || cost == 0) {
-            return true;
-        } else {
-            return cost > econ.getBalance(p);
-            }
-        }
+        return !setupEconomy() || cost == 0 || cost > econ.getBalance(p);
+    }
 
+
+    public void setupCharts(Metrics metrics) {
+        metrics.addCustomChart(new Metrics.SingleLineChart("success") {
+            @Override
+            public int getValue() {
+                // (This is useless as there is already a player chart by default.)
+                return successTeleports;
+            }
+        });
+        metrics.addCustomChart(new Metrics.SingleLineChart("failed") {
+            @Override
+            public int getValue() {
+                // (This is useless as there is already a player chart by default.)
+                return failedTeleports;
+            }
+        });
+    }
 
 
 }
