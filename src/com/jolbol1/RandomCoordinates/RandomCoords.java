@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 
 /**
  * Created by James on 01/07/2016.
+ * Im confused AF!
  */
 public class RandomCoords extends JavaPlugin {
 
