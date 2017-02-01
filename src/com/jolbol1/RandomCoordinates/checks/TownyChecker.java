@@ -11,7 +11,11 @@ import org.bukkit.block.Block;
  * Created by JamesShopland on 14/04/15.
  */
 public class TownyChecker {
-
+    /**
+     * Checks if the player is near a Towny town, or within the checking radius.
+     * @param l The location to check.
+     * @return True or False, Is the location in a Town?
+     */
     public boolean TownyCheck(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("Towny") == null)) {
             if (RandomCoords.getPlugin().config.getString("Towny").equals("true")) {

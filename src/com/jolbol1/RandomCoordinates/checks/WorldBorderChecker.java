@@ -12,7 +12,11 @@ import org.bukkit.Location;
 public class WorldBorderChecker {
 
 
-    //Check if Random Location is in the WorldBorder
+    /**
+     * Checks if the location is outside of the WorldBorder world border. (Plugin)
+     * @param l The location to check.
+     * @return True or false, Is the location outside of the border.
+     */
     public boolean WorldBorderCheck(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("WorldBorder") == null)) {
             if (RandomCoords.getPlugin().config.getString("WorldBorder").equalsIgnoreCase("true")) {

@@ -15,6 +15,14 @@ import java.util.stream.Collectors;
  * Created by James on 05/07/2016.
  */
 public class ConstructTabCompleter implements TabCompleter {
+    /**
+     * The command that handles tab completion in minecraft.
+     * @param commandSender The player writing the command.
+     * @param command The command itself.
+     * @param s Not used.
+     * @param args The amount of arguments the player has typed.
+     * @return The tab competition list.
+     */
     @Override
     public List<String> onTabComplete(final CommandSender commandSender, final Command command, final String s, final String[] args) {
         if (args.length == 1) {

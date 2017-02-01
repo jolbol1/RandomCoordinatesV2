@@ -17,7 +17,10 @@ public class onJoin implements Listener {
     private final Coordinates coordinates = new Coordinates();
     private final MessageManager messages = new MessageManager();
 
-
+    /**
+     * The event that checks wheter to teleport the player on join.
+     * @param e The player join event.
+     */
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
         if (RandomCoords.getPlugin().config.getString("OnJoin").equalsIgnoreCase("false")) {

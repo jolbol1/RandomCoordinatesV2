@@ -82,7 +82,13 @@ public class All implements CommandInterface {
         }
     }
 
-
+    /**
+     * The function used within /RC All, to teleport all the players.
+     * @param sender Who used the command
+     * @param max The specified Max coordinate
+     * @param min The specified Min coordinate
+     * @param world The world to teleport all in.
+     */
     private void teleportAll(final CommandSender sender, final int max, final int min, World world) {
         for (final Player p : Bukkit.getServer().getOnlinePlayers()) {
             if (world == null) {
@@ -90,6 +96,7 @@ public class All implements CommandInterface {
             }
 
             //Check if world blacklisted
+
             for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
                 if (world.getName().equals(worlds)) {
                     messages.worldBanned(sender);

@@ -14,6 +14,10 @@ public class Signs implements Listener {
 
     private final MessageManager messages = new MessageManager();
 
+    /**
+     * Detects when a player creates a RC sign.
+     * @param e The sign change event.
+     */
     @EventHandler
     public void onSignChange(final SignChangeEvent e) {
         if (e.getLine(0) == null) {

@@ -12,7 +12,11 @@ import org.bukkit.entity.Player;
  * Created by JamesShopland on 24/12/14.
  */
 public class PlayerRadCheck {
-
+    /**
+     * Checks if a player is nearby the location, and within the checking radius.
+     * @param l The location to check.
+     * @return True or False, Are they near a player.
+     */
     public boolean isPlayerNear(final Location l) {
         final int X = l.getBlockX();
         final int Y = l.getBlockY();

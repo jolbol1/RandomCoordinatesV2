@@ -3,6 +3,7 @@ package com.jolbol1.RandomCoordinates.listeners;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,12 +14,19 @@ import java.util.Set;
 /**
  * Created by James on 04/07/2016.
  * <p>
- * THIS IS AN UNUSED CLASS / LISTENER
+ * THIS IS AN UNUSED CLASS / LISTENER, Apparently not...
  */
 public class BlockPortal implements Listener {
-
+    /**
+     * Blocks physics within the RC Portals. This is to allow for Portal blocks and flowing water.
+     * @param e The physics event.
+     */
     @EventHandler
     public void blockPhysics(final BlockPhysicsEvent e) {
+        Material mat = e.getBlock().getType();
+        if(mat == Material.WATER || mat == Material.STATIONARY_WATER || mat == Material.LAVA || mat == Material.STATIONARY_LAVA || mat == Material.PORTAL || mat == Material.ENDER_PORTAL) {
+
+
         if (RandomCoords.getPlugin().portals.get("Portal") == null) {
             return;
         }
@@ -54,12 +62,19 @@ public class BlockPortal implements Listener {
                 e.setCancelled(true);
                 return;
             }
-
+        }
 
         }
     }
 
-    //Written by desht
+
+    /**
+     * Are they inside of the portal.
+     * @param loc The players location.
+     * @param l1 Location of corner 1.
+     * @param l2 Location of corner 2.
+     * @return True or False, is the location in a portal.
+     */
     private boolean isInside(final Location loc, final Location l1, final Location l2) {
         final int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
         final int y1 = Math.min(l1.getBlockY(), l2.getBlockY());

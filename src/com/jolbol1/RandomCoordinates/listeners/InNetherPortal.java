@@ -17,6 +17,10 @@ public class InNetherPortal implements Listener {
 
     private final PortalEnter pe = new PortalEnter();
 
+    /**
+     * Checks if the player is a nether portal, and if that portal is a RC portal.
+     * @param e The teleport event.
+     */
     @EventHandler
     public void onPlayerTP(final PlayerTeleportEvent e) {
         if (e.getCause() != PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {

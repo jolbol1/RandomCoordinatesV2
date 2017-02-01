@@ -8,7 +8,11 @@ import org.bukkit.block.Block;
  * Created by James on 04/07/2016.
  */
 public class End {
-
+    /**
+     * Takes in the a random location for the end, Then finds the nearest island within 256.
+     * @param l Random location within the end.
+     * @return A Location on the nearest end island.
+     */
     public Location endCoord(final Location l) {
 
         final int X = l.getBlockX();
@@ -28,7 +32,7 @@ public class End {
         for (int i = 0; i < r * 2 + 1; i++) {
             for (int j = 0; j < r * 2 + 1; j++) {
                 for (int k = 0; k < r * 2 + 1; k++) {
-                    //Code here
+
                     final Block b = l.getWorld().getBlockAt(x, y, z);
                     if (b.getType() == Material.ENDER_STONE || b.getType() == Material.END_BRICKS) {
                         return b.getLocation().add(0, 2.5, 0);

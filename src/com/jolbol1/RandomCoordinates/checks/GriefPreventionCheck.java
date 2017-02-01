@@ -12,7 +12,11 @@ import org.bukkit.block.Block;
  */
 public class GriefPreventionCheck {
 
-
+    /**
+     * Used to check wether or not the location is in protected land, or within the buffer.
+     * @param l The location to check.
+     * @return True or False, Are they in protected land.
+     */
     public boolean griefPrevent(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention") == null)) {
             if (RandomCoords.getPlugin().config.getString("GriefPrevention").equals("true")) {

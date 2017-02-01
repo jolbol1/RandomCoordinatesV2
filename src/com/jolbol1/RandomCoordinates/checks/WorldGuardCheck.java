@@ -9,7 +9,11 @@ import org.bukkit.Location;
  * Created by JamesShopland on 11/01/15.
  */
 public class WorldGuardCheck {
-
+    /**
+     * Checks if the player is in, or near the specified WorldGuard regions.
+     * @param l The location to check.
+     * @return True or False, Is the location in one of these regions.
+     */
     public boolean WorldguardCheck(final Location l) {
 
         //Checks if plugin is installed.

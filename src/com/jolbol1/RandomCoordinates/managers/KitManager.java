@@ -27,7 +27,12 @@ import java.util.logging.Level;
  */
 class KitManager {
 
-
+    /**
+     * Grabs the kit from the config name.
+     * @param p The player we're getting the kit for.
+     * @param c The Chest that is being generated.
+     * @param name The name of the kit.
+     */
     public void getKit(final Player p, final Chest c, final String name) {
         if (Bukkit.getPluginManager().getPlugin("Essentials") == null) {
         } else {
@@ -56,6 +61,12 @@ class KitManager {
         }
     }
 
+    /**
+     * Gets the essentials kit from the config as ItemStacks.
+     * @param items The items in the kit.
+     * @param user The player in the form of Essentials User.
+     * @return The ItemStacks.
+     */
     private CompletableFuture<ItemStack[]> deSerialize(final List<String> items, final User user) {
         final Essentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
 

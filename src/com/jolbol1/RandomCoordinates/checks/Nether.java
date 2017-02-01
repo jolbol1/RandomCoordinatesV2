@@ -10,9 +10,16 @@ import org.bukkit.block.Block;
  */
 public class Nether {
 
-
+    /**
+     * Secret key used to get default Max and Min
+     */
     private static final int key = 574272099;
 
+    /**
+     * Takes the location and aims to find a 2 block gap that the player can teleport to on the Y value.
+     * @param l Takes in the initial location
+     * @return The new Y level.
+     */
     public int netherY(final Location l) {
         final int X = l.getBlockX();
         final int Y = 126;

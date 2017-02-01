@@ -10,7 +10,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
  * Created by James on 02/07/2016.
  */
 public class Invulnerable implements Listener {
-
+    /**
+     * Checks if the player is damaged while in InvulTime.
+     * @param e The damage event.
+     */
     @EventHandler
     public void onAnyDamage(final EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player)) {

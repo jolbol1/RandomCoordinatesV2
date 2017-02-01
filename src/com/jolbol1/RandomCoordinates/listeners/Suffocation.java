@@ -11,7 +11,10 @@ import org.bukkit.event.entity.EntityDamageEvent;
  * Created by James on 02/07/2016.
  */
 public class Suffocation implements Listener {
-
+    /**
+     * Checks if the player is suffocating on teleport, a re-teleports them higher.
+     * @param e The entity damage event.
+     */
     @EventHandler
     public void OnSuffocation(final EntityDamageEvent e) {
         if (!(e.getEntity() instanceof Player)) {
@@ -34,6 +37,7 @@ public class Suffocation implements Listener {
         double zR = Math.floor(z) + 0.5;
         final Location reTry = new Location(p.getWorld(), xR, highestY + 2, zR);
         p.teleport(reTry);
+        return;
 
     }
 

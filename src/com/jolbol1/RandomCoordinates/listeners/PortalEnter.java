@@ -79,7 +79,13 @@ public class PortalEnter extends BukkitRunnable {
         }
     }
 
-    //Written by desht
+    /**
+     * Checks if a plyer is inside the portal.
+      * @param loc The players location.
+     * @param l1 Corner 1 of the portal.
+     * @param l2 Corner 2 of the portal.
+     * @return True or False, are they in the portal.
+     */
     public boolean isInside(final Location loc, final Location l1, final Location l2) {
         final int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
         final int y1 = Math.min(l1.getBlockY(), l2.getBlockY());

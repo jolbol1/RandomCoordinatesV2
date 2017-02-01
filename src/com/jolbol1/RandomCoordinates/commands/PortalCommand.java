@@ -70,11 +70,11 @@ public class PortalCommand implements CommandInterface {
                         }
 
                     }
-                    if (selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) == null || selection.get(RandomCoords.getPlugin().PortalMap("pos2", p)) == null) {
+                    if (selection.get(PortalMap("pos1", p)) == null || selection.get(PortalMap("pos2", p)) == null) {
                         messages.noSelection(sender);
-                    } else if (selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) != null && selection.get(RandomCoords.getPlugin().PortalMap("pos1", p)) != null) {
-                        final Location pos1 = (Location) selection.get(RandomCoords.getPlugin().PortalMap("pos1", p));
-                        final Location pos2 = (Location) selection.get(RandomCoords.getPlugin().PortalMap("pos2", p));
+                    } else if (selection.get(PortalMap("pos1", p)) != null && selection.get(PortalMap("pos1", p)) != null) {
+                        final Location pos1 = (Location) selection.get(PortalMap("pos1", p));
+                        final Location pos2 = (Location) selection.get(PortalMap("pos2", p));
                         if (pos1.getWorld() != pos2.getWorld()) {
                             messages.posInSameWorld(sender);
                             return;
@@ -123,4 +123,16 @@ public class PortalCommand implements CommandInterface {
             messages.noPermission(sender);
         }
     }
+
+    /**
+     * Creates a string of the position + player.
+     * @param position The position.
+     * @param p The player.
+     * @return The Combined String.
+     */
+    public String PortalMap(final String position, final Player p) {
+        return position + p.getName();
+    }
+
+
 }

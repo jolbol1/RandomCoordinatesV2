@@ -41,28 +41,47 @@ import java.util.logging.Logger;
  */
 public class RandomCoords extends JavaPlugin {
 
+
     public static Logger logger;
     private static Economy econ;
     private static Plugin plugin;
+
+    /**
+     * Used to put in the current /RC Wand selection, and who selected it.
+     */
     public final Map<Player, Location> wandSelection = new ConcurrentHashMap<>();
+    /**
+     * Creates an instance of the messages folder, Which handles most messages within.
+     */
     private final MessageManager messages = new MessageManager();
+
+//Creates an instance of the config files.
     public FileConfiguration language;
     public FileConfiguration config;
     public FileConfiguration limiter;
     public FileConfiguration portals;
     public FileConfiguration warps;
-    public int successTeleports = 0;
-    public int failedTeleports = 0;
     private File languageFile;
     private File configFile;
     private File limiterFile;
     private File portalsFile;
     private File warpFile;
 
+    //Sets the number to 0, The counter for successful teleports and failed.
+    public int successTeleports = 0;
+    public int failedTeleports = 0;
+
+    /**
+     * Used to grab the plugin instance from this clas
+     * @return The plugin instance
+     */
     public static RandomCoords getPlugin() {
         return JavaPlugin.getPlugin(RandomCoords.class);
     }
 
+    /**
+     * What to do on start up.
+     */
     public void onEnable() {
         //Setup bStats Metrics
 
@@ -163,6 +182,9 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
+    /**
+     * Used to update the language file, used for new updates.
+     */
     private void matchLanguage() {
 
         final InputStream is = getResource("language-defaults.yml");
@@ -188,6 +210,9 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
+    /**
+     * Used to update the config file.
+     */
     private void matchConfig() {
 
         final InputStream is = getResource("config-defaults.yml");
@@ -214,10 +239,17 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
+    /**
+     * Another method to grab an instance of plugin.
+     * @return the plugin instance.
+     */
     public Plugin getInstance() {
         return plugin;
     }
 
+    /**
+     * Used to save changes to the language file, and update.
+     */
     public void reloadLanguageFile() {
         if (languageFile == null) {
             languageFile = new File(plugin.getDataFolder(), "language.yml");
@@ -231,6 +263,9 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
+    /**
+     * Used to save changes to the config file, and update.
+     */
     public void reloadConfigFile() {
         if (configFile == null) {
             configFile = new File(plugin.getDataFolder(), "config.yml");
@@ -244,6 +279,9 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
+    /**
+     * Saves the config file, to add changes.
+     */
     public void saveCustomConfig() {
         if (config == null || configFile == null) {
             return;
@@ -255,6 +293,9 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
+    /**
+     * Save changes to the limiter.
+     */
     public void saveLimiter() {
         if (limiter == null || limiterFile == null) {
             return;
@@ -266,6 +307,9 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
+    /**
+     * Save changes to the portal file.
+     */
     public void savePortals() {
         if (portals == null || portalsFile == null) {
             return;
@@ -277,6 +321,9 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
+    /**
+     * Save changes to the warp file.
+     */
     public void saveWarps() {
         if (warps == null || warpFile == null) {
             return;
@@ -288,7 +335,10 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
-
+    /**
+     * Grabs an instance of the WorldGuard plugin
+     * @return WorldGuard plugin
+     */
     public WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
 
@@ -300,7 +350,10 @@ public class RandomCoords extends JavaPlugin {
         return (WorldGuardPlugin) plugin;
     }
 
-
+    /**
+     * Creates a item for the /RC wand
+     * @return the Wand ItemStack
+     */
     public ItemStack wand() {
         final ItemStack wand = new ItemStack(Material.GOLD_AXE);
         final ItemMeta itemMeta = wand.getItemMeta();
@@ -312,14 +365,21 @@ public class RandomCoords extends JavaPlugin {
         return wand;
     }
 
-    public String PortalMap(final String position, final Player p) {
-        return position + p.getName();
-    }
 
+    /**
+     * Checks if the player has the specified permission.
+     * @param sender Who are we checking
+     * @param permission What permission are we checking
+     * @return True or False, Do they have the permission?
+     */
     public boolean hasPermission(final CommandSender sender, final String permission) {
         return sender.hasPermission(permission);
     }
 
+    /**
+     * Creates the economy envoronment for this plugin/
+     * @return the instance of the economy, Using vault.
+     */
     private boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
@@ -332,6 +392,12 @@ public class RandomCoords extends JavaPlugin {
         return econ != null;
     }
 
+    /**
+     * Check if the player has paid the price of teleporting.
+     * @param p The initiater of the teleport, and who we're charging
+     * @param cost The cost
+     * @return True or False, Have they paid.
+     */
     public boolean hasPayed(final Player p, final double cost) {
         if (!setupEconomy() || cost == 0) {
             return true;
@@ -349,11 +415,20 @@ public class RandomCoords extends JavaPlugin {
         }
     }
 
+    /**
+     * Checks if they have the correct amount of money to pay for the teleport.
+     * @param p The player that we are cheking.
+     * @param cost the cost of teleport
+     * @return True or False, do they have the money?
+     */
     public boolean hasMoney(final Player p, final double cost) {
         return !setupEconomy() || cost == 0 || cost > econ.getBalance(p);
     }
 
-
+    /**
+     * Generates the charts to send to metric.
+     * @param metrics returns charts to send.
+     */
     public void setupCharts(Metrics metrics) {
         metrics.addCustomChart(new Metrics.SingleLineChart("success") {
             @Override

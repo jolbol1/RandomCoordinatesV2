@@ -12,7 +12,11 @@ import org.bukkit.block.Block;
  */
 public class FactionChecker {
 
-
+    /**
+     * Used to check wether or not the location is in faction land, or within the buffer.
+     * @param l The location that we are checking.
+     * @return True or False, is it in faction land?
+     */
     public boolean FactionCheck(final Location l) {
         if (!(Bukkit.getServer().getPluginManager().getPlugin("Factions") == null)) {
             if (RandomCoords.getPlugin().config.getString("Factions").equals("true")) {

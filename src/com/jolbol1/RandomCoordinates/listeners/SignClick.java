@@ -24,6 +24,10 @@ public class SignClick implements Listener {
     private final MessageManager messages = new MessageManager();
     private final Coordinates coordinates = new Coordinates();
 
+    /**
+     * Gets when a player clicks a sign, and if its a RC sign.
+     * @param e The player interact event.
+     */
     @EventHandler
     public void onClickEvent(final PlayerInteractEvent e) {
         double cost = 0;
