@@ -67,4 +67,5 @@ CircleRadiusDefault: false
 CircleRadiusWorlds:
   - example
 debug: false
+UpdateMessage: true
 

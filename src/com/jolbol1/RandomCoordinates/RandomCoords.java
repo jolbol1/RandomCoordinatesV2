@@ -25,10 +25,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -151,6 +149,10 @@ public class RandomCoords extends JavaPlugin {
 
         final PortalEnter pe = new PortalEnter();
         pe.runTaskTimer(this, 0L, 20L);
+
+        if(config.getString("UpdateMessage").equalsIgnoreCase("true")) {
+            updater();
+        }
 
 
     }
@@ -325,7 +327,51 @@ public class RandomCoords extends JavaPlugin {
     }
 
     private void updater() {
-        
+        //Gets the site URL we're reading from.
+        URL site;
+        //Sets the string as null, until its changed when we read.
+        String versionOnFile = null;
+
+        /**
+         * Trys to grab the coorinates from the Random.Org site.
+         * Catch if it cant, logs an error in the console.
+         */
+        try {
+            //Website URL.
+            final String web = "https://rawgit.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
+            //Sets it as the site to be read from.
+            site = new URL(web);
+
+            /**
+             * Tries using buffered reader to read the line on the page.
+             */
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(site.openStream()))) {
+                //Set the line
+                String line;
+                /**
+                 * If the line is not null, set Random as the line number.
+                 */
+                while ((line = in.readLine()) != null) {
+                    //Set string random as line.
+                    versionOnFile = line;
+                }
+            }
+        } catch (IOException ignored) {
+            //Log if we couldnt read the line of the site.
+            RandomCoords.logger.severe("Couldnt grab the update.yml from the web.");
+        }
+        //Return the number as a string.
+        if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
+            for(Player p : Bukkit.getOnlinePlayers()) {
+                if(p.isOp()) {
+                    p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit.");
+                }
+            }
+        }
+
+
+
+
     }
 
 
