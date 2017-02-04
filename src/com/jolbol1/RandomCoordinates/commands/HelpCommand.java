@@ -10,51 +10,66 @@ import org.bukkit.command.CommandSender;
  */
 public class HelpCommand implements CommandInterface {
 
-    private final String prefix = ChatColor.GOLD + "- ";
-    private final ChatColor good = ChatColor.RED;
+    private final String prefix = ChatColor.GOLD + "";
+    private final ChatColor good = ChatColor.AQUA;
+    private final ChatColor un = ChatColor.DARK_AQUA;
+    private final ChatColor desc = ChatColor.YELLOW;
 
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
+        if (args[0].equalsIgnoreCase("help")) {
+            if (args.length == 1 || args.length == 2 && args[1].equalsIgnoreCase("1")) {
 
-            sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Help Page: Developed by Jolbol1/ImBaffled");
-            if (sender.hasPermission("Random.Basic") || sender.hasPermission("Random.Command") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC - Teleport to somewhere random!");
-            }
-            if (sender.hasPermission("Random.Warps") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC Warp - Teleport to a random warp!");
-            }
-            if (sender.hasPermission("Random.Admin.All") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC All {World} {Max} {Min} - Teleports all players to a random location. {World/Max/Min} are not required.");
-            }
-            if (sender.hasPermission("Random.Admin.Others") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC Player {Name} {Wolrd} {Max} {Min} - Teleports the specified player to a random location. {World/Max/Min} are not required.");
-            }
-            if (sender.hasPermission("Random.Admin.Reload") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC Reload - Reloads the configuration files.");
-            }
-            if (sender.hasPermission("Random.Admin.Warp") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC Warp Set {Name} - Sets a warp with {Name} at current location");
-                sender.sendMessage(prefix + good + "/RC Warp Delete {Name} - Deletes the warp with {Name}");
-                sender.sendMessage(prefix + good + "/RC Warp List - Lists all set warps");
+                sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Help Page 1/3: Developed by Jolbol1/ImBaffled");
+                if (sender.hasPermission("Random.Basic") || sender.hasPermission("Random.Command") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC" + desc +  " Teleport to somewhere random!");
+                }
+                if (sender.hasPermission("Random.Warps") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC Warp" + desc + " Teleport to a random warp!");
+                }
+                if (sender.hasPermission("Random.Admin.All") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC All" + un +  " {World} {Max} {Min}" + desc + " Teleports all players to a random location. {World/Max/Min} are not required.");
+                }
+                if (sender.hasPermission("Random.Admin.Others") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC Player" + un +  " {Name} {World} {Max} {Min}" + desc + " Teleports the specified player to a random location. {World/Max/Min} are not required.");
+                }
+                if (sender.hasPermission("Random.Admin.Reload") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC Reload" + desc +  " Reloads the configuration files.");
+                }
 
-
-            }
-
-            if (sender.hasPermission("Random.Admin.Portals") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC Wand - Gives you the Random Wand for portal selection.");
-                sender.sendMessage(prefix + good + "/RC Portal Create {Name} - Creates a portal from the RandomWand selection with name {Name}");
-                sender.sendMessage(prefix + good + "/RC Portal Delete {Name} - Deletes a portal with name {Name}");
-            }
+            } else if (args.length == 2 && args[1].equalsIgnoreCase("2")) {
+                sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Help Page 2/3: Developed by Jolbol1/ImBaffled");
+                if (sender.hasPermission("Random.Admin.Warp") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC Warp Set" + un +  " {Name}" + desc +  " Sets a warp with {Name} at current location");
+                    sender.sendMessage(prefix + good + "/RC Warp Delete" + un +  " {Name}" + desc +  " Deletes the warp with {Name}");
+                    sender.sendMessage(prefix + good + "/RC Warp List" + desc +  " Lists all set warps");
 
 
-            if (sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.Admin.Settings") || sender.hasPermission("Random.*")) {
-                sender.sendMessage(prefix + good + "/RC Set {World} Center - Sets the centerpoint for the Max, Min boundary");
-                sender.sendMessage(prefix + good + "/RC Set {World} Max {Number} - Sets the maximum boundary for random teleporting");
-                sender.sendMessage(prefix + good + "/RC Set {World} Min {Number} - Sets the minimum boundary for random teleporting");
-                sender.sendMessage(prefix + good + "To remove the center, use 'remove' after Center, To use the global max/min, replace {Number} with 'global'");
+                }
+
+                if (sender.hasPermission("Random.Admin.Portals") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC Wand" + desc +  " Gives you the Random Wand for portal selection.");
+                    sender.sendMessage(prefix + good + "/RC Portal Create" + un + " {Name}" + desc + " Creates a portal from the RandomWand selection with name {Name}");
+                    sender.sendMessage(prefix + good + "/RC Portal Delete" + un +  " {Name}" + desc +  " Deletes a portal with name {Name}");
+                }
+            } else if (args.length == 2 && args[1].equalsIgnoreCase("3")) {
+                sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Help Page 3/3: Developed by Jolbol1/ImBaffled");
+
+                if (sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.Admin.Settings") || sender.hasPermission("Random.*")) {
+                    sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Center" + desc + " Sets the centerpoint for the Max, Min boundary");
+                    sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Center Remove" + desc + " Removes the center point for {World}");
+
+                    sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Max" + un + " {Number}" + desc + " Sets the maximum boundary for random teleporting");
+                    sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Min" + un + " {Number}" + desc + " Sets the minimum boundary for random teleporting");
+                    sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Max Global" + desc + " Sets the max to the default in config.");
+                    sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Min Global"  + desc + " Sets the min to the default in config.");
+                }
+            } else if(args.length == 2) {
+                sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "Invalid Page, Must be between 1 and 3!");
             }
         }
     }
 }
+
+

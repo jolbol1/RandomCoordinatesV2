@@ -66,4 +66,5 @@ Metrics: true
 CircleRadiusDefault: false
 CircleRadiusWorlds:
   - example
+debug: false
 

@@ -26,6 +26,7 @@ public class All implements CommandInterface {
             if (!args[0].equalsIgnoreCase("all")) {
                 return;
             }
+
             if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.All") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
                 if (args.length == 1) {
                     teleportAll(sender, 574272099, 574272099, null);
@@ -91,8 +92,12 @@ public class All implements CommandInterface {
      */
     private void teleportAll(final CommandSender sender, final int max, final int min, World world) {
         for (final Player p : Bukkit.getServer().getOnlinePlayers()) {
+            String worldName;
             if (world == null) {
                 world = p.getWorld();
+                worldName = "the world they were in.";
+            } else {
+                worldName = world.getName();
             }
 
             //Check if world blacklisted
@@ -105,12 +110,14 @@ public class All implements CommandInterface {
                 }
             }
             if (!(sender instanceof ConsoleCommandSender)) {
+                messages.teleportedAll(sender, worldName);
                 final Player player = (Player) sender;
                 if (p != player) {
                     coordinates.finalCoordinates(p, max, min, world, CoordType.ALL, 0);
                     messages.teleportedBy(sender, p);
                 }
             } else {
+                messages.teleportedAll(sender, worldName);
                 coordinates.finalCoordinates(p, max, min, world, CoordType.ALL, 0);
                 messages.teleportedBy(sender, p);
             }

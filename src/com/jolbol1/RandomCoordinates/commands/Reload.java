@@ -18,8 +18,12 @@ public class Reload implements CommandInterface {
         if (args.length == 1) {
             if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Reload") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
                 if (args[0].equalsIgnoreCase("reload")) {
-                    RandomCoords.getPlugin().reloadLanguageFile();
-                    RandomCoords.getPlugin().reloadConfigFile();
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().language, "language.yml");
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().config, "config.yml");
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().limiter, "limiter.yml");
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().portals, "portals.yml");
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().warps, "warps.yml");
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().blacklist, "blacklist.yml");
                     messages.reloadMessage(sender);
 
                 }

@@ -447,5 +447,17 @@ public class MessageManager {
         sender.sendMessage(prefix + message);
     }
 
+    /**
+     * Message that is when a player /RC all's people/
+     * @param sender Who we're sending the message to.
+     * @param world The world they telepoted too.
+     */
+    public void teleportedAll(final CommandSender sender, final String world) {
+        final String message = RandomCoords.getPlugin().language.getString("TeleportedAll");
+        final String finalMessage = message.replaceAll("%world", world);
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix + messages);
+    }
+
 
 }

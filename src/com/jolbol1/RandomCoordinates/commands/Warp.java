@@ -62,13 +62,13 @@ public class Warp implements CommandInterface {
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Y", y);
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Z", z);
                     RandomCoords.getPlugin().warps.set("Warps." + warpName + ".World", world.getName());
-                    RandomCoords.getPlugin().saveWarps();
+                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().warps, RandomCoords.getPlugin().warpFile);
                     messages.warpSet(sender, warpName);
                 } else if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("delete") && args[2] != null) {
                     final String warpName = args[2];
                     if (RandomCoords.getPlugin().warps.getString("Warps." + warpName) != null) {
                         RandomCoords.getPlugin().warps.set("Warps." + warpName, null);
-                        RandomCoords.getPlugin().saveWarps();
+                        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().warps, RandomCoords.getPlugin().warpFile);
                         messages.warpDelete(sender, warpName);
                     } else {
                         messages.warpNotExist(sender);

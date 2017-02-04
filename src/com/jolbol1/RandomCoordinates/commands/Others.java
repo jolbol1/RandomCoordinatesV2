@@ -78,7 +78,7 @@ public class Others implements CommandInterface {
                 try {
                     max = Integer.valueOf(args[3]);
                 } catch (NumberFormatException e) {
-                    messages.incorrectUsage(sender, "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
+                    messages.incorrectUsage(sender, "/RC player {Player} {World} {Max} {Min} - {World/Max/Min} = Not Required");
                     return;
                 }
                 final World world = Bukkit.getServer().getWorld(wName);

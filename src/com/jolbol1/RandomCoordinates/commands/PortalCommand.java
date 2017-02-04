@@ -95,7 +95,7 @@ public class PortalCommand implements CommandInterface {
                         RandomCoords.getPlugin().portals.set("Portal." + pName + "." + "p2z", p2z);
                         RandomCoords.getPlugin().portals.set("Portal." + pName + ".PortalWorld", pos1.getBlock().getWorld().getName());
                         RandomCoords.getPlugin().portals.set("Portal." + pName + ".world", wName);
-                        RandomCoords.getPlugin().savePortals();
+                        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().portals, RandomCoords.getPlugin().portalsFile);
                         messages.portalCreated(sender, pName, wName);
 
 
@@ -108,7 +108,7 @@ public class PortalCommand implements CommandInterface {
                         if (RandomCoords.getPlugin().portals.get("Portal." + pName) != null) {
                             RandomCoords.getPlugin().portals.set("Portal." + pName, null);
                             messages.portalDeleted(sender, pName);
-                            RandomCoords.getPlugin().savePortals();
+                            RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().portals, RandomCoords.getPlugin().portalsFile);
                             return;
                         } else {
                             messages.portalNotExist(sender, pName);

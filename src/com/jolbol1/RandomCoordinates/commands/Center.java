@@ -43,7 +43,7 @@ public class Center implements CommandInterface {
                         RandomCoords.getPlugin().config.set(wName + ".Center.X", x);
                         RandomCoords.getPlugin().config.set(wName + ".Center.Y", y);
                         RandomCoords.getPlugin().config.set(wName + ".Center.Z", z);
-                        RandomCoords.getPlugin().saveCustomConfig();
+                        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().config, RandomCoords.getPlugin().configFile);
                         messages.centerSet(sender);
                     }
 
@@ -64,7 +64,7 @@ public class Center implements CommandInterface {
 
                     if (args[3].equalsIgnoreCase("global")) {
                         RandomCoords.getPlugin().config.set(world.getName() + ".Max", null);
-                        RandomCoords.getPlugin().saveCustomConfig();
+                        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().config, RandomCoords.getPlugin().configFile);
                         messages.maxRemove(sender, world.getName());
 
                         return;
@@ -79,7 +79,7 @@ public class Center implements CommandInterface {
 
                     final String wName = world.getName();
                     RandomCoords.getPlugin().config.set(wName + ".Max", max);
-                    RandomCoords.getPlugin().saveCustomConfig();
+                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().config, RandomCoords.getPlugin().configFile);
                     messages.maxSet(sender, String.valueOf(max), world.getName());
 
                 } else if (args[2].equalsIgnoreCase("min")) {
@@ -92,7 +92,7 @@ public class Center implements CommandInterface {
                     }
                     if (args[3].equalsIgnoreCase("global")) {
                         RandomCoords.getPlugin().config.set(world.getName() + ".Min", null);
-                        RandomCoords.getPlugin().saveCustomConfig();
+                        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().config, RandomCoords.getPlugin().configFile);
                         messages.minRemove(sender, world.getName());
                         return;
                     }
@@ -106,7 +106,7 @@ public class Center implements CommandInterface {
 
                     final String wName = world.getName();
                     RandomCoords.getPlugin().config.set(wName + ".Min", min);
-                    RandomCoords.getPlugin().saveCustomConfig();
+                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().config, RandomCoords.getPlugin().configFile);
                     messages.minSet(sender, String.valueOf(min), world.getName());
                 } else if (args[2].equalsIgnoreCase("center") && args[3].equalsIgnoreCase("remove")) {
                     World world;
@@ -117,7 +117,7 @@ public class Center implements CommandInterface {
                         return;
                     }
                     RandomCoords.getPlugin().config.set(world.getName() + ".Center", null);
-                    RandomCoords.getPlugin().saveCustomConfig();
+                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().config, RandomCoords.getPlugin().configFile);
                     messages.centerRemove(sender, world.getName());
 
                 }

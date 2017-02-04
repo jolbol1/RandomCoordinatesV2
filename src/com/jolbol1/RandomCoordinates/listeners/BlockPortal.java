@@ -17,6 +17,9 @@ import java.util.Set;
  * THIS IS AN UNUSED CLASS / LISTENER, Apparently not...
  */
 public class BlockPortal implements Listener {
+
+    private final PortalEnter pe = new PortalEnter();
+
     /**
      * Blocks physics within the RC Portals. This is to allow for Portal blocks and flowing water.
      * @param e The physics event.
@@ -24,43 +27,77 @@ public class BlockPortal implements Listener {
     @EventHandler
     public void blockPhysics(final BlockPhysicsEvent e) {
         Material mat = e.getBlock().getType();
+        /**
+         * If the material thats causing the physics event is one of these, Execute the next code, Else allow physics normally.
+         */
         if(mat == Material.WATER || mat == Material.STATIONARY_WATER || mat == Material.LAVA || mat == Material.STATIONARY_LAVA || mat == Material.PORTAL || mat == Material.ENDER_PORTAL) {
 
-
-        if (RandomCoords.getPlugin().portals.get("Portal") == null) {
+            /**
+             * If There are not any portals, Allow natural physics.
+              */
+            if (RandomCoords.getPlugin().portals.get("Portal") == null) {
             return;
         }
+
+        //Gets the list of portals from the portal file.
         final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
-        for (final String name : portals) {
+            /**
+             * Check all of these portals to see if the block that had an update is in one of them.
+             */
+            for (final String name : portals) {
+                //Gets the world that the portal goes to.
+                final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
 
-
-            final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
-            if (Bukkit.getServer().getWorld(world) == null) {
-                Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
-                return;
+                /**
+                 * If the wolrd doesnt exist, Allow natural physics and log that no such world occurs for said portal.
+                  */
+                if (Bukkit.getServer().getWorld(world) == null) {
+                    //Log the fact that the world is non existent
+                    Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
+                    return;
 
             }
+
+            //Gets the world that the portal is in.
             final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
 
-            if (Bukkit.getServer().getWorld(portalWorld) == null) {
-                Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
-                return;
+                /**
+                 * If the world the portal is in is null, Again log it and return.
+                  */
+                if (Bukkit.getServer().getWorld(portalWorld) == null) {
+                    //Log the fact that this world no longer exitst.
+                    Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
+                    return;
+                }
 
-            }
-            final World w = Bukkit.getServer().getWorld(portalWorld);
-            final int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
-            final int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
-            final int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
+                //Grabs the world that the portal is in.
+                final World w = Bukkit.getServer().getWorld(portalWorld);
+                /**
+                 * Grab one corner of the portal.
+                 */
+                final int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
+                final int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
+                final int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
+                /**
+                 * Grab the other corner of the portal.
+                 */
+                final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
+                final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
+                final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
 
-            final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
-            final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
-            final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
-            final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
-            final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
+                /**
+                 * Use these value as a method to get the location of the corner.
+                 */
+                final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
+                final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
 
-            if (isInside(e.getBlock().getLocation(), l1, l2)) {
-                e.setCancelled(true);
-                return;
+                /**.
+                 * If the location that we have got is inside a portal, Cancel the physics.
+                 */
+                if (pe.isInside(e.getBlock().getLocation(), l1, l2)) {
+                    //Cancels the physics event.
+                    e.setCancelled(true);
+                    return;
             }
         }
 
@@ -68,26 +105,7 @@ public class BlockPortal implements Listener {
     }
 
 
-    /**
-     * Are they inside of the portal.
-     * @param loc The players location.
-     * @param l1 Location of corner 1.
-     * @param l2 Location of corner 2.
-     * @return True or False, is the location in a portal.
-     */
-    private boolean isInside(final Location loc, final Location l1, final Location l2) {
-        final int x1 = Math.min(l1.getBlockX(), l2.getBlockX());
-        final int y1 = Math.min(l1.getBlockY(), l2.getBlockY());
-        final int z1 = Math.min(l1.getBlockZ(), l2.getBlockZ());
-        final int x2 = Math.max(l1.getBlockX(), l2.getBlockX());
-        final int y2 = Math.max(l1.getBlockY(), l2.getBlockY());
-        final int z2 = Math.max(l1.getBlockZ(), l2.getBlockZ());
-        final int x = loc.getBlockX();
-        final int y = loc.getBlockY();
-        final int z = loc.getBlockZ();
 
-        return x >= x1 && x <= x2 && y >= y1 && y <= y2 && z >= z1 && z <= z2;
-    }
 
 }
 

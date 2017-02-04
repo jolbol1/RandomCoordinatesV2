@@ -23,20 +23,37 @@ public class onJoin implements Listener {
      */
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
+        /**
+         * If the onJoin config option is false, then dont run the code.
+         */
         if (RandomCoords.getPlugin().config.getString("OnJoin").equalsIgnoreCase("false")) {
             return;
         }
+        /**
+         * If the player has the permission to be teleported onJoin then do so. Else, Dont. :P
+         */
         if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.OnJoin") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
+            //Grabs an instance of the player who is joining.
             final Player p = e.getPlayer();
+            /**
+             * Checks if the player has played before, If so dont run the code.
+             */
             if (p.hasPlayedBefore()) {
                 return;
             }
+            //Get the command that should be run on join. Plans to change this to a list.
             final String command = RandomCoords.getPlugin().config.getString("OnJoinCommand");
+            //Initiate the coordinates function which will handle the random teleport. Notice the secret key to get default values.
             coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.JOIN, 0);
+            //Message them to let them know that they have been teleported.
             messages.onJoin(p);
+            /**
+             * If there is no command, return.
+             */
             if (command.equalsIgnoreCase("none")) {
                 return;
             }
+            //Runs the command specified, from the players point of view. (SHOULD BE MOVED TO THE COORDINATES, SERIOUS ISSUE)
             p.getServer().dispatchCommand(p, command);
         }
 

@@ -62,7 +62,7 @@ public class SignClick implements Listener {
                             }
 
                         }
-                        if (RandomCoords.getPlugin().hasMoney(e.getPlayer(), cost)) {
+                        if (coordinates.hasMoney(e.getPlayer(), cost)) {
                             coordinates.finalCoordinates(e.getPlayer(), 574272099, 574272099, world, CoordType.SIGN, cost);
                         } else {
                             messages.cost(e.getPlayer(), cost);

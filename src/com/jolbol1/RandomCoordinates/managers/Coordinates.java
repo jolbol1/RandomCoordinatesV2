@@ -4,6 +4,7 @@ package com.jolbol1.RandomCoordinates.managers;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.checks.*;
 import com.jolbol1.RandomCoordinates.cooldown.Cooldown;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -15,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.util.Vector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,6 +53,8 @@ public class Coordinates {
     private final End end = new End();
     //Grabs the max attempts value from the config.
     private final int maxAttempts = RandomCoords.getPlugin().config.getInt("MaxAttempts");
+    //Grab an instance of the debug manager.
+    private final DebugManager debugManager = new DebugManager();
 
     /**
      * Grabs random coordinates within a world.
@@ -68,9 +70,9 @@ public class Coordinates {
         //Setup the value of the Z coordinate as null, But to be changed later.
         int randomZ;
         //Grab the X coordinate of the center of the Random Area
-        int spawnX = getCenterX(world);
+        int centerX = getCenterX(world);
         //Grab the Z coordinate of the center of the Random Area
-        int spawnZ = getCenterZ(world);
+        int centerZ = getCenterZ(world);
         //Sets the minimum as 0, Usually changed
         int minOne = 0;
         int minTwo = 0;
@@ -104,13 +106,13 @@ public class Coordinates {
         }
 
         //Just uses a Y = 90 as a default, Is always changed to highest block... I hope.
-        final Location preRandom = new Location(world, spawnX + (randomX + 0.5), 90, spawnZ + (randomZ + 0.5));
+        final Location preRandom = new Location(world, centerX + (randomX + 0.5), 90, centerZ + (randomZ + 0.5));
 
         /**
          * If the world is actual the nether, use the Nether class to find a Y coordinate thats safe.
          * This is to avoid .getHighestBlockAt returning the bedrock on top of the nether. (Will take longer to grab coordinate)
          */
-        if (world.getBiome(spawnX, spawnZ).equals(Biome.HELL)) {
+        if (world.getBiome(centerX, centerZ).equals(Biome.HELL)) {
             highestPoint = nether.netherY(preRandom);
 
         } else {
@@ -118,7 +120,7 @@ public class Coordinates {
         }
 
         //Returns a random location they may be able to spawn to.
-        return new Location(world, spawnX + (randomX + 0.5), highestPoint, spawnZ + (randomZ + 0.5));
+        return new Location(world, centerX + (randomX + 0.5), highestPoint, centerZ + (randomZ + 0.5));
 
     }
 
@@ -175,9 +177,86 @@ public class Coordinates {
      * @param cost The cost of the teleport.
      */
     public void finalCoordinates(final Player player, int max, int min, final World world, final CoordType type, final double cost) {
+        //Sets the default search term in the config as "Command". May be changed based on the CoordType.
+        String name = "Command";
+        //Sets the default search term for the cost name as Default.
+        String costName = "default";
+        double thisCost = cost;
+        //Sets time before as 0, may be changed later.
+        int timeBefore = 0;
+        //Sets the cooldown as 0, may be changed later.
+        int cooldown = 0;
+
         /**
-         * Check is the world they want to teleport in is banned. If so, cancel.
+         * Changes the search term based on the CoordType provided in the parameters.
          */
+        switch (type) {
+            case COMMAND:
+                name = "Command";
+                costName = "CommandCost";
+                break;
+            case ALL:
+                name = "All";
+                break;
+            case PLAYER:
+                name = "Others";
+                break;
+            case SIGN:
+                name = "Signs";
+                break;
+            case JOIN:
+                name = "Join";
+                break;
+            case PORTAL:
+                name = "Portals";
+                costName = "PortalCost";
+                break;
+            case WARPS:
+                name = "Warps";
+                break;
+            case WARPWORLD:
+                name = "Warps";
+                break;
+
+        }
+
+        if(!hasMoney(player, costApplys(thisCost, costName))) {
+            messages.cost(player, costApplys(thisCost, costName));
+            return;
+        }
+        //Changes the limiter boolean to the one provided by the check.
+
+        /**
+         * If the limiter is false, AKA they have reached it. Cancel.
+         */
+        if (reachedLimit(player, name)) {
+            return;
+        }
+
+
+
+        //Changes the cooldown, and sees if it applys.
+        cooldown = cooldownApplys(player, cooldown, name);
+        if (inCooldown(player, cooldown)) {
+            final int secondsLeft = Cooldown.getTimeLeft(player.getUniqueId(), "Command");
+            messages.cooldownMessage(player, secondsLeft);
+            return;
+        }
+
+
+
+        //Sees if timeBefore applys and will change it if so.
+        timeBefore = timeBeforeApplys(player, timeBefore, name);
+        if (inTimeBefore(player, timeBefore)) {
+            return;
+        }
+        //Changes the cost, and sees if it applys.
+        if(!hasPayed(player, costApplys(thisCost, costName))) {
+            return;
+        }
+
+
+
         if (isWorldBanned(player, world)) {
             return;
         }
@@ -224,78 +303,18 @@ public class Coordinates {
             if (!isLocSafe(locationTP) || circleRadius(locationTP, max, center)) {
                 //Adds to attempts.
                 attempts++;
+                debugManager.logToFile("\n" + attempts + "LocSafe: " + String.valueOf(isLocSafe(locationTP)) + " Circle: " + String.valueOf(circleRadius(locationTP, max, center)) + "\n");
                 //Keeps the loop going.
                 exitLoop = false;
 
             } else {
                 //Stops the loop.
                 exitLoop = true;
-                //Adds the buffer to the teleport location
-                locationTP = addBuffer(locationTP);
-                //Setsup the limiter boolean. Used to check if they have reached the limit is.
-                boolean limiter;
-                //Sets up the cost as the one provided in the parameters.
-                double thisCost = cost;
-                //Sets time before as 0, may be changed later.
-                int timeBefore = 0;
-                //Sets the cooldown as 0, may be changed later.
-                int cooldown = 0;
-                //Sets the default search term in the config as "Command". May be changed based on the CoordType.
-                String name = "Command";
-                //Sets the default search term for the cost name as Default.
-                String costName = "default";
-                /**
-                 * Changes the search term based on the CoordType provided in the parameters.
-                 */
-                switch (type) {
-                    case COMMAND:
-                        name = "Command";
-                        costName = "CommandCost";
-                        break;
-                    case ALL:
-                        name = "All";
-                        break;
-                    case PLAYER:
-                        name = "Others";
-                        break;
-                    case SIGN:
-                        name = "Signs";
-                        break;
-                    case JOIN:
-                        name = "Join";
-                        break;
-                    case PORTAL:
-                        name = "Portals";
-                        costName = "PortalCost";
-                        break;
-                    case WARPS:
-                        name = "Warps";
-                        break;
-                    case WARPWORLD:
-                        name = "Warps";
-                        break;
-
-                }
-
-                /**
-                 * These checks are mainly used to differentiate the different methods of intiating a RC teleport, while using the same
-                 * function. E.G If CoordType is portal, It sets timeBefore to none.
-                 */
                 //Sets the location. Mainly used to set it to a warp if that is the coord type.
                 locationTP = shouldWarp(player, world, locationTP, name, type);
-                //Changes the limiter boolean to the one provided by the check.
-                limiter = limiterApplys(player, true, name);
-                //Changes the cost, and sees if it applys.
-                thisCost = costApplys(thisCost, costName);
-                //Sees if timeBefore applys and will change it if so.
-                timeBefore = timeBeforeApplys(player, timeBefore, name);
-                //Changes the cooldown, and sees if it applys.
-                cooldown = cooldownApplys(player, cooldown, name);
-                /**
-                 * If the limiter is false, AKA they have reached it. Cancel.
-                 */
-                if (!limiter) {
-                    return;
+                //Adds the buffer to the teleport location
+                if(!(type == CoordType.WARPWORLD || type == CoordType.WARPS)) {
+                    locationTP = addBuffer(locationTP);
                 }
                 /**
                  * Standard check to see if something has gone wrong. If the location is null, then cancel. Seldom use.
@@ -304,21 +323,10 @@ public class Coordinates {
                     return;
                 }
                 /**
-                 * If the player is in Time Before, AKA they are already in the teleport process return false.
+                 * Then schedule the final teleport.
                  */
-                if (inTimeBefore(player, timeBefore)) {
-                    return;
-                }
-                //Get the health of the player. Used for the invul idea.
-                final double health = player.getHealth();
-                //Grab the players location at the point they initiated the proccess.
-                final Location start = player.getLocation();
-                /**
-                 * If the player is isnt in the cooldown, Then schedule the final teleport.
-                 */
-                if (!inCooldown(player, cooldown)) {
-                    scheduleStuff(player, locationTP, thisCost, health, start, timeBefore, cooldown);
-                }
+                limiterApplys(player, name);
+                scheduleStuff(player, locationTP, thisCost, player.getHealth(), player.getLocation(), timeBefore, cooldown);
 
             }
         }
@@ -332,32 +340,44 @@ public class Coordinates {
      * @return True or False, Is it safe?
      */
     private boolean isLocSafe(final Location location) {
-
-        //This checks if the biome is hell, and if the Y value has been left unchanged. Seldom use.
+        /**
+         *This checks if the nether Y coord is left unchanged, thus bad Y coord. Seldom use.
+         */
         if (location.getWorld().getBiome(location.getBlockX(), location.getBlockZ()).equals(Biome.HELL)) {
             if (location.getY() == 574272099) {
                 return false;
             }
         }
-
         // Get the block and its material thats highest
         final Block block = location.getBlock();
         final Material material = block.getType();
-
         //Get the material of the top block, e.g Grass layer
         final Material material1 = block.getRelative(BlockFace.DOWN).getType();
-
         //Get the block thats 1 below the surface
         final Location logLoc = new Location(location.getWorld(), location.getBlockX(), location.getY() - 1, location.getBlockZ());
         final Block log = logLoc.subtract(0, 1, 0).getBlock();
         final Material matt = log.getType();
-
         //Get the block that is 2 below the surface.
         final Block log2 = logLoc.subtract(0, 1, 0).getBlock();
         final Material matt2 = log2.getType();
+        /**
+         * Run through the blacklisted list and if the block is on the blacklist, Then return false.
+         */
+        for(String materialName : RandomCoords.getPlugin().blacklist.getStringList("Blacklisted")) {
+            Material blacklist = Material.valueOf(materialName);
+            if(material1 == blacklist || material == blacklist || matt2 == blacklist || matt == blacklist) {
+                debugManager.logToFile("Material1: " + material.toString() + "\nMaterial: " + material.toString() + "\nMatt2: " + matt2.toString() + "\nMatt: " + matt.toString());
+                return false;
+            }
+        }
 
-        //Checks if any of these blocks are Lava, or Water aswell as logs due to a bug in the get highest block.
-        return !(material1 == Material.LAVA || material1 == Material.STATIONARY_LAVA || material1 == Material.FIRE || material1 == Material.CACTUS || material1 == Material.WATER || material1 == Material.STATIONARY_WATER || matt == Material.LAVA || matt == Material.STATIONARY_LAVA || matt == Material.WATER || matt == Material.STATIONARY_WATER || material == Material.FIRE || material == Material.CACTUS || matt2 == Material.LOG || matt == Material.LOG || matt2 == Material.LOG_2 || matt == Material.LOG_2 || material == Material.LAVA || material == Material.STATIONARY_LAVA || material == Material.WATER || material == Material.STATIONARY_WATER) && fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && wgc.WorldguardCheck(location) && !isOutsideBorder(location);
+        /**
+         * Otherwise, If the block is safe, Is it in any of the regions?
+         */
+        if(RandomCoords.getPlugin().config.getString("debug").equalsIgnoreCase("true")) {
+            debugManager.logToFile("Faction: " + String.valueOf(fc.FactionCheck(location)) + "\nGrief: " + String.valueOf(gpc.griefPrevent(location)) + "\nPlayer: " + String.valueOf(prc.isPlayerNear(location)) + "\nTowny: " + String.valueOf(tc.TownyCheck(location)) + "\nWorldBorder: " + String.valueOf(wbc.WorldBorderCheck(location)) + "\nWorldGuard: " + String.valueOf(wgc.WorldguardCheck(location)) + "\nVanillaBorder" + String.valueOf(!isOutsideBorder(location)));
+        }
+        return  fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && wgc.WorldguardCheck(location) && !isOutsideBorder(location);
     }
 
 
@@ -578,7 +598,7 @@ public class Coordinates {
              */
             if (limiter.get(uuid) == null) {
                 limiter.set(uuid + ".Uses", 1);
-                RandomCoords.getPlugin().saveLimiter();
+                RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().limiter, RandomCoords.getPlugin().limiterFile);
                 return true;
             }
 
@@ -595,7 +615,7 @@ public class Coordinates {
                 //Add one to their limit.
                 limiter.set(uuid + ".Uses", used + 1);
                 //Save the chages to the limiter file.
-                RandomCoords.getPlugin().saveLimiter();
+                RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().limiter, RandomCoords.getPlugin().limiterFile);
                 return true;
 
             } else {
@@ -631,7 +651,6 @@ public class Coordinates {
          * All inside here activates after the TimeBefore period.
          */
         s.scheduleSyncDelayedTask(RandomCoords.getPlugin().getInstance(), () -> {
-
             /**
              * Checks if we should stop the teleportation on move.
              * If true, we then check if they have moved.
@@ -647,7 +666,6 @@ public class Coordinates {
                     return;
                 }
             }
-
             /**
              * Checks if we should cancel the teleport on damage.
              */
@@ -661,10 +679,8 @@ public class Coordinates {
                     return;
                 }
             }
-
             //Sets the variable for the chunk loader as false so that it continues to loop.
             boolean exit = false;
-
             /**
              * The loop that handles the loading of the chunk that they are teleporting into.
              * If the config options false, Exit the loop. If the chunks generated, exit the loop.
@@ -681,7 +697,7 @@ public class Coordinates {
                      * If the player has paid the price, Teleport them if not, Return.
                      * (hasPayed manages the message sending about cost)
                      */
-                    if (RandomCoords.getPlugin().hasPayed(player, thisCost)) {
+
                         //Teleports the player finally to the safe location
                         player.teleport(locationTP);
                         //Should we put a bonus chest at this location?
@@ -690,15 +706,10 @@ public class Coordinates {
                         RandomCoords.getPlugin().successTeleports++;
                         //Start the cooldown.
                         cool.start();
-                    } else {
-                        //Return if none of the above is true.
-                        return;
-                    }
+
 
                 }
             }
-
-
             /**
              * Checks if we should play a sound.
              * If so try to, If the config is set wrong log it.
@@ -720,7 +731,6 @@ public class Coordinates {
 
 
             }
-
             /**
              * Checks if we should play an effect.
              * If so try it, If the config is set incorrectly, Log it.
@@ -742,20 +752,16 @@ public class Coordinates {
 
 
             }
-
             /**
              * This starts the cooldown for the suffocation check. This is what is checked for in the Suffocation class.
              */
             final Cooldown c = new Cooldown(player.getUniqueId(), "Invul", 30);
             c.start();
-
-
             /**
              * Start the Invul timer, This is used if the users would like the players to be invul for a while after TP.
              */
             final Cooldown cT = new Cooldown(player.getUniqueId(), "InvulTime", RandomCoords.getPlugin().config.getInt("InvulTime"));
             cT.start();
-
             //Send the message that they have teleported.
             messages.teleportMessage(player, locationTP);
 
@@ -824,7 +830,8 @@ public class Coordinates {
                                     //Tell the limiter file that they have had a bonus chest.
                                     RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
                                     //Save these changes to the limiter file.
-                                    RandomCoords.getPlugin().saveLimiter();
+                                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().limiter, RandomCoords.getPlugin().limiterFile);
+
 
                                 }
                             }
@@ -842,10 +849,10 @@ public class Coordinates {
                             //Tell the limiter file they have recieved a chest.
                             RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
                             //Save these changes.
-                            RandomCoords.getPlugin().saveLimiter();
+                            RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().limiter, RandomCoords.getPlugin().limiterFile);
                         } else {
                             //Log that it is not a material.
-                            Bukkit.broadcastMessage(material + "  is not a material.");
+                            Bukkit.getLogger().log(Level.WARNING, material + "  is not a material.");
                         }
                     }
 
@@ -1069,7 +1076,7 @@ public class Coordinates {
     private Location addBuffer(Location locationTP) {
         /**
          * If the biome is hell, Only add 1 to the location.
-         * Else if the biome is the sky, Get the highest block for the end coord. (Work needs to be done here, Im not sure this works now.
+         * Else if the biome is the sky, Get the highest block for the end coord. (May seem odd to do this here, but why not)
          * Else add the default 2.5 amount.
          */
         if (locationTP.getWorld().getBiome(locationTP.getBlockX(), locationTP.getBlockZ()).equals(Biome.HELL)) {
@@ -1132,29 +1139,47 @@ public class Coordinates {
 
     }
 
+
+    private boolean reachedLimit(Player player, String name) {
+        if(!RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains(name)) {
+            return false;
+        }
+
+        if(RandomCoords.getPlugin().config.getInt("Limit") == 0) {
+            return false;
+        }
+        final FileConfiguration limiterFile = RandomCoords.getPlugin().limiter;
+
+        String uuid = player.getUniqueId().toString();
+        //Grab their uses.
+        final int used = limiterFile.getInt(uuid + ".Uses");
+        //Grab the limit.
+        final int limit = RandomCoords.getPlugin().config.getInt("Limit");
+        if (used == limit) {
+            messages.reachedLimit(player);
+            return true;
+
+        }
+
+        return false;
+    }
+
     /**
      * Does the limiter apply?
      * @param player The player we're checking for.
-     * @param limiter The limiter boolean.
      * @param name The name of the CoordType.
      * @return True or False, Should we use the limiter.
      */
-    private boolean limiterApplys(Player player, boolean limiter, String name) {
-        /**
-         * If the name of the teleport type is Join, Dont add a limiter.
-         */
-        if (name.equals("Join")) {
-            return limiter;
-        }
+    private boolean limiterApplys(Player player, String name) {
         /**
          * If the LimiterApplys list contains the teleport type name, set limiter as isLimiter boolean.
          */
         if (RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains(name)) {
             //Sets the limiter boolean as the one provided in the isLimiter boolean function.
-            limiter = isLimiter(player);
+            return isLimiter(player);
         }
         //Returns the original given limiter value.
-        return limiter;
+        return true;
 
     }
 
@@ -1349,14 +1374,51 @@ public class Coordinates {
             return false;
 
         } else {
+            /**
+             *This code has been moved as of the v0.0.6
+             */
             //Gets the second left in the cooldown.
-            final int secondsLeft = Cooldown.getTimeLeft(player.getUniqueId(), "Command");
             //Sends the message.
-            messages.cooldownMessage(player, secondsLeft);
+            //MESSAGE MOVED UP ABOVE.
             //Return true, They are in the cooldown.
             return true;
         }
     }
+
+    /**
+     * Check if the player has paid the price of teleporting.
+     * @param p The initiater of the teleport, and who we're charging
+     * @param cost The cost
+     * @return True or False, Have they paid.
+     */
+    public boolean hasPayed(final Player p, final double cost) {
+        if (!RandomCoords.getPlugin().setupEconomy() || cost == 0) {
+            return true;
+        } else {
+            final EconomyResponse r = RandomCoords.getPlugin().econ.withdrawPlayer(p, cost);
+            if (r.transactionSuccess()) {
+                messages.charged(p, cost);
+                return true;
+
+            } else {
+                messages.cost(p, cost);
+
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Checks if they have the correct amount of money to pay for the teleport.
+     * @param p The player that we are cheking.
+     * @param cost the cost of teleport
+     * @return True or False, do they have the money?
+     */
+    public boolean hasMoney(final Player p, final double cost) {
+        return !RandomCoords.getPlugin().setupEconomy() || cost == 0 || cost <= RandomCoords.getPlugin().econ.getBalance(p);
+    }
+
+
 
 
 

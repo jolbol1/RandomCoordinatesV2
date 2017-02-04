@@ -43,7 +43,7 @@ public class RandomCoords extends JavaPlugin {
 
 
     public static Logger logger;
-    private static Economy econ;
+    public static Economy econ;
     private static Plugin plugin;
 
     /**
@@ -61,11 +61,13 @@ public class RandomCoords extends JavaPlugin {
     public FileConfiguration limiter;
     public FileConfiguration portals;
     public FileConfiguration warps;
+    public FileConfiguration blacklist;
     private File languageFile;
-    private File configFile;
-    private File limiterFile;
-    private File portalsFile;
-    private File warpFile;
+    public File configFile;
+    public File limiterFile;
+    public File portalsFile;
+    public File warpFile;
+    public File blackFile;
 
     //Sets the number to 0, The counter for successful teleports and failed.
     public int successTeleports = 0;
@@ -97,59 +99,30 @@ public class RandomCoords extends JavaPlugin {
         logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
 
 
+
+        this.getDataFolder().mkdirs();
         //Setup Language File
         languageFile = new File(this.getDataFolder(), "language.yml");
-        if (!languageFile.exists()) {
-            try {
-                languageFile.createNewFile();
-            } catch (IOException e) {
-                logger.severe("Could Not Create language.yml!");
-            }
-        }
-        language = YamlConfiguration.loadConfiguration(languageFile);
-        matchLanguage();
+        language = setupFile(languageFile);
+        matchFile(language, languageFile, "language");
 
         configFile = new File(this.getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            try {
-                configFile.createNewFile();
-            } catch (IOException e) {
-                logger.severe("Could Not Create config.yml");
-            }
-        }
-        config = YamlConfiguration.loadConfiguration(configFile);
-        matchConfig();
+        config = setupFile(configFile);
+        matchFile(config, configFile, "config");
 
 
         limiterFile = new File(this.getDataFolder(), "limiter.yml");
-        if (!limiterFile.exists()) {
-            try {
-                limiterFile.createNewFile();
-            } catch (IOException e) {
-                logger.severe("Could Not Create limiter.yml");
-            }
-        }
-        limiter = YamlConfiguration.loadConfiguration(limiterFile);
+        limiter = setupFile(limiterFile);
 
         portalsFile = new File(this.getDataFolder(), "portals.yml");
-        if (!portalsFile.exists()) {
-            try {
-                portalsFile.createNewFile();
-            } catch (IOException e) {
-                logger.severe("Could Not Create portals.yml");
-            }
-        }
-        portals = YamlConfiguration.loadConfiguration(portalsFile);
+        portals = setupFile(portalsFile);
 
         warpFile = new File(this.getDataFolder(), "warps.yml");
-        if (!warpFile.exists()) {
-            try {
-                warpFile.createNewFile();
-            } catch (IOException e) {
-                logger.severe("Could Not Create warps.yml");
-            }
-        }
-        warps = YamlConfiguration.loadConfiguration(warpFile);
+        warps = setupFile(warpFile);
+
+        blackFile = new File(this.getDataFolder(), "blacklist.yml");
+        blacklist = setupFile(blackFile);
+        if(blacklist.getStringList("Blacklisted") != null) { matchFile(blacklist, blackFile, "blacklist"); }
 
         pm.registerEvents(new Suffocation(), this);
         pm.registerEvents(new Invulnerable(), this);
@@ -182,55 +155,36 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
+
+
+
+
     /**
      * Used to update the language file, used for new updates.
      */
-    private void matchLanguage() {
 
-        final InputStream is = getResource("language-defaults.yml");
-        if (is != null) {
-
-            final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource("language-defaults.yml")));
-            final File updateConfig = new File(getDataFolder(), "language.yml");
-
-            for (final String key : defConfig.getConfigurationSection("").getKeys(false)) {
-
-                final YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
-                if (!newConfig.contains(key)) {
-                    language.set(key, defConfig.get(key));
-                    try {
-                        language.save(languageFile);
-                    } catch (IOException e) {
-                        logger.log(Level.SEVERE, "There was an error matching the language.yml file!");
-                    }
-
-                }
-            }
-
-        }
-    }
 
     /**
      * Used to update the config file.
      */
-    private void matchConfig() {
+    private void matchFile(FileConfiguration fileConfig, File file, String name) {
 
-        final InputStream is = getResource("config-defaults.yml");
+        final InputStream is = getResource(name + "-defaults.yml");
         if (is != null) {
 
-            final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource("config-defaults.yml")));
-            final File updateConfig = new File(getDataFolder(), "config.yml");
+            final YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(this.getResource(name + "-defaults.yml")));
+            final File updateConfig = new File(getDataFolder(), name + ".yml");
 
             for (final String key : defConfig.getConfigurationSection("").getKeys(false)) {
 
                 final YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
                 if (!newConfig.contains(key)) {
-                    config.set(key, defConfig.get(key));
+                    fileConfig.set(key, defConfig.get(key));
                     Bukkit.getLogger().log(Level.WARNING, "Set: " + defConfig.get(key));
                     try {
-                        config.save(configFile);
+                        fileConfig.save(file);
                     } catch (IOException e) {
-                        logger.log(Level.SEVERE, " There was a problem matching the config.yml!");
+                        logger.log(Level.SEVERE, " There was a problem matching the" + name + ".yml!");
                     }
 
                 }
@@ -263,77 +217,31 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
-    /**
-     * Used to save changes to the config file, and update.
-     */
-    public void reloadConfigFile() {
-        if (configFile == null) {
-            configFile = new File(plugin.getDataFolder(), "config.yml");
-        }
-        config = YamlConfiguration.loadConfiguration(configFile);
-        final InputStream defLanguageStream = plugin.getResource("config.yml");
-        if (defLanguageStream != null) {
-            final YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
-            config.setDefaults(defLanguage);
-        }
+    public void reloadFile(FileConfiguration fileConfig, String fileName) {
+        File file = new File(this.getDataFolder(), fileName);
+            try {
+                fileConfig.load(file);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
     }
+
 
     /**
      * Saves the config file, to add changes.
      */
-    public void saveCustomConfig() {
-        if (config == null || configFile == null) {
+    public void saveFile(FileConfiguration fileConfig, File file) {
+        if (fileConfig == null || file == null) {
             return;
         }
         try {
-            config.save(configFile);
+            fileConfig.save(file);
         } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save to config.yml ", ex);
+            plugin.getLogger().log(Level.SEVERE, "Could not save to " + fileConfig.getName(), ex);
         }
     }
 
-    /**
-     * Save changes to the limiter.
-     */
-    public void saveLimiter() {
-        if (limiter == null || limiterFile == null) {
-            return;
-        }
-        try {
-            limiter.save(limiterFile);
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save to limiter.yml ", ex);
-        }
-    }
-
-    /**
-     * Save changes to the portal file.
-     */
-    public void savePortals() {
-        if (portals == null || portalsFile == null) {
-            return;
-        }
-        try {
-            portals.save(portalsFile);
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save to portals.yml ", ex);
-        }
-    }
-
-    /**
-     * Save changes to the warp file.
-     */
-    public void saveWarps() {
-        if (warps == null || warpFile == null) {
-            return;
-        }
-        try {
-            warps.save(warpFile);
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save to warps.yml ", ex);
-        }
-    }
 
     /**
      * Grabs an instance of the WorldGuard plugin
@@ -350,20 +258,8 @@ public class RandomCoords extends JavaPlugin {
         return (WorldGuardPlugin) plugin;
     }
 
-    /**
-     * Creates a item for the /RC wand
-     * @return the Wand ItemStack
-     */
-    public ItemStack wand() {
-        final ItemStack wand = new ItemStack(Material.GOLD_AXE);
-        final ItemMeta itemMeta = wand.getItemMeta();
-        itemMeta.setDisplayName(ChatColor.GOLD + "Random Wand");
-        final List<String> lore = new ArrayList<>();
-        lore.add("Wand for portal creation!");
-        itemMeta.setLore(lore);
-        wand.setItemMeta(itemMeta);
-        return wand;
-    }
+
+
 
 
     /**
@@ -380,7 +276,7 @@ public class RandomCoords extends JavaPlugin {
      * Creates the economy envoronment for this plugin/
      * @return the instance of the economy, Using vault.
      */
-    private boolean setupEconomy() {
+    public boolean setupEconomy() {
         if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return false;
         }
@@ -392,38 +288,7 @@ public class RandomCoords extends JavaPlugin {
         return econ != null;
     }
 
-    /**
-     * Check if the player has paid the price of teleporting.
-     * @param p The initiater of the teleport, and who we're charging
-     * @param cost The cost
-     * @return True or False, Have they paid.
-     */
-    public boolean hasPayed(final Player p, final double cost) {
-        if (!setupEconomy() || cost == 0) {
-            return true;
-        } else {
-            final EconomyResponse r = econ.withdrawPlayer(p, cost);
-            if (r.transactionSuccess()) {
-                messages.charged(p, cost);
-                return true;
 
-            } else {
-                messages.cost(p, cost);
-
-                return false;
-            }
-        }
-    }
-
-    /**
-     * Checks if they have the correct amount of money to pay for the teleport.
-     * @param p The player that we are cheking.
-     * @param cost the cost of teleport
-     * @return True or False, do they have the money?
-     */
-    public boolean hasMoney(final Player p, final double cost) {
-        return !setupEconomy() || cost == 0 || cost > econ.getBalance(p);
-    }
 
     /**
      * Generates the charts to send to metric.
@@ -445,6 +310,25 @@ public class RandomCoords extends JavaPlugin {
             }
         });
     }
+
+    private FileConfiguration setupFile(File file) {
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                logger.severe(file.getName() + " may not have been created.");
+            }
+        }
+
+        return YamlConfiguration.loadConfiguration(file);
+
+    }
+
+    private void updater() {
+        
+    }
+
+
 
 
 }

@@ -16,13 +16,23 @@ public class Invulnerable implements Listener {
      */
     @EventHandler
     public void onAnyDamage(final EntityDamageEvent e) {
+        /**
+         * If the damage was not caused to a player, then dont run the code.
+         */
         if (!(e.getEntity() instanceof Player)) {
             return;
         }
+
+        //Get the player the damage was caused to.
         final Player p = (Player) e.getEntity();
+        /**
+         * Are they in the Invul cooldown? If no, return.
+         */
         if (!Cooldown.isInCooldown(p.getUniqueId(), "InvulTime")) {
             return;
         }
+
+        //Otherwise cancel the event.
         e.setCancelled(true);
     }
 

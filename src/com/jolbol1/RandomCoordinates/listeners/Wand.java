@@ -2,6 +2,7 @@ package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.PortalCommand;
+import com.jolbol1.RandomCoordinates.commands.WandGive;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.block.Block;
@@ -21,6 +22,7 @@ public class Wand implements Listener {
     private final Map selection = RandomCoords.getPlugin().wandSelection;
     private final MessageManager messages = new MessageManager();
     private final PortalCommand portalCommand = new PortalCommand();
+    private final WandGive wandGive = new WandGive();
 
     /**
      * Gets when the player has clicked using the /RC Wand.
@@ -32,7 +34,7 @@ public class Wand implements Listener {
             return;
         }
         final Player p = e.getPlayer();
-        if (p.getInventory().getItemInMainHand().equals(RandomCoords.getPlugin().wand())) {
+        if (p.getInventory().getItemInMainHand().equals(wandGive.wand())) {
             if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
 
                 if (e.getAction() == Action.LEFT_CLICK_BLOCK) {

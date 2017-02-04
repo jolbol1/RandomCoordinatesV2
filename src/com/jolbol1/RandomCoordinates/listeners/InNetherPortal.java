@@ -23,47 +23,88 @@ public class InNetherPortal implements Listener {
      */
     @EventHandler
     public void onPlayerTP(final PlayerTeleportEvent e) {
+
+        /**
+         * Checks if the teleport cause was a nether portal. If yes, proceed with code.
+         */
         if (e.getCause() != PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
             return;
         }
+        /**
+         * Checks if the plugin actually has any portals.
+         */
         if (RandomCoords.getPlugin().portals == null) {
             return;
         }
+        /**
+         * Checks if the file itself has any portals in it.
+         */
         if (RandomCoords.getPlugin().portals.getConfigurationSection("Portal") == null) {
             return;
         }
+        /**
+         * Checks yet again if there are any portals
+         */
         if (RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false) == null) {
             return;
         }
+
+        //Gets a set of all of the portals.
         final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
+
+        /**
+         * For all of these portals, check whether or not the teleport is within these portals.
+         */
         for (final String name : portals) {
 
+            //Get the world that this portal teleports to.
             final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
+            /**
+             * If this world is null, Return and log the fact.
+             */
             if (Bukkit.getServer().getWorld(world) == null) {
+                //Log the fact that this world does not exist.
                 Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
                 return;
 
             }
+            // Get the world that the portal is actually in.
             final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
+            /**
+             * If this is also null, Seldom Use. Then cancel the code.
+             */
             if (Bukkit.getServer().getWorld(portalWorld) == null) {
+                //Log the fact that this world does not exist.
                 Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
                 return;
 
             }
+
+            //Get an instance of the actual world.
             final World w = Bukkit.getServer().getWorld(portalWorld);
+            /**
+             * Get one corner of the portal.
+             */
             final int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
             final int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
             final int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
-
+            /**
+             * Get the other corner of the portal.
+             */
             final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
             final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
             final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
+            /**
+             * Use these values to get the corners as locations.
+             */
             final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
             final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
 
-
-            //  World worldW = Bukkit.getServer().getWorld(world);
+            /**
+             * If the location is from within the portal, then cancel the teleport event.
+             */
             if (pe.isInside(e.getPlayer().getLocation(), l1, l2)) {
+                //Cancels the teleport event.
                 e.setCancelled(true);
                 return;
             }
@@ -74,42 +115,5 @@ public class InNetherPortal implements Listener {
 
     }
 
- /*   public boolean inAll(final Location location) {
-        if (RandomCoords.getPlugin().portals.get("Portal") == null) {
-            return false;
-        }
-        final ConfigurationSection cs = RandomCoords.getPlugin().portals.getConfigurationSection("Portal.");
-        for (final String name : cs.getKeys(false)) {
-            final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
-            if (Bukkit.getServer().getWorld(world) == null) {
-                Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
-                return false;
 
-            }
-            final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
-            if (Bukkit.getServer().getWorld(portalWorld) == null) {
-                Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
-                return false;
-
-            }
-            final World w = Bukkit.getServer().getWorld(portalWorld);
-            final int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
-            final int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
-            final int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
-
-            final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
-            final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
-            final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
-            final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
-            final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
-
-
-        //    World worldW = Bukkit.getServer().getWorld(world);
-            return pe.isInside(location, l1, l2);
-
-        }
-
-
-        return false;
-    }*/
 }
