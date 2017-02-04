@@ -338,7 +338,7 @@ public class RandomCoords extends JavaPlugin {
          */
         try {
             //Website URL.
-            final String web = "https://rawgit.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
+            final String web = "https://raw.githubusercontent.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
             //Sets it as the site to be read from.
             site = new URL(web);
 
@@ -362,6 +362,7 @@ public class RandomCoords extends JavaPlugin {
         }
         //Return the number as a string.
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
+            Bukkit.getLogger().log(Level.CONFIG, ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit.");
             for(Player p : Bukkit.getOnlinePlayers()) {
                 if(p.isOp()) {
                     p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit.");
