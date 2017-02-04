@@ -66,6 +66,9 @@ public class RandomCoords extends JavaPlugin {
     public File portalsFile;
     public File warpFile;
     public File blackFile;
+    final String ANSI_RESET = "\u001B[0m";
+    final String ANSI_BOLD = "\u001B[1m";
+    final String ANSI_BLUE = "\u001B[34m";
 
     //Sets the number to 0, The counter for successful teleports and failed.
     public int successTeleports = 0;
@@ -91,9 +94,7 @@ public class RandomCoords extends JavaPlugin {
         final PluginManager pm = getServer().getPluginManager();
         final CommandHandler handler = new CommandHandler();
         final PluginDescriptionFile pdf = getDescription();
-        final String ANSI_RESET = "\u001B[0m";
-        final String ANSI_BOLD = "\u001B[1m";
-        final String ANSI_BLUE = "\u001B[34m";
+
         logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
 
 
@@ -338,7 +339,7 @@ public class RandomCoords extends JavaPlugin {
          */
         try {
             //Website URL.
-            final String web = "https://raw.githubusercontent.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
+            final String web = "https://rawgit.com/jolbol1/RandomCoordinatesV2/master/src/update.yml";
             //Sets it as the site to be read from.
             site = new URL(web);
 
@@ -362,10 +363,10 @@ public class RandomCoords extends JavaPlugin {
         }
         //Return the number as a string.
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
-            Bukkit.getLogger().log(Level.CONFIG, ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit.");
+            Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Bukkit. http://bit.ly/RandomDownload" + ANSI_RESET);
             for(Player p : Bukkit.getOnlinePlayers()) {
                 if(p.isOp()) {
-                    p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit.");
+                    p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit. http://bit.ly/RandomDownload");
                 }
             }
         }
