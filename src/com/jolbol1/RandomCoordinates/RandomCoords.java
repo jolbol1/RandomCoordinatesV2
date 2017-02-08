@@ -131,6 +131,7 @@ public class RandomCoords extends JavaPlugin {
         pm.registerEvents(new BlockPortal(), this);
         pm.registerEvents(new InNetherPortal(), this);
         pm.registerEvents(new Wand(), this);
+        pm.registerEvents(new PlayerSwitchWorld(), this);
         handler.register("rc", new RandomCommand());
         handler.register("wand", new WandGive());
         handler.register("reload", new Reload());
@@ -183,7 +184,6 @@ public class RandomCoords extends JavaPlugin {
                 final YamlConfiguration newConfig = YamlConfiguration.loadConfiguration(updateConfig);
                 if (!newConfig.contains(key)) {
                     fileConfig.set(key, defConfig.get(key));
-                    Bukkit.getLogger().log(Level.WARNING, "Set: " + defConfig.get(key));
                     try {
                         fileConfig.save(file);
                     } catch (IOException e) {
@@ -362,6 +362,7 @@ public class RandomCoords extends JavaPlugin {
             RandomCoords.logger.severe("Couldnt grab the update.yml from the web.");
         }
         //Return the number as a string.
+        if(versionOnFile == null ) { return; }
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
             Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Bukkit. http://bit.ly/RandomDownload" + ANSI_RESET);
             for(Player p : Bukkit.getOnlinePlayers()) {

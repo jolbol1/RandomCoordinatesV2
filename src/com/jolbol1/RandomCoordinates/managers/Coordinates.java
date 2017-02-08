@@ -326,7 +326,7 @@ public class Coordinates {
                  * Then schedule the final teleport.
                  */
                 limiterApplys(player, name);
-                scheduleStuff(player, locationTP, thisCost, player.getHealth(), player.getLocation(), timeBefore, cooldown);
+                scheduleStuff(player, locationTP, thisCost, player.getHealth(), player.getLocation(), timeBefore, cooldown, type);
 
             }
         }
@@ -640,7 +640,7 @@ public class Coordinates {
      * @param timeBefore How long to actually wait before teleporting.
      * @param cooldown How long until they can teleport again.
      */
-    private void scheduleStuff(final Player player, final Location locationTP, final double thisCost, final double health, final Location start, final int timeBefore, final int cooldown) {
+    private void scheduleStuff(final Player player, final Location locationTP, final double thisCost, final double health, final Location start, final int timeBefore, final int cooldown, CoordType coordType) {
         //Setup an instance of Bukkit scheduler.
         final BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
         //Setup an instance of the cooldown labelled command.
@@ -660,11 +660,12 @@ public class Coordinates {
                 /**
                  * This is where we check if they have moved using the variables provided in the parameters.
                   */
-                if (start.distance(player.getLocation()) > 1) {
-                    messages.youMoved(player);
-
-                    return;
-                }
+               if(!coordType.equals(CoordType.JOINWORLD)) {
+                   if (start.distance(player.getLocation()) > 1) {
+                       messages.youMoved(player);
+                       return;
+                   }
+               }
             }
             /**
              * Checks if we should cancel the teleport on damage.

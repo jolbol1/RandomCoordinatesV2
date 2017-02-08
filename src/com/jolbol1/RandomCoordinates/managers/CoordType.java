@@ -39,4 +39,6 @@ public enum CoordType {
      */
     WARPWORLD,
 
+    JOINWORLD,
+
 }
