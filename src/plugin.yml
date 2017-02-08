@@ -1,6 +1,6 @@
 name: RandomCoords
 main: com.jolbol1.RandomCoordinates.RandomCoords
-version: 0.0.7-RELEASE
+version: 0.0.8-RELEASE
 website: http://bukkit.org
 author: Jolbol1
 softdepend: [Factions, MassiveCore, WorldEdit, WorldBorder, Vault, WorldGuard, Essentials]

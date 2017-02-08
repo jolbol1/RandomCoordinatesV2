@@ -1,0 +1,7 @@
+Blacklisted:
+  - LAVA
+  - WATER
+  - STATIONARY_WATER
+  - STATIONARY_LAVA
+  - FIRE
+  - CACTUS
