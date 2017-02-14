@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.kingdoms.main.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,6 +54,9 @@ public class Coordinates {
     private final End end = new End();
     //Grabs the max attempts value from the config.
     private final int maxAttempts = RandomCoords.getPlugin().config.getInt("MaxAttempts");
+
+    private final RedProtect redProtect = new RedProtect();
+    private final KingdomsClaim kingdomsClaim = new KingdomsClaim();
     //Grab an instance of the debug manager.
     private final DebugManager debugManager = new DebugManager();
 
@@ -64,15 +68,15 @@ public class Coordinates {
      * @param world The world that we're grabbing the coordinate in.
      * @return Random Location within world.
      */
-    private Location getRandomCoordinates(final Player player, int max, final int min, final World world) {
+    private Location getRandomCoordinates(final Player player, final int max, final int min, final World world) {
         //Setup the value for the X coordinate as null, But to be changed later.
         int randomX;
         //Setup the value of the Z coordinate as null, But to be changed later.
         int randomZ;
         //Grab the X coordinate of the center of the Random Area
-        int centerX = getCenterX(world);
+        final int centerX = getCenterX(world);
         //Grab the Z coordinate of the center of the Random Area
-        int centerZ = getCenterZ(world);
+        final int centerZ = getCenterZ(world);
         //Sets the minimum as 0, Usually changed
         int minOne = 0;
         int minTwo = 0;
@@ -181,7 +185,7 @@ public class Coordinates {
         String name = "Command";
         //Sets the default search term for the cost name as Default.
         String costName = "default";
-        double thisCost = cost;
+        final double thisCost = cost;
         //Sets time before as 0, may be changed later.
         int timeBefore = 0;
         //Sets the cooldown as 0, may be changed later.
@@ -278,6 +282,9 @@ public class Coordinates {
             min = getMin(world);
         }
 
+        Location center;
+        Location locationTP;
+
         /**
          * This creates the loop to check for a safe location to teleport users to.
          */
@@ -292,9 +299,9 @@ public class Coordinates {
                 return;
             }
             //Get the coordinate that is going to be tested.
-            Location locationTP = getRandomCoordinates(player, max, min, world);
+            locationTP = getRandomCoordinates(player, max, min, world);
             //Get the boundary center of the world.
-            Location center = new Location(world, getCenterX(world), locationTP.getY(), getCenterZ(world));
+            center = new Location(world, getCenterX(world), locationTP.getY(), getCenterZ(world));
 
             /**
              * If the location is not safe, or isnt in the circular radius, then add to the attempts.
@@ -363,8 +370,8 @@ public class Coordinates {
         /**
          * Run through the blacklisted list and if the block is on the blacklist, Then return false.
          */
-        for(String materialName : RandomCoords.getPlugin().blacklist.getStringList("Blacklisted")) {
-            Material blacklist = Material.valueOf(materialName);
+        for(final String materialName : RandomCoords.getPlugin().blacklist.getStringList("Blacklisted")) {
+            final Material blacklist = Material.valueOf(materialName);
             if(material1 == blacklist || material == blacklist || matt2 == blacklist || matt == blacklist) {
                 debugManager.logToFile("Material1: " + material.toString() + "\nMaterial: " + material.toString() + "\nMatt2: " + matt2.toString() + "\nMatt: " + matt.toString());
                 return false;
@@ -377,7 +384,7 @@ public class Coordinates {
         if(RandomCoords.getPlugin().config.getString("debug").equalsIgnoreCase("true")) {
             debugManager.logToFile("Faction: " + String.valueOf(fc.FactionCheck(location)) + "\nGrief: " + String.valueOf(gpc.griefPrevent(location)) + "\nPlayer: " + String.valueOf(prc.isPlayerNear(location)) + "\nTowny: " + String.valueOf(tc.TownyCheck(location)) + "\nWorldBorder: " + String.valueOf(wbc.WorldBorderCheck(location)) + "\nWorldGuard: " + String.valueOf(wgc.WorldguardCheck(location)) + "\nVanillaBorder" + String.valueOf(!isOutsideBorder(location)));
         }
-        return  fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && wgc.WorldguardCheck(location) && !isOutsideBorder(location);
+        return kingdomsClaim.KingdomsClaim(location) && redProtect.RedProtect(location) && fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && wgc.WorldguardCheck(location) && !isOutsideBorder(location);
     }
 
 
@@ -456,7 +463,7 @@ public class Coordinates {
      * @param coordType The method in which they requested the warp.
      * @return Returns one of the Warps at random.
      */
-    private Location warpTP(final Player p, final World world, CoordType coordType) {
+    private Location warpTP(final Player p, final World world, final CoordType coordType) {
 
         /**
          * Checks if the world that player is in is banned.
@@ -640,7 +647,7 @@ public class Coordinates {
      * @param timeBefore How long to actually wait before teleporting.
      * @param cooldown How long until they can teleport again.
      */
-    private void scheduleStuff(final Player player, final Location locationTP, final double thisCost, final double health, final Location start, final int timeBefore, final int cooldown, CoordType coordType) {
+    private void scheduleStuff(final Player player, final Location locationTP, final double thisCost, final double health, final Location start, final int timeBefore, final int cooldown, final CoordType coordType) {
         //Setup an instance of Bukkit scheduler.
         final BukkitScheduler s = RandomCoords.getPlugin().getServer().getScheduler();
         //Setup an instance of the cooldown labelled command.
@@ -775,7 +782,7 @@ public class Coordinates {
      * @param player The player thats been teleported.
      * @param locationTP The location they were teleported to.
      */
-    private void bonusChests(Player player, Location locationTP) {
+    private void bonusChests(final Player player, final Location locationTP) {
         /**
          * Checks if the bonus chest feature is active. If not it does nothing.
          */
@@ -871,7 +878,7 @@ public class Coordinates {
      * @param center The center of the circle we're checking.
      * @return True or False, Is it within the circle.
      */
-    private boolean circleRadius(Location loc, double radius, Location center) {
+    private boolean circleRadius(final Location loc, final double radius, final Location center) {
         /**
          * Returns a boolean if the location is outside of the radius.
          * AND checks if the CircleRadius is default overall, or for the world.
@@ -884,27 +891,27 @@ public class Coordinates {
      * @param loc The location we're checking
      * @return True or False, Is it outside of the location.
      */
-    private boolean isOutsideBorder(Location loc) {
+    private boolean isOutsideBorder(final Location loc) {
         /**
          * Checks if we should check for VanillaBorders. Else return false.
          */
         if (RandomCoords.getPlugin().config.getString("VanillaBorder").equalsIgnoreCase("true")) {
             //Get the worlds world border.
-            WorldBorder wb = loc.getWorld().getWorldBorder();
+            final WorldBorder wb = loc.getWorld().getWorldBorder();
             //Get the center of that border.
-            Location center = wb.getCenter();
+            final Location center = wb.getCenter();
             //Get the size of that border.
-            double size = wb.getSize();
+            final double size = wb.getSize();
             //Divide that size in half to get the radius of the border.
-            double radius = size / 2;
+            final double radius = size / 2;
             //Get the X coord of the center.
-            int centerX = center.getBlockX();
+            final int centerX = center.getBlockX();
             //Get the Z coord of the center.
-            int centerZ = center.getBlockZ();
+            final int centerZ = center.getBlockZ();
             //Get the X coord of the player.
-            int playerX = loc.getBlockX();
+            final int playerX = loc.getBlockX();
             //Get the Z coord of the Player.
-            int playerZ = loc.getBlockZ();
+            final int playerZ = loc.getBlockZ();
 
             /**
              * If the player is outside the border, then return true.
@@ -923,7 +930,7 @@ public class Coordinates {
      * @param world The world we want the max of.
      * @return The maximum coordinate.
      */
-    private int getMax(World world) {
+    private int getMax(final World world) {
         //Initiate the X coordinate of the spawnpoint
         int spawnX;
         //Initiate the Z coordinate of the spawnpoint
@@ -976,9 +983,9 @@ public class Coordinates {
             //Get the center of the world border.
             final Location center = border.getCenter();
             //Get the X coordinate of the center.
-            int borderX = center.getBlockX();
+            final int borderX = center.getBlockX();
             //Get the Z coordinate of the center.
-            int borderZ = center.getBlockZ();
+            final int borderZ = center.getBlockZ();
             //Get the size of the world border.
             final double size = border.getSize();
             //Get the radius.
@@ -1008,7 +1015,7 @@ public class Coordinates {
      * @param world The world we want the min of.
      * @return The minimum coordinate.
      */
-    private int getMin(World world) {
+    private int getMin(final World world) {
         //Initiate a number for the min coordinate.
         int min;
         /**
@@ -1030,7 +1037,7 @@ public class Coordinates {
      * @param world The world we want the center of.
      * @return The X coordinate.
      */
-    private int getCenterX(World world) {
+    private int getCenterX(final World world) {
         //Initiate a value for the center X of the world.
         int spawnX;
         /**
@@ -1052,7 +1059,7 @@ public class Coordinates {
      * @param world The world we want the center of.
      * @return The Z coordinate.
      */
-    private int getCenterZ(World world) {
+    private int getCenterZ(final World world) {
         //Initiate a value for the center Z of the world.
         int spawnZ;
         /**
@@ -1088,7 +1095,7 @@ public class Coordinates {
             //Gets the end coord from the end class.
             locationTP = end.endCoord(locationTP);
             //Gets the highest value at this point.
-            int highest = locationTP.getWorld().getHighestBlockYAt(locationTP.getBlockX(), locationTP.getBlockZ());
+            final int highest = locationTP.getWorld().getHighestBlockYAt(locationTP.getBlockX(), locationTP.getBlockZ());
             //Sets the locationTp as the new location made from above.
             locationTP = new Location(locationTP.getWorld(), locationTP.getBlockX(), highest, locationTP.getBlockZ());
 
@@ -1112,7 +1119,7 @@ public class Coordinates {
      * @param coordType The CoordType enum. The method of teleporting.
      * @return The final location.
      */
-    private Location shouldWarp(Player player, World world, Location locationTP, String name, CoordType coordType) {
+    private Location shouldWarp(final Player player, final World world, Location locationTP, final String name, final CoordType coordType) {
 
         /**
          * If the name of the teleport type provide (See FinalCoordinates) is Warps, Set the locationTP as the warp location.
@@ -1141,7 +1148,7 @@ public class Coordinates {
     }
 
 
-    private boolean reachedLimit(Player player, String name) {
+    private boolean reachedLimit(final Player player, final String name) {
         if(!RandomCoords.getPlugin().config.getStringList("LimiterApplys").contains(name)) {
             return false;
         }
@@ -1151,7 +1158,7 @@ public class Coordinates {
         }
         final FileConfiguration limiterFile = RandomCoords.getPlugin().limiter;
 
-        String uuid = player.getUniqueId().toString();
+        final String uuid = player.getUniqueId().toString();
         //Grab their uses.
         final int used = limiterFile.getInt(uuid + ".Uses");
         //Grab the limit.
@@ -1171,7 +1178,7 @@ public class Coordinates {
      * @param name The name of the CoordType.
      * @return True or False, Should we use the limiter.
      */
-    private boolean limiterApplys(Player player, String name) {
+    private boolean limiterApplys(final Player player, final String name) {
         /**
          * If the LimiterApplys list contains the teleport type name, set limiter as isLimiter boolean.
          */
@@ -1190,7 +1197,7 @@ public class Coordinates {
      * @param name The name of the CoordType.
      * @return The cost of the teleport.
      */
-    private double costApplys(double thisCost, String name) {
+    private double costApplys(double thisCost, final String name) {
         /**
          * If the cost name (See FinalCoordinates) is default, just return thisCost value provided.
          */
@@ -1217,7 +1224,7 @@ public class Coordinates {
      * @param name The name of the CoordType.
      * @return The timeBefore int.
      */
-    private int timeBeforeApplys(Player player, int timeBefore, String name) {
+    private int timeBeforeApplys(final Player player, int timeBefore, final String name) {
 
         /**
          * If the teleport type name is Join, Return the given timeBefore.
@@ -1261,7 +1268,7 @@ public class Coordinates {
      * @param name The name of the CoordType.
      * @return The cooldown integer.
      */
-    private int cooldownApplys(Player player, int cooldown, String name) {
+    private int cooldownApplys(final Player player, int cooldown, final String name) {
         /**
          * If name is equal to teleport type Join. Return the cooldown provide. (Usually 0)
          */
@@ -1303,7 +1310,7 @@ public class Coordinates {
      * @param world The world we're checking.
      * @return True or False, Is the world banned?
      */
-    private boolean isWorldBanned(Player player, World world) {
+    private boolean isWorldBanned(final Player player, final World world) {
         /**
          * If the world is banned, Return true, and a message.
          */
@@ -1323,7 +1330,7 @@ public class Coordinates {
      * @param timeBefore The timeBefore teleporting int.
      * @return True or False, Are they in the time before?
      */
-    private boolean inTimeBefore(Player player, int timeBefore) {
+    private boolean inTimeBefore(final Player player, final int timeBefore) {
         /**
          * If the player is in the TimeBefore cooldown, Then tell them they are about to teleport.
          * Also return true.
@@ -1357,7 +1364,7 @@ public class Coordinates {
      * @param cooldown The cooldown int.
      * @return True or False, Are they in the cooldown?
      */
-    private boolean inCooldown(Player player, int cooldown) {
+    private boolean inCooldown(final Player player, final int cooldown) {
         /**
          * If the cooldown is equal to 0, Return false, they are not in the cooldown.
          */

@@ -12,7 +12,7 @@ import java.io.PrintWriter;
  */
 public class DebugManager {
 
-    public void logToFile(String message)
+    public void logToFile(final String message)
 
     {
       if(!RandomCoords.getPlugin().config.getString("debug").equalsIgnoreCase("true")) {
@@ -20,22 +20,22 @@ public class DebugManager {
       }
         try
         {
-            File dataFolder = RandomCoords.getPlugin().getDataFolder();
+            final File dataFolder = RandomCoords.getPlugin().getDataFolder();
             if(!dataFolder.exists())
             {
                 dataFolder.mkdir();
             }
 
-            File saveTo = new File(RandomCoords.getPlugin().getDataFolder(), "log.txt");
+            final File saveTo = new File(RandomCoords.getPlugin().getDataFolder(), "log.txt");
             if (!saveTo.exists())
             {
                 saveTo.createNewFile();
             }
 
 
-            FileWriter fw = new FileWriter(saveTo, true);
+            final FileWriter fw = new FileWriter(saveTo, true);
 
-            PrintWriter pw = new PrintWriter(fw);
+            final PrintWriter pw = new PrintWriter(fw);
 
             pw.println(message);
 

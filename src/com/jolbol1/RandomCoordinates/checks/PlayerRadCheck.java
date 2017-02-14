@@ -31,16 +31,13 @@ public class PlayerRadCheck {
         final int bx = x;
         final int bz = z;
 
-        if (RandomCoords.getPlugin().config.getString("AvoidPlayers").equals("false")) {
-            return true;
-        } else {
+        if (RandomCoords.getPlugin().config.getString("AvoidPlayers").equals("true")) {
 
             for (int i = 0; i < r * 2 + 1; i++) {
                 for (int j = 0; j < r * 2 + 1; j++) {
                     for (int k = 0; k < r * 2 + 1; k++) {
                         //noinspection LoopStatementThatDoesntLoop
                         for (final Player p : Bukkit.getOnlinePlayers()) {
-                            //Code here
                             final Block b = l.getWorld().getBlockAt(x, y, z);
                             return p.getLocation().getBlock().getRelative(BlockFace.DOWN) != b;
                         }
@@ -54,7 +51,8 @@ public class PlayerRadCheck {
                 x = bx;
                 y++;
             }
-            return false;
+
         }
+        return true;
     }
 }

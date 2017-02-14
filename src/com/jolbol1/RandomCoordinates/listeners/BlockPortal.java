@@ -26,7 +26,7 @@ public class BlockPortal implements Listener {
      */
     @EventHandler
     public void blockPhysics(final BlockPhysicsEvent e) {
-        Material mat = e.getBlock().getType();
+        final Material mat = e.getBlock().getType();
         /**
          * If the material thats causing the physics event is one of these, Execute the next code, Else allow physics normally.
          */

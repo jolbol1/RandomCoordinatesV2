@@ -31,13 +31,13 @@ public class Suffocation implements Listener {
         }
         e.setCancelled(true);
         final int highestY = p.getWorld().getHighestBlockYAt(p.getLocation());
-        double x = p.getLocation().getX();
-        double z = p.getLocation().getZ();
-        double xR = Math.floor(x) + 0.5;
-        double zR = Math.floor(z) + 0.5;
+        final double x = p.getLocation().getX();
+        final double z = p.getLocation().getZ();
+        final double xR = Math.floor(x) + 0.5;
+        final double zR = Math.floor(z) + 0.5;
         final Location reTry = new Location(p.getWorld(), xR, highestY + 2, zR);
         p.teleport(reTry);
-        return;
+
 
     }
 

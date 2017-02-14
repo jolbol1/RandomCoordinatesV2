@@ -9,16 +9,12 @@ import com.jolbol1.RandomCoordinates.managers.Metrics;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -27,8 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -51,7 +45,6 @@ public class RandomCoords extends JavaPlugin {
     /**
      * Creates an instance of the messages folder, Which handles most messages within.
      */
-    private final MessageManager messages = new MessageManager();
 
 //Creates an instance of the config files.
     public FileConfiguration language;
@@ -71,8 +64,8 @@ public class RandomCoords extends JavaPlugin {
     final String ANSI_BLUE = "\u001B[34m";
 
     //Sets the number to 0, The counter for successful teleports and failed.
-    public int successTeleports = 0;
-    public int failedTeleports = 0;
+    public int successTeleports;
+    public int failedTeleports;
 
     /**
      * Used to grab the plugin instance from this clas
@@ -144,7 +137,7 @@ public class RandomCoords extends JavaPlugin {
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
         if (RandomCoords.getPlugin().config.getString("Metrics").equalsIgnoreCase("true")) {
-            Metrics metrics = new Metrics(this);
+            final Metrics metrics = new Metrics(this);
             setupCharts(metrics);
         }
 
@@ -171,7 +164,7 @@ public class RandomCoords extends JavaPlugin {
     /**
      * Used to update the config file.
      */
-    private void matchFile(FileConfiguration fileConfig, File file, String name) {
+    private void matchFile(final FileConfiguration fileConfig, final File file, final String name) {
 
         final InputStream is = getResource(name + "-defaults.yml");
         if (is != null) {
@@ -220,8 +213,8 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
-    public void reloadFile(FileConfiguration fileConfig, String fileName) {
-        File file = new File(this.getDataFolder(), fileName);
+    public void reloadFile(final FileConfiguration fileConfig, final String fileName) {
+        final File file = new File(this.getDataFolder(), fileName);
             try {
                 fileConfig.load(file);
             } catch (Exception e) {
@@ -234,7 +227,7 @@ public class RandomCoords extends JavaPlugin {
     /**
      * Saves the config file, to add changes.
      */
-    public void saveFile(FileConfiguration fileConfig, File file) {
+    public void saveFile(final FileConfiguration fileConfig, final File file) {
         if (fileConfig == null || file == null) {
             return;
         }
@@ -297,7 +290,7 @@ public class RandomCoords extends JavaPlugin {
      * Generates the charts to send to metric.
      * @param metrics returns charts to send.
      */
-    public void setupCharts(Metrics metrics) {
+    public void setupCharts(final Metrics metrics) {
         metrics.addCustomChart(new Metrics.SingleLineChart("success") {
             @Override
             public int getValue() {
@@ -314,7 +307,7 @@ public class RandomCoords extends JavaPlugin {
         });
     }
 
-    private FileConfiguration setupFile(File file) {
+    private FileConfiguration setupFile(final File file) {
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -365,7 +358,7 @@ public class RandomCoords extends JavaPlugin {
         if(versionOnFile == null ) { return; }
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
             Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Bukkit. http://bit.ly/RandomDownload" + ANSI_RESET);
-            for(Player p : Bukkit.getOnlinePlayers()) {
+            for(final Player p : Bukkit.getOnlinePlayers()) {
                 if(p.isOp()) {
                     p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit. http://bit.ly/RandomDownload");
                 }
@@ -375,10 +368,12 @@ public class RandomCoords extends JavaPlugin {
 
 
 
+
+
     }
 
 
-
+  
 
 }
 

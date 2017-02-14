@@ -30,7 +30,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     void minTooLarge(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MinTooLarge"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MinTooLarge"));
         sender.sendMessage(prefix + message);
     }
 
@@ -54,7 +54,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     public void notPlayer(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NotPlayer"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NotPlayer"));
         sender.sendMessage(prefix + message);
 
     }
@@ -75,7 +75,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     public void reloadMessage(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReloadFiles"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReloadFiles"));
         sender.sendMessage(prefix + message);
     }
 
@@ -87,7 +87,7 @@ public class MessageManager {
     void TeleportingIn(final CommandSender sender, final int Time) {
         final String message = RandomCoords.getPlugin().language.getString("TeleportingIn");
         final String messageFinal = ChatColor.translateAlternateColorCodes('&', message.replaceAll("%time", String.valueOf(Time)));
-        String messages = ChatColor.translateAlternateColorCodes('&', messageFinal);
+        final String messages = ChatColor.translateAlternateColorCodes('&', messageFinal);
         sender.sendMessage(prefix + messages);
     }
 
@@ -107,7 +107,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     void couldntFind(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("TooManyAttempts"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("TooManyAttempts"));
         sender.sendMessage(prefix + message);
     }
 
@@ -116,7 +116,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     void reachedLimit(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReachedLimit"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReachedLimit"));
         sender.sendMessage(prefix + message);
     }
 
@@ -125,7 +125,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     public void onJoin(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("OnJoin"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("OnJoin"));
         sender.sendMessage(prefix + message);
     }
 
@@ -148,7 +148,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     public void rcAllUsage(final CommandSender sender) {
-        String correct = ChatColor.RED + "Correct Usage: /RC all {Max} {Min} {World}  - {} = Not required";
+        final String correct = ChatColor.RED + "Correct Usage: /RC all {Max} {Min} {World}  - {} = Not required";
         sender.sendMessage(prefix + correct);
 
     }
@@ -189,7 +189,7 @@ public class MessageManager {
      * @param sender Who we're sending the message to.
      */
     public void noSelection(final CommandSender sender) {
-        String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoSelection"));
+        final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoSelection"));
         sender.sendMessage(prefix + message);
     }
 

@@ -22,6 +22,8 @@ AvoidPlayers: false
 Towny: false
 WorldBorder: false
 WorldGuard: false
+RedProtect: false
+Kingdoms: false
 VanillaBorder: true
 Regions:
  - example

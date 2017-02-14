@@ -18,17 +18,16 @@ import java.util.List;
 public class PlayerSwitchWorld implements Listener {
 
     private final Coordinates coordinates = new Coordinates();
-    private final MessageManager messages = new MessageManager();
 
     @EventHandler
-    public void onPlayerSwitch(PlayerTeleportEvent e) {
-        Player p = e.getPlayer();
+    public void onPlayerSwitch(final PlayerTeleportEvent e) {
         if(RandomCoords.getPlugin().config.getStringList("OnJoinWorlds") == null )  { return; }
-        List<String> list = RandomCoords.getPlugin().config.getStringList("OnJoinWorlds");
-        if(list.isEmpty()) return;
+        final List<String> list = RandomCoords.getPlugin().config.getStringList("OnJoinWorlds");
+        if(list.isEmpty()) { return; }
         if(e.getTo().getWorld() == e.getFrom().getWorld()) { return; }
         if(list.contains(e.getTo().getWorld().getName())) {
             if(e.getTo().getWorld().getPlayers().contains(e.getPlayer())) { return; }
+            final Player p = e.getPlayer();
             coordinates.finalCoordinates(p, 574272099, 574272099, e.getTo().getWorld(), CoordType.JOINWORLD, 0);
 
         }

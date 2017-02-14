@@ -32,7 +32,7 @@ public class SignClick implements Listener {
     public void onClickEvent(final PlayerInteractEvent e) {
         double cost = 0;
         String line1 = null;
-        if (e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_BLOCK)
+        if (e.getAction() == Action.LEFT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (e.getClickedBlock().getType() == Material.WALL_SIGN || e.getClickedBlock().getType() == Material.SIGN || e.getClickedBlock().getType() == Material.SIGN_POST) {
                 final Sign sign = (Sign) e.getClickedBlock().getState();
                 if (sign.getLine(0).equalsIgnoreCase(ChatColor.GREEN + "[RandomCoords]")) {
@@ -74,6 +74,7 @@ public class SignClick implements Listener {
                     }
                 }
             }
+        }
     }
 
 }
