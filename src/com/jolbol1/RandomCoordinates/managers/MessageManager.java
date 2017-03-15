@@ -12,9 +12,12 @@ import org.bukkit.entity.Player;
  */
 public class MessageManager {
     //
-    private final String prefix = ChatColor.GOLD + "[RandomCoords] ";
-    private final ChatColor good = ChatColor.GREEN;
+    private String prefix() {
+        String prefix = RandomCoords.getPlugin().language.getString("Prefix") + ChatColor.RESET;
+        String message = ChatColor.translateAlternateColorCodes('&', prefix);
+        return message;
 
+    }
 
     /**
      * Message for if the player has no permission.
@@ -22,7 +25,7 @@ public class MessageManager {
      */
     public void noPermission(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoPermission"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -31,7 +34,7 @@ public class MessageManager {
      */
     void minTooLarge(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MinTooLarge"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -44,8 +47,8 @@ public class MessageManager {
         final String locX = String.valueOf(location.getX());
         final String locY = String.valueOf(location.getBlockY());
         final String locZ = String.valueOf(location.getZ());
-        final String newMessage = message.replaceAll("%coordinates", ChatColor.GREEN + (locX + ", " + good + locY + ", " + good + locZ));
-        player.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', newMessage));
+        final String newMessage = message.replaceAll("%coordinates", (locX + ", " + locY + ", "  + locZ));
+        player.sendMessage(prefix() + ChatColor.translateAlternateColorCodes('&', newMessage));
 
     }
 
@@ -55,7 +58,7 @@ public class MessageManager {
      */
     public void notPlayer(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NotPlayer"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
 
     }
 
@@ -67,7 +70,7 @@ public class MessageManager {
     void cooldownMessage(final CommandSender sender, final int Time) {
         final String message = RandomCoords.getPlugin().language.getString("CooldownMessage");
         final String messageTime = message.replaceAll("%time", String.valueOf(Time));
-        sender.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', messageTime));
+        sender.sendMessage(prefix() + ChatColor.translateAlternateColorCodes('&', messageTime));
     }
 
     /**
@@ -76,7 +79,7 @@ public class MessageManager {
      */
     public void reloadMessage(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReloadFiles"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -88,7 +91,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("TeleportingIn");
         final String messageFinal = ChatColor.translateAlternateColorCodes('&', message.replaceAll("%time", String.valueOf(Time)));
         final String messages = ChatColor.translateAlternateColorCodes('&', messageFinal);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -99,7 +102,7 @@ public class MessageManager {
     void aboutTo(final CommandSender sender, final int Time) {
         final String message = RandomCoords.getPlugin().language.getString("AlreadyAboutTo");
         final String messageFinal = message.replaceAll("%time", String.valueOf(Time));
-        sender.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', messageFinal));
+        sender.sendMessage(prefix() + ChatColor.translateAlternateColorCodes('&', messageFinal));
     }
 
     /**
@@ -108,7 +111,7 @@ public class MessageManager {
      */
     void couldntFind(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("TooManyAttempts"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -117,7 +120,7 @@ public class MessageManager {
      */
     void reachedLimit(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("ReachedLimit"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -126,7 +129,7 @@ public class MessageManager {
      */
     public void onJoin(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("OnJoin"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -139,7 +142,7 @@ public class MessageManager {
         //String targetName = target.getDisplayName();
         final String message = RandomCoords.getPlugin().language.getString("TeleportedBy");
         final String finalMessage = message.replaceAll("%player", originator);
-        target.sendMessage(prefix + ChatColor.translateAlternateColorCodes('&', finalMessage));
+        target.sendMessage(prefix() + ChatColor.translateAlternateColorCodes('&', finalMessage));
 
     }
 
@@ -149,7 +152,7 @@ public class MessageManager {
      */
     public void rcAllUsage(final CommandSender sender) {
         final String correct = ChatColor.RED + "Correct Usage: /RC all {Max} {Min} {World}  - {} = Not required";
-        sender.sendMessage(prefix + correct);
+        sender.sendMessage(prefix() + correct);
 
     }
 
@@ -171,7 +174,7 @@ public class MessageManager {
      */
     public void centerSet(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("CenterSet"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
 
     }
 
@@ -181,7 +184,7 @@ public class MessageManager {
      */
     public void signCreated(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("SignCreated"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -190,7 +193,7 @@ public class MessageManager {
      */
     public void noSelection(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoSelection"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -204,7 +207,7 @@ public class MessageManager {
         final String messageW = message.replaceAll("%world", wname);
         final String finalMessage = messageW.replaceAll("%name", name);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -214,7 +217,7 @@ public class MessageManager {
      */
     public void incorrectUsage(final CommandSender sender, final String correct) {
         final String message = ChatColor.translateAlternateColorCodes('&', "Incorrect Usage: " + correct);
-        sender.sendMessage(prefix + ChatColor.RED + message);
+        sender.sendMessage(prefix() + ChatColor.RED + message);
     }
 
     /**
@@ -226,7 +229,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("PortalNotExist");
         final String finalMessage = message.replaceAll("%name", name);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -238,7 +241,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("PortalDeleted");
         final String finalMessage = message.replaceAll("%name", name);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -247,7 +250,7 @@ public class MessageManager {
      */
     public void portalList(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("PortalList"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -256,7 +259,7 @@ public class MessageManager {
      */
     public void posInSameWorld(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("PositionInSameWorld"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -270,7 +273,7 @@ public class MessageManager {
         final String stageOne = message.replaceAll("%world", world);
         final String finalMessage = stageOne.replaceAll("%max", max);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -284,7 +287,7 @@ public class MessageManager {
         final String stageOne = message.replaceAll("%world", world);
         final String finalMessage = stageOne.replaceAll("%min", min);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -296,7 +299,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("MaxRemove");
         final String finalMessage = message.replaceAll("%world", world);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -308,7 +311,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("MinRemove");
         final String finalMessage = message.replaceAll("%world", world);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -320,7 +323,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("CenterRemove");
         final String finalMessage = message.replaceAll("%world", world);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -329,7 +332,7 @@ public class MessageManager {
      */
     void youMoved(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MovedTooFar"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -338,7 +341,7 @@ public class MessageManager {
      */
     void tookDamage(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("CantUseInCombat"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -347,7 +350,7 @@ public class MessageManager {
      */
     public void worldBanned(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WorldBanned"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -359,7 +362,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("WarpSet");
         final String finalMessage = message.replaceAll("%name", name);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -371,7 +374,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("WarpDelete");
         final String finalMessage = message.replaceAll("%name", name);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -380,7 +383,7 @@ public class MessageManager {
      */
     void noWarps(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoWarps"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -393,7 +396,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("NoWarpsWorld");
         final String finalMessage = ChatColor.translateAlternateColorCodes('&', message.replaceAll("%world", world));
 
-        sender.sendMessage(prefix + finalMessage);
+        sender.sendMessage(prefix() + finalMessage);
     }
 
     /**
@@ -402,7 +405,7 @@ public class MessageManager {
      */
     public void noCommand(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("NoSuchCommand"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -414,7 +417,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("Charged");
         final String costMessage = message.replaceAll("%cost", String.valueOf(cost));
         final String messages = ChatColor.translateAlternateColorCodes('&', costMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -426,7 +429,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("Cost");
         final String costMessage = message.replaceAll("%cost", String.valueOf(cost));
         final String messages = ChatColor.translateAlternateColorCodes('&', costMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
     /**
@@ -435,7 +438,7 @@ public class MessageManager {
      */
     public void warpNotExist(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WarpNotExist"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -444,7 +447,7 @@ public class MessageManager {
      */
     public void wandGiven(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("WandGive"));
-        sender.sendMessage(prefix + message);
+        sender.sendMessage(prefix() + message);
     }
 
     /**
@@ -456,7 +459,7 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("TeleportedAll");
         final String finalMessage = message.replaceAll("%world", world);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
-        sender.sendMessage(prefix + messages);
+        sender.sendMessage(prefix() + messages);
     }
 
 

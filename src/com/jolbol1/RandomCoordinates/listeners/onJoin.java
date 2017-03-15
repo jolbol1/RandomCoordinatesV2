@@ -55,6 +55,9 @@ public class onJoin implements Listener {
             }
             //Runs the command specified, from the players point of view. (SHOULD BE MOVED TO THE COORDINATES, SERIOUS ISSUE)
             p.getServer().dispatchCommand(p, command);
+            if(p.getHealth() == 10) {
+
+            }
         }
 
     }

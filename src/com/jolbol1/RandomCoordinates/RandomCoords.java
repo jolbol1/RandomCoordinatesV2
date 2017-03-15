@@ -4,7 +4,6 @@ import com.jolbol1.RandomCoordinates.commands.*;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandHandler;
 import com.jolbol1.RandomCoordinates.listeners.*;
 import com.jolbol1.RandomCoordinates.managers.ConstructTabCompleter;
-import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import com.jolbol1.RandomCoordinates.managers.Metrics;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.md_5.bungee.api.ChatColor;
@@ -85,7 +84,7 @@ public class RandomCoords extends JavaPlugin {
         logger = Bukkit.getServer().getLogger();
         plugin = this;
         final PluginManager pm = getServer().getPluginManager();
-        final CommandHandler handler = new CommandHandler();
+
         final PluginDescriptionFile pdf = getDescription();
 
         logger.log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords]" + ANSI_BLUE + ANSI_BOLD + pdf.getName() + ANSI_BLUE + ANSI_BOLD + " Version: " + ANSI_BLUE + ANSI_BOLD + pdf.getVersion() + ANSI_BLUE + ANSI_BOLD + " enabled." + ANSI_RESET);
@@ -125,6 +124,7 @@ public class RandomCoords extends JavaPlugin {
         pm.registerEvents(new InNetherPortal(), this);
         pm.registerEvents(new Wand(), this);
         pm.registerEvents(new PlayerSwitchWorld(), this);
+        final CommandHandler handler = new CommandHandler();
         handler.register("rc", new RandomCommand());
         handler.register("wand", new WandGive());
         handler.register("reload", new Reload());
@@ -247,7 +247,7 @@ public class RandomCoords extends JavaPlugin {
         final Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
 
         // WorldGuard may not be loaded
-        if (!(plugin instanceof WorldGuardPlugin)) {
+        if (!(plugin instanceof WorldGuardPlugin) || plugin == null) {
             return null; // Maybe you want throw an exception instead
         }
 

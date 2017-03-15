@@ -1247,7 +1247,7 @@ public class Coordinates {
                 /**
                  * Do they have the bypass permission?
                  */
-                if (player.hasPermission("Random.TBT.Bypass") || player.hasPermission("Random.*")) {
+                if (player.hasPermission("Random.TBT.Bypass") || player.hasPermission("Random.*") || player.isOp()) {
                     //they can bypass, thus TB = 0.
                     timeBefore = 0;
                 } else {
