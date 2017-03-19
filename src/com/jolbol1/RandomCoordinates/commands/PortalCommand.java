@@ -41,8 +41,10 @@ public class PortalCommand implements CommandInterface {
                 } else if (args[0].equalsIgnoreCase("portal") && args[1].equalsIgnoreCase("list")) {
                     final ConfigurationSection cs = RandomCoords.getPlugin().portals.getConfigurationSection("Portal");
                     messages.portalList(sender);
-                    for (final String a : cs.getKeys(false)) {
-                        sender.sendMessage(ChatColor.RED + a);
+                    if(cs != null) {
+                        for (final String a : cs.getKeys(false)) {
+                            sender.sendMessage(ChatColor.RED + a);
+                        }
                     }
                 } else {
                     if (args[0].equalsIgnoreCase("portal")) {

@@ -42,22 +42,12 @@ public class onJoin implements Listener {
                 return;
             }
             //Get the command that should be run on join. Plans to change this to a list.
-            final String command = RandomCoords.getPlugin().config.getString("OnJoinCommand");
             //Initiate the coordinates function which will handle the random teleport. Notice the secret key to get default values.
             coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.JOIN, 0);
             //Message them to let them know that they have been teleported.
             messages.onJoin(p);
-            /**
-             * If there is no command, return.
-             */
-            if (command.equalsIgnoreCase("none")) {
-                return;
-            }
-            //Runs the command specified, from the players point of view. (SHOULD BE MOVED TO THE COORDINATES, SERIOUS ISSUE)
-            p.getServer().dispatchCommand(p, command);
-            if(p.getHealth() == 10) {
 
-            }
+
         }
 
     }

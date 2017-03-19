@@ -24,6 +24,7 @@ public class Reload implements CommandInterface {
                     RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().portals, "portals.yml");
                     RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().warps, "warps.yml");
                     RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().blacklist, "blacklist.yml");
+                    RandomCoords.getPlugin().reloadFile(RandomCoords.getPlugin().skyBlockSave, "SkyBlockSave.yml");
                     messages.reloadMessage(sender);
 
                 }

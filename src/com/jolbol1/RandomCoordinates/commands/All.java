@@ -57,6 +57,9 @@ public class All implements CommandInterface {
                     } catch (NumberFormatException nfe) {
                         messages.rcAllUsage(sender);
                     }
+                    if(!coordinates.maxGreaterThanMin(sender, max, 574272099, world)) {
+                        return;
+                    }
                     teleportAll(sender, max, min, world);
                 } else if (args.length == 4) {
                     if (Bukkit.getServer().getWorld(args[1]) != null) {
@@ -68,6 +71,9 @@ public class All implements CommandInterface {
                             min = Integer.valueOf(args[3]);
                         } catch (NumberFormatException nfe) {
                             messages.rcAllUsage(sender);
+                        }
+                        if(!coordinates.maxGreaterThanMin(sender, max, min, world)) {
+                            return;
                         }
                         teleportAll(sender, max, min, world);
                     } else {

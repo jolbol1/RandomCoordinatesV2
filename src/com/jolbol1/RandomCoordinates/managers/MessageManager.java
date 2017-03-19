@@ -32,7 +32,7 @@ public class MessageManager {
      * Message for when the min is greater than the maximum.
      * @param sender Who we're sending the message to.
      */
-    void minTooLarge(final CommandSender sender) {
+    public void minTooLarge(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("MinTooLarge"));
         sender.sendMessage(prefix() + message);
     }

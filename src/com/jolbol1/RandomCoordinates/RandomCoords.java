@@ -2,6 +2,7 @@ package com.jolbol1.RandomCoordinates;
 
 import com.jolbol1.RandomCoordinates.commands.*;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandHandler;
+import com.jolbol1.RandomCoordinates.event.RandomTeleportEvent;
 import com.jolbol1.RandomCoordinates.listeners.*;
 import com.jolbol1.RandomCoordinates.managers.ConstructTabCompleter;
 import com.jolbol1.RandomCoordinates.managers.Metrics;
@@ -22,7 +23,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,12 +55,15 @@ public class RandomCoords extends JavaPlugin {
     public FileConfiguration portals;
     public FileConfiguration warps;
     public FileConfiguration blacklist;
+    public FileConfiguration skyBlockSave;
+    public HashMap<UUID, Location> skyBlock = new HashMap<>();
     private File languageFile;
     public File configFile;
     public File limiterFile;
     public File portalsFile;
     public File warpFile;
     public File blackFile;
+    public File skyBlockSaveFile;
     final String ANSI_RESET = "\u001B[0m";
     final String ANSI_BOLD = "\u001B[1m";
     final String ANSI_BLUE = "\u001B[34m";
@@ -111,6 +117,10 @@ public class RandomCoords extends JavaPlugin {
         warpFile = new File(this.getDataFolder(), "warps.yml");
         warps = setupFile(warpFile);
 
+        skyBlockSaveFile = new File(this.getDataFolder(), "SkyBlockSave.yml");
+        skyBlockSave = setupFile(skyBlockSaveFile);
+        matchFile(skyBlockSave, skyBlockSaveFile, "SkyBlockSave");
+
         blackFile = new File(this.getDataFolder(), "blacklist.yml");
         blacklist = setupFile(blackFile);
         if(blacklist.getStringList("Blacklisted") != null) { matchFile(blacklist, blackFile, "blacklist"); }
@@ -124,6 +134,8 @@ public class RandomCoords extends JavaPlugin {
         pm.registerEvents(new InNetherPortal(), this);
         pm.registerEvents(new Wand(), this);
         pm.registerEvents(new PlayerSwitchWorld(), this);
+        pm.registerEvents(new RandomTeleportListener(), this);
+        pm.registerEvents(new SkyBlockBreak(), this);
         final CommandHandler handler = new CommandHandler();
         handler.register("rc", new RandomCommand());
         handler.register("wand", new WandGive());
@@ -149,7 +161,33 @@ public class RandomCoords extends JavaPlugin {
             updater();
         }
 
+        for(String str: skyBlockSave.getKeys(true)) {
 
+            if(str.equalsIgnoreCase("SkyBlock") || str.equalsIgnoreCase("AutoRemove") || str.equalsIgnoreCase("SkyBlockWorlds")) {
+            //For some reason this wouldnt work when reversed... Not to sure why... I have had 4hrs sleep.
+            } else {
+
+
+                skyBlock.put(UUID.fromString(str), (Location) skyBlockSave.get(str));
+                skyBlockSave.set(str, null);
+                saveFile(skyBlockSave, skyBlockSaveFile);
+            }
+
+        }
+
+
+
+    }
+
+    public void onDisable(){
+        if(skyBlock.size() != 0 || skyBlock != null) {
+            for(Map.Entry<UUID, Location> map : skyBlock.entrySet()) {
+                skyBlockSave.set(map.getKey().toString(), map.getValue());
+                saveFile(skyBlockSave, skyBlockSaveFile);
+
+            }
+
+        }
     }
 
 
@@ -357,15 +395,14 @@ public class RandomCoords extends JavaPlugin {
         //Return the number as a string.
         if(versionOnFile == null ) { return; }
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
-            Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Bukkit. http://bit.ly/RandomDownload" + ANSI_RESET);
+            Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Spigot. http://bit.ly/RandomTeleportSpigot" + ANSI_RESET);
             for(final Player p : Bukkit.getOnlinePlayers()) {
                 if(p.isOp()) {
-                    p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Bukkit. http://bit.ly/RandomDownload");
+                    p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
                 }
             }
         }
-
-
+        
 
 
 

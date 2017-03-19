@@ -92,6 +92,9 @@ public class Others implements CommandInterface {
 
                             }
                         }
+                        if(!coordinates.maxGreaterThanMin(sender, max, 574272099, world)) {
+                            return;
+                        }
                         coordinates.finalCoordinates(player, max, 574272099, world, CoordType.PLAYER, 0);
                         messages.teleportedBy(sender, player);
 
@@ -109,9 +112,10 @@ public class Others implements CommandInterface {
                     max = Integer.valueOf(args[3]);
                     min = Integer.valueOf(args[4]);
                 } catch (NumberFormatException e) {
-                    messages.incorrectUsage(sender, "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
+                    messages.incorrectUsage(sender, "/RC player {Player} {World} {Max} {Min} - {World/Max/Min} = Not Required");
                     return;
                 }
+
                 final String target = args[1];
                 final World world = Bukkit.getServer().getWorld(wName);
                 for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
@@ -122,6 +126,9 @@ public class Others implements CommandInterface {
                                 return;
 
                             }
+                        }
+                        if(!coordinates.maxGreaterThanMin(sender, max, min, world)) {
+                            return;
                         }
                         coordinates.finalCoordinates(player, max, min, world, CoordType.PLAYER, 0);
                     }

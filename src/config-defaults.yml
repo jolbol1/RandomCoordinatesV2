@@ -25,6 +25,7 @@ WorldGuard: false
 RedProtect: false
 Kingdoms: false
 VanillaBorder: true
+SkyBlock: false
 Regions:
  - example
 

@@ -6,10 +6,12 @@ import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -26,6 +28,35 @@ public class PortalEnter extends BukkitRunnable {
      */
     @Override
     public void run() {
+
+        if(!RandomCoords.getPlugin().skyBlock.isEmpty() && !RandomCoords.getPlugin().skyBlockSave.getString("SkyBlock").equalsIgnoreCase("none")) {
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (RandomCoords.getPlugin().skyBlock.containsKey(p.getUniqueId())) {
+                    if (Material.getMaterial(RandomCoords.getPlugin().skyBlockSave.getString("SkyBlock")) != null) {
+
+                        Material material = Material.getMaterial(RandomCoords.getPlugin().skyBlockSave.getString("SkyBlock"));
+
+                        if (RandomCoords.getPlugin().skyBlock.get(p.getUniqueId()).getBlock().getType().equals(Material.AIR)) {
+
+                            RandomCoords.getPlugin().skyBlock.get(p.getUniqueId()).getBlock().setType(material);
+                        } else if(!RandomCoords.getPlugin().skyBlock.get(p.getUniqueId()).getBlock().getType().equals(material)) {
+                            RandomCoords.getPlugin().skyBlock.remove(p.getUniqueId());
+
+                        }
+                        if(RandomCoords.getPlugin().skyBlockSave.getString("AutoRemove").equalsIgnoreCase("true")) {
+                            if(p.getLocation().getWorld().equals(RandomCoords.getPlugin().skyBlock.get(p.getUniqueId()).getWorld())) {
+                                if (RandomCoords.getPlugin().skyBlock.get(p.getUniqueId()).distance(p.getLocation().subtract(0, 1, 0)) > 2.5) {
+                                    RandomCoords.getPlugin().skyBlock.get(p.getUniqueId()).getBlock().setType(Material.AIR);
+                                    RandomCoords.getPlugin().skyBlock.remove(p.getUniqueId());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         /**
          * If there is no portals, Return.
          */

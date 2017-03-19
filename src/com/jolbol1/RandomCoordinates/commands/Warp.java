@@ -76,11 +76,16 @@ public class Warp implements CommandInterface {
                 }
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("list")) {
-                    final Set<String> warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
-                    sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Warps:");
 
-                    for (final String name : warps) {
-                        sender.sendMessage(ChatColor.GREEN + name);
+                    Set<String> warps = null;
+                    if(RandomCoords.getPlugin().warps.getConfigurationSection("Warps.") !=null) {
+                        warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
+                    }
+                    sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Warps:");
+                    if(warps !=null) {
+                        for (final String name : warps) {
+                            sender.sendMessage(ChatColor.GREEN + name);
+                        }
                     }
                 } else if (args[0].equalsIgnoreCase("warp") && Bukkit.getServer().getWorld(args[1]) != null) {
                     final World world = Bukkit.getServer().getWorld(args[1]);

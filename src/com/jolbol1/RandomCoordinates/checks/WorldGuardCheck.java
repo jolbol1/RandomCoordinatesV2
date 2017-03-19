@@ -2,20 +2,14 @@ package com.jolbol1.RandomCoordinates.checks;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
+
 import com.sk89q.worldguard.bukkit.RegionContainer;
-import com.sk89q.worldguard.domains.DefaultDomain;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
-import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Sound;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +26,11 @@ public class WorldGuardCheck {
     public boolean WorldguardCheck(final Location l) {
 
         //Checks if plugin is installed.
-        if (!(Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") == null)) {
+        if (Bukkit.getServer().getPluginManager().getPlugin("WorldGuard") != null) {
 
             //Checks if WorldGuard is enabled
             if (RandomCoords.getPlugin().config.getString("WorldGuard").equals("true")) {
+
                 final int X = l.getBlockX();
                 //  int Y = l.getBlockY();
                 final int Z = l.getBlockZ();
@@ -48,11 +43,16 @@ public class WorldGuardCheck {
 
                             //See if allRegions is enabled.
                             if (RandomCoords.getPlugin().config.getStringList("Regions").contains("allRegions")) {
+
                                 return RandomCoords.getPlugin().getWorldGuard().getRegionManager(l.getWorld()).getApplicableRegions(l).size() == 0;
                             } else {
                                 RegionContainer container = RandomCoords.getPlugin().getWorldGuard().getRegionContainer();
                                 RegionManager regions = container.get(l.getWorld());
-                                ProtectedRegion regionRadius = createCuboid(l);
+                                int cub = RandomCoords.getPlugin().config.getInt("CheckingRadius");
+                                BlockVector p1 = new BlockVector(l.getX() + cub, 0.0D, l.getZ() + cub);
+                                BlockVector p2 = new BlockVector(l.getX() - cub, 256.0D, l.getZ() - cub);
+                                ProtectedRegion cuboid = new ProtectedCuboidRegion("RandomCoordsREGION-DO-NOT-USE", p1, p2);
+                                ProtectedRegion regionRadius = cuboid;
                                 ApplicableRegionSet set = regions.getApplicableRegions(regionRadius);
                                 if(set.size() == 0 ) {
                                     return true;
@@ -88,16 +88,7 @@ public class WorldGuardCheck {
     }
 
 
-    public ProtectedRegion createCuboid(Location l)
 
-    {
-        int cub = RandomCoords.getPlugin().config.getInt("CheckingRadius");
-        BlockVector p1 = new BlockVector(l.getX() + cub, 0.0D, l.getZ() + cub);
-        BlockVector p2 = new BlockVector(l.getX() - cub, 256.0D, l.getZ() - cub);
-        ProtectedRegion cuboid = new ProtectedCuboidRegion("RandomCoordsREGION-DO-NOT-USE", p1, p2);
-        return cuboid;
-
-    }
 
 
 }

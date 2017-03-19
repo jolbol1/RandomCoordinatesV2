@@ -4,6 +4,7 @@ package com.jolbol1.RandomCoordinates.managers;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.checks.*;
 import com.jolbol1.RandomCoordinates.cooldown.Cooldown;
+import com.jolbol1.RandomCoordinates.event.RandomTeleportEvent;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -16,7 +17,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.kingdoms.main.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -47,7 +48,18 @@ public class Coordinates {
     //Creates an instance of the WorldBorder checker.
     private final WorldBorderChecker wbc = new WorldBorderChecker();
     //Creates an instance of the WorldGuard checker.
-    private final WorldGuardCheck wgc = new WorldGuardCheck();
+    private WorldGuardCheck wgc = null;
+    private boolean worldGuardEnabled(Location l) {
+        if(RandomCoords.getPlugin().getWorldGuard() != null) {
+            if(wgc == null) {
+                wgc = new WorldGuardCheck();
+            }
+            return wgc.WorldguardCheck(l);
+        } else {
+            return true;
+        }
+    }
+
     //Creates an instance of the Nether coordinate generator.
     private final Nether nether = new Nether();
     //Creates an instance of the End Island finder.
@@ -140,7 +152,6 @@ public class Coordinates {
          * Checks if the minimum is greater than the max, thus would return an error.
          */
         if (min >= max) {
-            messages.minTooLarge(sender);
         }
 
         //Returns a random number
@@ -382,9 +393,9 @@ public class Coordinates {
          * Otherwise, If the block is safe, Is it in any of the regions?
          */
         if(RandomCoords.getPlugin().config.getString("debug").equalsIgnoreCase("true")) {
-            debugManager.logToFile("Faction: " + String.valueOf(fc.FactionCheck(location)) + "\nGrief: " + String.valueOf(gpc.griefPrevent(location)) + "\nPlayer: " + String.valueOf(prc.isPlayerNear(location)) + "\nTowny: " + String.valueOf(tc.TownyCheck(location)) + "\nWorldBorder: " + String.valueOf(wbc.WorldBorderCheck(location)) + "\nWorldGuard: " + String.valueOf(wgc.WorldguardCheck(location)) + "\nVanillaBorder" + String.valueOf(!isOutsideBorder(location)));
+            debugManager.logToFile("Faction: " + String.valueOf(fc.FactionCheck(location)) + "\nGrief: " + String.valueOf(gpc.griefPrevent(location)) + "\nPlayer: " + String.valueOf(prc.isPlayerNear(location)) + "\nTowny: " + String.valueOf(tc.TownyCheck(location)) + "\nWorldBorder: " + String.valueOf(wbc.WorldBorderCheck(location)) + "\nWorldGuard: " + String.valueOf(worldGuardEnabled(location)) + "\nVanillaBorder" + String.valueOf(!isOutsideBorder(location)));
         }
-        return kingdomsClaim.KingdomsClaim(location) && redProtect.RedProtect(location) && fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && wgc.WorldguardCheck(location) && !isOutsideBorder(location);
+        return kingdomsClaim.KingdomsClaim(location) && redProtect.RedProtect(location) && fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && worldGuardEnabled(location) && !isOutsideBorder(location);
     }
 
 
@@ -701,77 +712,105 @@ public class Coordinates {
                  * Then start the cooldown.
                  */
                 if (exit) {
-                    /**
-                     * If the player has paid the price, Teleport them if not, Return.
-                     * (hasPayed manages the message sending about cost)
-                     */
 
+
+                    RandomTeleportEvent event = new RandomTeleportEvent(player, locationTP, coordType, cooldown);
+                    Bukkit.getServer().getPluginManager().callEvent(event);
+
+                    if (!event.isCancelled()) {
                         //Teleports the player finally to the safe location
-                        player.teleport(locationTP);
+                        event.getPlayer().teleport(event.location());
+
+
+
+                        if(event.coordType().equals(CoordType.JOIN) || event.coordType().equals(CoordType.JOINWORLD)) {
+
+                            if (RandomCoords.getPlugin().config.get("OnJoinCommand") instanceof String) {
+                                if (RandomCoords.getPlugin().config.getString("OnJoinCommand").equalsIgnoreCase("none")) {
+                                    return;
+                                }
+
+                                Bukkit.getServer().dispatchCommand(event.getPlayer(), RandomCoords.getPlugin().config.getString("OnJoinCommand"));
+
+                            } else if (RandomCoords.getPlugin().config.get("OnJoinCommand") instanceof List) {
+                                if (RandomCoords.getPlugin().config.getStringList("OnJoinCommand").contains("none")) {
+                                    return;
+                                }
+
+                                for (String n : RandomCoords.getPlugin().config.getStringList("OnJoinCommand")) {
+                                    Bukkit.getServer().dispatchCommand(event.getPlayer(), n);
+
+                                }
+                            }
+                        }
+
                         //Should we put a bonus chest at this location?
-                        bonusChests(player, locationTP);
+                        bonusChests(event.getPlayer(), event.location());
                         //Adds 1 To successful teleports for metrcis.
                         RandomCoords.getPlugin().successTeleports++;
                         //Start the cooldown.
                         cool.start();
+                        /**
+                         * Checks if we should play a sound.
+                         * If so try to, If the config is set wrong log it.
+                         */
+                        if (!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {
+                            //Get the name of the sound to be played.
+                            final String soundName = RandomCoords.getPlugin().config.getString("Sound");
+                            /**
+                             * Attempts to play the sound at the location they have teleported to.
+                             * Catches if the config is typed incorrectly and will log this.
+                             */
+                            try {
+                                //Play the sound.
+                                player.playSound(locationTP, Sound.valueOf(soundName), 1, 1);
+                            } catch (IllegalArgumentException e) {
+                                //Log if the sound is incorrect.
+                                Bukkit.getServer().getLogger().log(Level.WARNING, "Sound: " + soundName + " does not exist!");
+                            }
+
+
+                        }
+                        /**
+                         * Checks if we should play an effect.
+                         * If so try it, If the config is set incorrectly, Log it.
+                         */
+                        if (!RandomCoords.getPlugin().config.getString("Effect").equalsIgnoreCase("false")) {
+                            //Get the effect name from the config.
+                            final String effectName = RandomCoords.getPlugin().config.getString("Effect");
+                            /**
+                             * Try to play the effect at the players location.
+                             * Catch if the config is set incorrectly and log that.
+                             */
+                            try {
+                                //Play the effect at the location
+                                locationTP.getWorld().playEffect(locationTP, Effect.valueOf(effectName), 1);
+                            } catch (IllegalArgumentException e) {
+                                //Log the fact that the config is incorrect.
+                                Bukkit.getServer().getLogger().log(Level.WARNING, "Effect: " + effectName + " does not exist!");
+                            }
+
+
+                        }
+                        /**
+                         * This starts the cooldown for the suffocation check. This is what is checked for in the Suffocation class.
+                         */
+                        final Cooldown c = new Cooldown(player.getUniqueId(), "Invul", 30);
+                        c.start();
+                        /**
+                         * Start the Invul timer, This is used if the users would like the players to be invul for a while after TP.
+                         */
+                        final Cooldown cT = new Cooldown(player.getUniqueId(), "InvulTime", RandomCoords.getPlugin().config.getInt("InvulTime"));
+                        cT.start();
+                        //Send the message that they have teleported.
+                        messages.teleportMessage(player, locationTP);
+                    }
+
 
 
                 }
             }
-            /**
-             * Checks if we should play a sound.
-             * If so try to, If the config is set wrong log it.
-             */
-            if (!RandomCoords.getPlugin().config.getString("Sound").equalsIgnoreCase("false")) {
-                //Get the name of the sound to be played.
-                final String soundName = RandomCoords.getPlugin().config.getString("Sound");
-                /**
-                 * Attempts to play the sound at the location they have teleported to.
-                 * Catches if the config is typed incorrectly and will log this.
-                 */
-                try {
-                    //Play the sound.
-                    player.playSound(locationTP, Sound.valueOf(soundName), 1, 1);
-                } catch (IllegalArgumentException e) {
-                    //Log if the sound is incorrect.
-                    Bukkit.getServer().getLogger().log(Level.WARNING, "Sound: " + soundName + " does not exist!");
-                }
 
-
-            }
-            /**
-             * Checks if we should play an effect.
-             * If so try it, If the config is set incorrectly, Log it.
-             */
-            if (!RandomCoords.getPlugin().config.getString("Effect").equalsIgnoreCase("false")) {
-                //Get the effect name from the config.
-                final String effectName = RandomCoords.getPlugin().config.getString("Effect");
-                /**
-                 * Try to play the effect at the players location.
-                 * Catch if the config is set incorrectly and log that.
-                 */
-                try {
-                    //Play the effect at the location
-                    locationTP.getWorld().playEffect(locationTP, Effect.valueOf(effectName), 1);
-                } catch (IllegalArgumentException e) {
-                    //Log the fact that the config is incorrect.
-                    Bukkit.getServer().getLogger().log(Level.WARNING, "Effect: " + effectName + " does not exist!");
-                }
-
-
-            }
-            /**
-             * This starts the cooldown for the suffocation check. This is what is checked for in the Suffocation class.
-             */
-            final Cooldown c = new Cooldown(player.getUniqueId(), "Invul", 30);
-            c.start();
-            /**
-             * Start the Invul timer, This is used if the users would like the players to be invul for a while after TP.
-             */
-            final Cooldown cT = new Cooldown(player.getUniqueId(), "InvulTime", RandomCoords.getPlugin().config.getInt("InvulTime"));
-            cT.start();
-            //Send the message that they have teleported.
-            messages.teleportMessage(player, locationTP);
 
         }, timeBefore * 20L);
     }
@@ -782,7 +821,7 @@ public class Coordinates {
      * @param player The player thats been teleported.
      * @param locationTP The location they were teleported to.
      */
-    private void bonusChests(final Player player, final Location locationTP) {
+    public void bonusChests(final Player player, final Location locationTP) {
         /**
          * Checks if the bonus chest feature is active. If not it does nothing.
          */
@@ -1091,7 +1130,7 @@ public class Coordinates {
             //Adds 1 to the Y value if the biome is hell.
             locationTP = locationTP.add(0, 1, 0);
 
-        } else if (locationTP.getWorld().getBiome(locationTP.getBlockX(), locationTP.getBlockZ()).equals(Biome.SKY)) {
+        } else if (locationTP.getWorld().getBiome(locationTP.getBlockX(), locationTP.getBlockZ()).equals(Biome.SKY) && !RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(locationTP.getWorld().getName())) {
             //Gets the end coord from the end class.
             locationTP = end.endCoord(locationTP);
             //Gets the highest value at this point.
@@ -1102,6 +1141,9 @@ public class Coordinates {
 
         } else {
             //Add 2.5 to the location. The max amount before fall damage.
+            if(locationTP.getY() <= 0) {
+                locationTP.add(0, 60, 0);
+            }
             locationTP = locationTP.add(0, 2.5, 0);
         }
 
@@ -1424,6 +1466,32 @@ public class Coordinates {
      */
     public boolean hasMoney(final Player p, final double cost) {
         return !RandomCoords.getPlugin().setupEconomy() || cost == 0 || cost <= RandomCoords.getPlugin().econ.getBalance(p);
+    }
+
+    //1000 max, 5444min
+    public boolean maxGreaterThanMin(CommandSender sender, int max, int min, World world) {
+     if(max == 574272099 && min != 574272099) {
+         if(getMax(world) <= min) {
+
+             messages.minTooLarge(sender);
+             return false;
+         }
+     } else if(max != 574272099 && min == 574272099) {
+            if(getMin(world) >= max) {
+                messages.minTooLarge(sender);
+                return false;
+            }
+        } else if(max == 574272099 && min == 574272099) {
+            if(getMin(world) >= getMax(world)) {
+                messages.minTooLarge(sender);
+                return false;
+            }
+        } else if(min >= max)  {
+
+            messages.minTooLarge(sender);
+         return false;
+     }
+     return true;
     }
 
 
