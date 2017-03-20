@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import java.util.Set;
@@ -26,81 +27,168 @@ public class Warp implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        if (sender instanceof ConsoleCommandSender) {
-            messages.notPlayer(sender);
-            return;
-        }
+        if(args.length >= 1 && args[0].equalsIgnoreCase("warp") && sender.hasPermission("Random.*") && sender.hasPermission("Random.Admin.*") && sender.hasPermission("Random.Admin.Portals")) {
+            String mode = null;
+            String name = null;
+            String playerName = null;
+            String worldName = null;
+            for(String s : args) {
 
-        if (args.length == 1 && args[0].equalsIgnoreCase("warp")) {
-            if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-                final Player p = (Player) sender;
-                coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.WARPS, 0);
-                return;
-            } else {
-                messages.noPermission(sender);
-                return;
+                if(!s.equalsIgnoreCase("warp")) {
+                     if(s.contains("name:")) {
+                        name = s.replace("name:", "");
+                    } else if(s.equalsIgnoreCase("create") || s.equalsIgnoreCase("set")) {
 
+                        if(mode == null) {
+                            mode = "create";
+                        }
+                    } else if(s.equalsIgnoreCase("delete") || s.equalsIgnoreCase("remove")) {
+                        if(mode == null) {
+                            mode = "delete";
+                        }
+                    } else if(s.equalsIgnoreCase("list")) {
+                        mode = "list";
+                    } else if(Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(s))) {
+                         playerName = s;
+                     } else if(name == null) {
+                        name = s;
+                    } else if(name != null) {
+                         worldName = s;
+                     } else if(s.contains(":")) {
+                            messages.incorrectUsage(sender, "/RC Warp create/delete/list {Name} or use flags!");
+                            return;
+                     }
+
+
+
+
+                }
             }
 
-        }
+            if(mode == null) {
+                mode = "teleport";
+            }
 
-
-        final Player p = (Player) sender;
-        if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Warp") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-            if (args.length == 3) {
-                if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("set") && args[2] != null) {
-                    final String warpName = args[2];
-                    final Location location = p.getLocation();
-                    final double xD = location.getX();
-                    final double yD = location.getBlockY();
-                    final double zD = location.getBlockZ();
-                    final double x = Math.floor(xD) + 0.5;
-                    final double y = Math.floor(yD);
-                    final double z = Math.floor(zD) + 0.5;
-                    final World world = location.getWorld();
-                    RandomCoords.getPlugin().warps.set("Warps." + warpName + ".X", x);
-                    RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Y", y);
-                    RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Z", z);
-                    RandomCoords.getPlugin().warps.set("Warps." + warpName + ".World", world.getName());
-                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().warps, RandomCoords.getPlugin().warpFile);
-                    messages.warpSet(sender, warpName);
-                } else if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("delete") && args[2] != null) {
-                    final String warpName = args[2];
-                    if (RandomCoords.getPlugin().warps.getString("Warps." + warpName) != null) {
-                        RandomCoords.getPlugin().warps.set("Warps." + warpName, null);
-                        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().warps, RandomCoords.getPlugin().warpFile);
-                        messages.warpDelete(sender, warpName);
-                    } else {
-                        messages.warpNotExist(sender);
-                    }
+            if(mode.equalsIgnoreCase("create")) {
+                if(sender instanceof ConsoleCommandSender) {
+                    messages.notPlayer(sender);
+                    return;
                 }
-            } else if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("warp") && args[1].equalsIgnoreCase("list")) {
+                if(!(sender instanceof Player)) {
+                    messages.notPlayer(sender);
+                    return;
+                }
+                if(name != null) {
+                    createWarp(name, (Player) sender, sender);
+                    return;
+                } else {
+                    messages.incorrectUsage(sender, "/RC Warp create {Name} to create warp where you are standing");
+                }
+            } else if(mode.equalsIgnoreCase("delete")) {
+                if(name != null) {
+                    deleteWarp(name, sender);
+                } else {
+                    messages.incorrectUsage(sender, "/RC Warp delete {Name} to delete the warp with name {Name}");
 
-                    Set<String> warps = null;
-                    if(RandomCoords.getPlugin().warps.getConfigurationSection("Warps.") !=null) {
-                        warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
-                    }
+                }
+            } else if(mode.equalsIgnoreCase("list")) {
+                if(name == null) {
+                    final Set<String> warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
                     sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Warps:");
-                    if(warps !=null) {
-                        for (final String name : warps) {
-                            sender.sendMessage(ChatColor.GREEN + name);
+
+                    for (final String warpName : warps) {
+                        sender.sendMessage(ChatColor.GREEN + warpName);
+                    }
+                } else if(name != null && Bukkit.getWorld(name) != null) {
+                    final Set<String> warps = RandomCoords.getPlugin().warps.getConfigurationSection("Warps.").getKeys(false);
+                    sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.GREEN + "Warps for " + name + ":");
+
+                    for (final String warpName : warps) {
+                        if(RandomCoords.getPlugin().warps.getString("Warps." + warpName + ".World").equalsIgnoreCase(name)) {
+                            sender.sendMessage(ChatColor.GREEN + warpName);
                         }
                     }
-                } else if (args[0].equalsIgnoreCase("warp") && Bukkit.getServer().getWorld(args[1]) != null) {
-                    final World world = Bukkit.getServer().getWorld(args[1]);
-                    if (RandomCoords.getPlugin().hasPermission(sender, "Random.Warps") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-                        coordinates.finalCoordinates(p, 574272099, 574272099, world, CoordType.WARPWORLD, 0);
-                    } else {
-                        messages.noPermission(sender);
+                }
+            } else if(mode.equalsIgnoreCase("teleport")) {
+                CoordType coordType;
 
+                if(RandomCoords.getPlugin().config.getString("WarpCrossWorld").equalsIgnoreCase("true")){
+                    coordType = CoordType.WARPS;
+                } else {
+                    coordType = CoordType.WARPWORLD;
+                }
+                if(name == null && playerName == null) {
+                    if(sender instanceof ConsoleCommandSender) {
+                        messages.notPlayer(sender);
+                        return;
                     }
+                        Player p = (Player) sender;
+                        coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), coordType, 0);
+                        return;
+
+                } else if(name != null && Bukkit.getWorld(name) != null && playerName == null) {
+                    if(sender instanceof ConsoleCommandSender) {
+                        messages.notPlayer(sender);
+                        return;
+                    }
+                    Player p = (Player) sender;
+                    coordinates.finalCoordinates(p, 574272099, 574272099, Bukkit.getWorld(name), coordType, 0);
+                    return;
+                } else if(playerName != null && Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(playerName)) && name != null) {
+
+                    Player p = Bukkit.getPlayer(playerName);
+                    messages.teleportedPlayer(sender, p);
+                    coordinates.finalCoordinates(p, 574272099, 574272099, Bukkit.getWorld(name), coordType, 0);
+                    return;
+
+                } else if(playerName != null && Bukkit.getOnlinePlayers().contains(Bukkit.getPlayer(playerName)) && name == null) {
+                    Player p = Bukkit.getPlayer(playerName);
+                    messages.teleportedPlayer(sender, p);
+                    coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), coordType, 0);
+                    return;
                 }
 
+                else {
+                    messages.incorrectUsage(sender, "/RC Warp {Player/World}");
+                    return;
+                }
             }
-        } else {
-            messages.noPermission(sender);
+
+
+
+
+
+
 
         }
     }
+
+    public void createWarp(String name, Player p, CommandSender sender) {
+        final String warpName = name;
+        final Location location = p.getLocation();
+        final double xD = location.getX();
+        final double yD = location.getBlockY();
+        final double zD = location.getBlockZ();
+        final double x = Math.floor(xD) + 0.5;
+        final double y = Math.floor(yD);
+        final double z = Math.floor(zD) + 0.5;
+        final World world = location.getWorld();
+        RandomCoords.getPlugin().warps.set("Warps." + warpName + ".X", x);
+        RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Y", y);
+        RandomCoords.getPlugin().warps.set("Warps." + warpName + ".Z", z);
+        RandomCoords.getPlugin().warps.set("Warps." + warpName + ".World", world.getName());
+        RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().warps, RandomCoords.getPlugin().warpFile);
+        messages.warpSet(sender, warpName);
+    }
+
+    public void deleteWarp(String warpName, CommandSender sender) {
+        if (RandomCoords.getPlugin().warps.getString("Warps." + warpName) != null) {
+            RandomCoords.getPlugin().warps.set("Warps." + warpName, null);
+            RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().warps, RandomCoords.getPlugin().warpFile);
+            messages.warpDelete(sender, warpName);
+        } else {
+            messages.warpNotExist(sender);
+        }
+    }
+
 }

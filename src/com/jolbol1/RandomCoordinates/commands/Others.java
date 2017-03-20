@@ -11,6 +11,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * Created by James on 04/07/2016.
  */
@@ -18,124 +21,156 @@ public class Others implements CommandInterface {
 
     private final Coordinates coordinates = new Coordinates();
     private final MessageManager messages = new MessageManager();
+    private int key = 574272099;
 
     @Override
-    public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        if (RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(sender, "Random.Admin.Others") || RandomCoords.getPlugin().hasPermission(sender, "Random.*")) {
-            if (args.length == 1 && args[0].equalsIgnoreCase("player")) {
-                messages.incorrectUsage(sender, "/RC player {World} {Max} {Min} - {World/Max/Min} = Not Required");
+    public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
+        //Is the command being run All?, Do they have the permission?
+        if(args.length >= 1 && args[0].equalsIgnoreCase("player") && (sender.hasPermission("Random.Admin.Others") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*"))) {
+
+            String toWorldName = null;
+            int max = key;
+            int min = key;
+            Player p = null;
+            if(args.length == 1) {
+                messages.incorrectUsage(sender, "/RC player {Player} {World} {Max} {Min}");
+                return;
+            } else if(args.length > 1) {
+                for(String s : args) {
+                    if (!s.equalsIgnoreCase("player")) {
+                        if (s instanceof String) {
+                            if(allPlayers(sender).contains(Bukkit.getPlayer(s))) {
+                                p = Bukkit.getPlayer(s);
+
+                            } else if(s.contains("player:")) {
+                                String name = s.replace("player:", "");
+                                if(allPlayers(sender).contains(Bukkit.getPlayer(name))) {
+                                    p = Bukkit.getPlayer(name);
+                                } else {
+                                    messages.playerNotExist(sender);
+                                    return;
+                                }
+                            } else if (s.contains("to:")) {
+                                toWorldName = s.replace("to:", "");
+                            } else if (s.contains("max:")) {
+                                if (!canParseInteger(s.replace("max:", ""))) {
+                                    break;
+                                }
+                                max = Integer.parseInt(s.replace("max:", ""));
+                            } else if (s.contains("min:")) {
+                                if (!canParseInteger(s.replace("min:", ""))) {
+                                    break;
+                                }
+                                min = Integer.parseInt(s.replace("min:", ""));
+                            } else if (canParseInteger(s)) {
+                                if(max == key) {
+                                    max = Integer.valueOf(s);
+                                } else if(min == key) {
+                                    min = Integer.valueOf(s);
+                                }
+                            } else if (p != null) {
+                                if(toWorldName == null) {
+                                    toWorldName = s;
+                                }
+
+
+                            } else {
+                                if(s.contains(":")) {
+                                    messages.incorrectUsage(sender, "/RC All {World}/{Max} or use flags!");
+                                    return;
+                                }
+
+                            }
+                        }
+                    }
+                }
+
+
+
+                if(p == null) {
+                    messages.playerNotExist(sender);
+                    return;
+                }
+
+                if(toWorldName != null && !doesWorldExist(sender, toWorldName)) {
+                    messages.invalidWorld(sender, toWorldName);
+                    return;
+                }
+
+                if(toWorldName == null) {
+                    toWorldName = p.getWorld().getName();
+                }
+
+                if((min > max && max != key && min != key)) {
+                    messages.minTooLarge(sender);
+                    return;
+                } else if(max != key &&  min == key) {
+                    int minimum = coordinates.getMin(Bukkit.getWorld(toWorldName));
+                    if(max > minimum) {
+                        messages.minTooLarge(sender);
+                        return;
+                    }
+                } else if(max == key &&  min != key) {
+                    int maximum = coordinates.getMax(Bukkit.getWorld(toWorldName));
+                    if(min > maximum) {
+                        messages.minTooLarge(sender);
+                        return;
+                    }
+                }
+
+                messages.teleportedBy(sender, p);
+                messages.teleportedPlayer(sender, p);
+                coordinates.finalCoordinates(p, max, min, Bukkit.getWorld(toWorldName), CoordType.PLAYER, 0);
                 return;
             }
-            if (args.length == 2 && args[0].equalsIgnoreCase("player")) {
-                final String target = args[1];
-                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    if (player.getName().equalsIgnoreCase(target)) {
-
-                        //Check if world banned
-                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
-                            if (player.getWorld().getName().equals(worlds)) {
-                                messages.worldBanned(sender);
-                                return;
-
-                            }
-                        }
-                        coordinates.finalCoordinates(player, 574272099, 574272099, player.getWorld(), CoordType.PLAYER, 0);
-                        messages.teleportedBy(sender, player);
-                    }
-                }
 
 
-            } else if (args.length == 3 && args[0].equalsIgnoreCase("player")) {
-                final String wName = args[2];
-                if (Bukkit.getServer().getWorld(wName) == null) {
-                    messages.invalidWorld(sender, wName);
-                    return;
-                }
-                final World world = Bukkit.getServer().getWorld(wName);
-                final String target = args[1];
 
-                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    if (player.getName().equalsIgnoreCase(target)) {
-                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
-                            if (world.getName().equals(worlds)) {
-                                messages.worldBanned(sender);
-                                return;
 
-                            }
-                        }
-                        coordinates.finalCoordinates(player, 574272099, 574272099, world, CoordType.PLAYER, 0);
-                        messages.teleportedBy(sender, player);
 
-                    }
-                }
-            } else if (args.length == 4 && args[0].equalsIgnoreCase("player")) {
-                final String wName = args[2];
-                if (Bukkit.getServer().getWorld(wName) == null) {
-                    messages.invalidWorld(sender, wName);
-                    return;
-                }
-                int max;
-                try {
-                    max = Integer.valueOf(args[3]);
-                } catch (NumberFormatException e) {
-                    messages.incorrectUsage(sender, "/RC player {Player} {World} {Max} {Min} - {World/Max/Min} = Not Required");
-                    return;
-                }
-                final World world = Bukkit.getServer().getWorld(wName);
-                final String target = args[1];
-                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    if (player.getName().equalsIgnoreCase(target)) {
-                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
-                            if (world.getName().equals(worlds)) {
-                                messages.worldBanned(sender);
-                                return;
 
-                            }
-                        }
-                        if(!coordinates.maxGreaterThanMin(sender, max, 574272099, world)) {
-                            return;
-                        }
-                        coordinates.finalCoordinates(player, max, 574272099, world, CoordType.PLAYER, 0);
-                        messages.teleportedBy(sender, player);
 
-                    }
-                }
-            } else if (args.length == 5) {
-                final String wName = args[2];
-                if (Bukkit.getServer().getWorld(wName) == null) {
-                    messages.invalidWorld(sender, wName);
-                    return;
-                }
-                int min;
-                int max;
-                try {
-                    max = Integer.valueOf(args[3]);
-                    min = Integer.valueOf(args[4]);
-                } catch (NumberFormatException e) {
-                    messages.incorrectUsage(sender, "/RC player {Player} {World} {Max} {Min} - {World/Max/Min} = Not Required");
-                    return;
-                }
 
-                final String target = args[1];
-                final World world = Bukkit.getServer().getWorld(wName);
-                for (final Player player : Bukkit.getServer().getOnlinePlayers()) {
-                    if (player.getName().equalsIgnoreCase(target)) {
-                        for (final String worlds : RandomCoords.getPlugin().config.getStringList("BannedWorlds")) {
-                            if (world.getName().equals(worlds)) {
-                                messages.worldBanned(sender);
-                                return;
 
-                            }
-                        }
-                        if(!coordinates.maxGreaterThanMin(sender, max, min, world)) {
-                            return;
-                        }
-                        coordinates.finalCoordinates(player, max, min, world, CoordType.PLAYER, 0);
-                    }
-                }
-            }
-        } else {
-            messages.noPermission(sender);
+
         }
     }
+
+    public boolean isWorldBanned(World world) {
+        if(RandomCoords.getPlugin().config.getStringList("BannedWorlds").contains(world.getName())) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean doesWorldExist(CommandSender sender, String worldName) {
+
+
+        if(Bukkit.getWorld(worldName) == null) {
+            return false;
+        }
+        return true;
+
+
+    }
+
+    public boolean canParseInteger(String maximum) {
+        try {
+            Integer.parseInt(maximum);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public Collection<Player> allPlayers(CommandSender sender) {
+        Collection<Player> players = new ArrayList<>();
+        for(Player p: Bukkit.getOnlinePlayers()) {
+                players.add(p);
+
+        }
+        return players;
+    }
+
+
 }

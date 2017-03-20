@@ -164,7 +164,7 @@ public class MessageManager {
     public void invalidWorld(final CommandSender sender, final String worldName) {
         final String message = RandomCoords.getPlugin().language.getString("InvalidWorld");
         final String finalMessage = message.replaceAll("%world", worldName);
-        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', finalMessage));
+        sender.sendMessage(prefix() + ChatColor.translateAlternateColorCodes('&', finalMessage));
 
     }
 
@@ -459,6 +459,26 @@ public class MessageManager {
         final String message = RandomCoords.getPlugin().language.getString("TeleportedAll");
         final String finalMessage = message.replaceAll("%world", world);
         final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix() + messages);
+    }
+
+    public void teleportedAll(final CommandSender sender) {
+        final String message = RandomCoords.getPlugin().language.getString("TeleportedAll");
+        final String finalMessage = message.replaceAll("%world", "their world");
+        final String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
+        sender.sendMessage(prefix() + messages);
+    }
+
+    public void playerNotExist(final CommandSender sender) {
+        final String message = RandomCoords.getPlugin().language.getString("PlayerNotExist");
+        final String messages = ChatColor.translateAlternateColorCodes('&', message);
+        sender.sendMessage(prefix() + messages);
+    }
+
+    public void teleportedPlayer(final CommandSender sender, Player target) {
+        String message = RandomCoords.getPlugin().language.getString("TeleportedPlayer");
+        String finalMessage = message.replaceAll("%player", target.getName());
+        String messages = ChatColor.translateAlternateColorCodes('&', finalMessage);
         sender.sendMessage(prefix() + messages);
     }
 

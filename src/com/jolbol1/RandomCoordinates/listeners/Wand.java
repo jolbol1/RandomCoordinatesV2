@@ -1,7 +1,7 @@
 package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.commands.PortalCommand;
+import com.jolbol1.RandomCoordinates.commands.Portals;
 import com.jolbol1.RandomCoordinates.commands.WandGive;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import net.md_5.bungee.api.ChatColor;
@@ -21,7 +21,7 @@ public class Wand implements Listener {
 
     private final Map selection = RandomCoords.getPlugin().wandSelection;
     private final MessageManager messages = new MessageManager();
-    private final PortalCommand portalCommand = new PortalCommand();
+    private final Portals portalCommand = new Portals();
     private final WandGive wandGive = new WandGive();
 
     /**

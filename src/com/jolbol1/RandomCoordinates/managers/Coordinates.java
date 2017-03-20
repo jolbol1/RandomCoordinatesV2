@@ -679,7 +679,7 @@ public class Coordinates {
                  * This is where we check if they have moved using the variables provided in the parameters.
                   */
                if(!coordType.equals(CoordType.JOINWORLD)) {
-                   if (start.distance(player.getLocation()) > 1) {
+                   if ((start.getWorld() != player.getWorld())  || (start.distance(player.getLocation()) > 1)) {
                        messages.youMoved(player);
                        return;
                    }
@@ -724,7 +724,6 @@ public class Coordinates {
 
 
                         if(event.coordType().equals(CoordType.JOIN) || event.coordType().equals(CoordType.JOINWORLD)) {
-
                             if (RandomCoords.getPlugin().config.get("OnJoinCommand") instanceof String) {
                                 if (RandomCoords.getPlugin().config.getString("OnJoinCommand").equalsIgnoreCase("none")) {
                                     return;
@@ -969,7 +968,7 @@ public class Coordinates {
      * @param world The world we want the max of.
      * @return The maximum coordinate.
      */
-    private int getMax(final World world) {
+    public int getMax(final World world) {
         //Initiate the X coordinate of the spawnpoint
         int spawnX;
         //Initiate the Z coordinate of the spawnpoint
@@ -1054,7 +1053,7 @@ public class Coordinates {
      * @param world The world we want the min of.
      * @return The minimum coordinate.
      */
-    private int getMin(final World world) {
+    public int getMin(final World world) {
         //Initiate a number for the min coordinate.
         int min;
         /**

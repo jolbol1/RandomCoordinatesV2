@@ -2,7 +2,6 @@ package com.jolbol1.RandomCoordinates;
 
 import com.jolbol1.RandomCoordinates.commands.*;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandHandler;
-import com.jolbol1.RandomCoordinates.event.RandomTeleportEvent;
 import com.jolbol1.RandomCoordinates.listeners.*;
 import com.jolbol1.RandomCoordinates.managers.ConstructTabCompleter;
 import com.jolbol1.RandomCoordinates.managers.Metrics;
@@ -141,11 +140,11 @@ public class RandomCoords extends JavaPlugin {
         handler.register("wand", new WandGive());
         handler.register("reload", new Reload());
         handler.register("all", new All());
-        handler.register("set", new Center());
-        handler.register("portal", new PortalCommand());
         handler.register("player", new Others());
         handler.register("warp", new Warp());
         handler.register("help", new HelpCommand());
+        handler.register("portals", new Portals());
+        handler.register("set", new WorldSettings());
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
         if (RandomCoords.getPlugin().config.getString("Metrics").equalsIgnoreCase("true")) {

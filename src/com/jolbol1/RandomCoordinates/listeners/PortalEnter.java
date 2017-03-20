@@ -108,6 +108,22 @@ public class PortalEnter extends BukkitRunnable {
             final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
             final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
             final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
+
+
+            int max = 574272099;
+            int min = 574272099;
+
+            if(RandomCoords.getPlugin().portals.get("Portal." + name + ".max") != null) {
+                max = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".max");
+            }
+
+            if(RandomCoords.getPlugin().portals.get("Portal." + name + ".min") != null) {
+                min = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".min");
+            }
+
+
+
+
             /**
              * Get the locations of these corners.
              */
@@ -152,7 +168,7 @@ public class PortalEnter extends BukkitRunnable {
                             return;
                         }
                         //Uses the coordinates class to finally send the player to the random spot.
-                        coordinates.finalCoordinates(player, 574272099, 574272099, worldW, CoordType.PORTAL, 0);
+                        coordinates.finalCoordinates(player, max, min, worldW, CoordType.PORTAL, 0);
                     } else {
                         //Messages them that they have no permission to use portals.
                         messages.noPermission(player);
