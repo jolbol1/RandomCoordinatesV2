@@ -1,9 +1,12 @@
 package com.jolbol1.RandomCoordinates.commands;
 
+import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.io.IOException;
 
 /**
  * Created by James on 07/07/2016.
@@ -18,6 +21,7 @@ public class HelpCommand implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
+
         if (args[0].equalsIgnoreCase("help")) {
             if (args.length == 1 || args.length == 2 && args[1].equalsIgnoreCase("1")) {
 

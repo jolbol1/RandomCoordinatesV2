@@ -11,6 +11,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -71,6 +72,15 @@ public class RandomCoords extends JavaPlugin {
     public int successTeleports;
     public int failedTeleports;
 
+    public int onJoin;
+    public int signTeleport;
+    public int commandTeleport;
+    public int otherTeleport;
+    public int allTeleport;
+    public int portalTeleport;
+    public int warpTeleport;
+
+
     /**
      * Used to grab the plugin instance from this clas
      * @return The plugin instance
@@ -86,6 +96,8 @@ public class RandomCoords extends JavaPlugin {
         //Setup bStats Metrics
 
 
+
+
         logger = Bukkit.getServer().getLogger();
         plugin = this;
         final PluginManager pm = getServer().getPluginManager();
@@ -96,19 +108,25 @@ public class RandomCoords extends JavaPlugin {
 
 
 
+
         this.getDataFolder().mkdirs();
         //Setup Language File
         languageFile = new File(this.getDataFolder(), "language.yml");
         language = setupFile(languageFile);
         matchFile(language, languageFile, "language");
 
+
         configFile = new File(this.getDataFolder(), "config.yml");
         config = setupFile(configFile);
+        config.options().header("RandomCoords: Need Help Setting Up? See the Wiki! https://github.com/jolbol1/RandomCoordinatesV2/wiki \n " +
+                "This will explain everything you need to know about all the options. \n " +
+                "Developed by Jolbol1");
         matchFile(config, configFile, "config");
 
 
         limiterFile = new File(this.getDataFolder(), "limiter.yml");
         limiter = setupFile(limiterFile);
+
 
         portalsFile = new File(this.getDataFolder(), "portals.yml");
         portals = setupFile(portalsFile);
@@ -140,11 +158,12 @@ public class RandomCoords extends JavaPlugin {
         handler.register("wand", new WandGive());
         handler.register("reload", new Reload());
         handler.register("all", new All());
-        handler.register("player", new Others());
         handler.register("warp", new Warp());
         handler.register("help", new HelpCommand());
-        handler.register("portals", new Portals());
+        handler.register("player", new Others());
+        handler.register("portal", new Portals());
         handler.register("set", new WorldSettings());
+        handler.register("region", new RegionCommand());
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
         if (RandomCoords.getPlugin().config.getString("Metrics").equalsIgnoreCase("true")) {
@@ -157,7 +176,7 @@ public class RandomCoords extends JavaPlugin {
         pe.runTaskTimer(this, 0L, 20L);
 
         if(config.getString("UpdateMessage").equalsIgnoreCase("true")) {
-            updater();
+            updater(null);
         }
 
         for(String str: skyBlockSave.getKeys(true)) {
@@ -234,21 +253,7 @@ public class RandomCoords extends JavaPlugin {
         return plugin;
     }
 
-    /**
-     * Used to save changes to the language file, and update.
-     */
-    public void reloadLanguageFile() {
-        if (languageFile == null) {
-            languageFile = new File(plugin.getDataFolder(), "language.yml");
-        }
-        language = YamlConfiguration.loadConfiguration(languageFile);
-        final InputStream defLanguageStream = plugin.getResource("language.yml");
-        if (defLanguageStream != null) {
-            final YamlConfiguration defLanguage = YamlConfiguration.loadConfiguration(defLanguageStream);
-            language.setDefaults(defLanguage);
-        }
 
-    }
 
     public void reloadFile(final FileConfiguration fileConfig, final String fileName) {
         final File file = new File(this.getDataFolder(), fileName);
@@ -342,6 +347,21 @@ public class RandomCoords extends JavaPlugin {
                 return failedTeleports;
             }
         });
+        metrics.addCustomChart(new Metrics.AdvancedPie("teleport_method") {
+            @Override
+            public HashMap<String, Integer> getValues(HashMap<String, Integer> valueMap) {
+                valueMap.put("All", allTeleport);
+                valueMap.put("Others", otherTeleport);
+                valueMap.put("Portal", portalTeleport);
+                valueMap.put("Sign", signTeleport);
+                valueMap.put("Join", onJoin);
+                valueMap.put("Command", commandTeleport);
+                valueMap.put("Warps", warpTeleport);
+
+                return valueMap;
+            }
+
+        });
     }
 
     private FileConfiguration setupFile(final File file) {
@@ -357,7 +377,7 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
-    private void updater() {
+    public void updater(Player p) {
         //Gets the site URL we're reading from.
         URL site;
         //Sets the string as null, until its changed when we read.
@@ -395,18 +415,23 @@ public class RandomCoords extends JavaPlugin {
         if(versionOnFile == null ) { return; }
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
             Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Spigot. http://bit.ly/RandomTeleportSpigot" + ANSI_RESET);
-            for(final Player p : Bukkit.getOnlinePlayers()) {
-                if(p.isOp()) {
-                    p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
-                }
-            }
+           if(p == null) {
+               for (final Player pl : Bukkit.getOnlinePlayers()) {
+                   if (pl.isOp()) {
+                       pl.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
+                   }
+               }
+           } else {
+               if (p.isOp()) {
+                   p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
+               }
+           }
         }
-        
-
-
-
-
     }
+
+
+
+
 
 
   

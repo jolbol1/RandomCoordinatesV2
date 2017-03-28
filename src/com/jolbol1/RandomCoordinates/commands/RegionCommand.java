@@ -679,122 +679,132 @@ package com.jolbol1.RandomCoordinates.commands;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
-import com.jolbol1.RandomCoordinates.managers.ArgMode;
-import com.jolbol1.RandomCoordinates.managers.CoordType;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
+
+import com.sk89q.worldguard.protection.managers.*;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
- * Created by James on 04/07/2016.
+ * Created by James on 23/03/2017.
  */
-public class Others implements CommandInterface {
+public class RegionCommand implements CommandInterface {
 
-    private final Coordinates coordinates = new Coordinates();
-    private final MessageManager messages = new MessageManager();
-    private CommonMethods commonMethods = new CommonMethods();
+    private MessageManager messages = new MessageManager();
+    private Coordinates coordinates = new Coordinates();
+    private RegionManager regionManager;
 
     @Override
     public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        //Is the command being run Player?, Do they have the permission?
-        if(args.length >= 1 && args[0].equalsIgnoreCase("player") && (sender.hasPermission("Random.Admin.Others") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*"))) {
+        if(args.length >= 1 && args[0].equalsIgnoreCase("region")) {
 
-            //The world name they want the player to go too. Null if not specified
-            String toWorldName = null;
-            //The max coordinate the player can teleport too. Set to default if not provided.
-            int max = commonMethods.key;
-            //The min coordintae the player can teleport too. Set to default if not provided.
-            int min = commonMethods.key;
-            //The player that we are teleporting, Null until specified.
-            Player p = null;
-            //Is the command is just /RC player. Send incorrect usage message.
-            if(args.length == 1) {
-                //Send Message
-                messages.incorrectUsage(sender, "/RC player {Player} {World} {Max} {Min}");
-                return;
-            } //If the command longer than just /RC player {args}
-            else if(args.length > 1) {
-                //Filter over all of the arguments.
-                Map modesUsed = commonMethods.processCommonArguments(args, true);
-
-                if(modesUsed.containsKey(ArgMode.WORLDNOTEXIST) && ! ((String) modesUsed.get(ArgMode.WORLDNOTEXIST)).contains("player:")) {
-
-                    if(modesUsed.containsKey(ArgMode.WORLD)) {
-                        messages.playerNotExist(sender);
-                        return;
-                    } else {
-                        messages.invalidWorld(sender, (String) modesUsed.get(ArgMode.WORLDNOTEXIST));
-                        return;
-                    }
-                }
-
-                if(modesUsed.containsKey(ArgMode.INCORRECT)) {
-                    messages.incorrectUsage(sender, "/RC player [playerName] {toWorld} {Max} {Min} -> {} = Optional.");
-                    return;
-                }
-
-                if(modesUsed.containsKey(ArgMode.PLAYER)) {
-                    p =(Player) modesUsed.get(ArgMode.PLAYER);
-                }
-
-                if(modesUsed.containsKey(ArgMode.MAX)) {
-                    max = (int) modesUsed.get(ArgMode.MAX);
-                }
-
-                if(modesUsed.containsKey(ArgMode.MIN)) {
-                    min = (int) modesUsed.get(ArgMode.MIN);
-                }
-
-                if(modesUsed.containsKey(ArgMode.WORLD)) {
-                    toWorldName = (String) modesUsed.get(ArgMode.WORLD);
-                }
-
-                for(String s : args) {
-                    if(s.contains("player:") && Bukkit.getPlayer(s.replace("player:", "")) != null) {
-                        p = Bukkit.getPlayer(s.replace("player:", ""));
-                    }
-                }
-
-                if(p == null) {
-                    messages.playerNotExist(sender);
-                    return;
-                }
-
-                if(toWorldName == null && p != null) {
-                    toWorldName = p.getWorld().getName();
-                }
-
-                if(!commonMethods.minToLarge(sender, min, max, Bukkit.getWorld(toWorldName))) {
-                    return;
-                }
-
-
-
-                //Send the teleported by message to target player/
-                messages.teleportedBy(sender, p);
-                //Send the teleported player message to the sender.
-                messages.teleportedPlayer(sender, p);
-                //Teleport them using the provided args.
-                coordinates.finalCoordinates(p, max, min, Bukkit.getWorld(toWorldName), CoordType.PLAYER, 0);
+            if(Bukkit.getPluginManager().getPlugin("WorldGuard") == null || Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
+                Bukkit.getServer().getLogger().log(Level.SEVERE, "WorldGuard/WorldEdit are not installed. This feature cannot be used.");
+                messages.incorrectUsage(sender, "WorldGuard/WorldEdit not installed.");
                 return;
             }
 
+            regionManager = new RegionManager();
+
+            Player p = null;
+            String region = null;
+
+            Map<String, String> regionList = regionManager.allRegionList(sender);
+            int i = 0;
+            for(String s : args) {
+                if(i != 0) {
+
+                    if(regionList.containsKey(s) && region == null) {
+                        region = s;
+                    } else if(s.contains("region:") && regionList.containsKey(s.replace("region:", ""))) {
+                        region = s.replace("region:", "");
+                    } else if(s.contains("player:") && Bukkit.getPlayer(s.replace("player:", "")) != null) {
+                        p = Bukkit.getPlayer(s.replace("player:", ""));
+                    }
+
+                    else if(Bukkit.getPlayer(s) != null && p == null) {
+                        p = Bukkit.getPlayer(s);
+                    } else if(region != null && p == null) {
+                        if(sender instanceof  Player) {
+                            p = (Player) sender;
+                        } else {
+                            messages.notPlayer(sender);
+                            return;
+                        }
+                    } else {
+                        messages.regionNotExist(sender, s);
+                        return;
+                    }
 
 
 
+                }
+
+               i++;
+            }
+
+           // teleportRandomlyInRegion(sender, p, region, regionList.get(region));
+            if(p == null) {
+                if(sender.hasPermission("Random.Region.Command") || sender.hasPermission("Random.*")) {
+                    p = (Player) sender;
+                } else {
+                    messages.noPermission(sender);
+                    return;
+                }
+            } else if(p != null) {
+
+                if(!(sender.hasPermission("Random.Region.Others") || sender.hasPermission("Random.Region.*") || sender.hasPermission("Random.*"))) {
+                    messages.noPermission(sender);
+                    return;
+                }
 
 
+            }
 
 
+            if(region != null && p != null) {
+                if(p != sender && (sender.hasPermission("Random.Region.Others") || sender.hasPermission("Random.Region.*") || sender.hasPermission("Random.*"))) {
 
+                    messages.teleportedPlayer(sender, p);
+                    messages.teleportedBy(sender, p);
+                 regionManager.teleportRandomlyInRegion(p, Bukkit.getWorld(regionList.get(region)), regionManager.getSelectionFromRegion(p, region, Bukkit.getWorld(regionList.get(region))));
+                    messages.teleportedWithinRegion(p, region);
+                } else if(p == sender ){
+
+                    if(p.hasPermission("Random.Region.Command")  || p.hasPermission("Random.*")) {
+
+                        if (p.hasPermission("Random.Regions." + region) || p.hasPermission("Random.Regions.*") || p.hasPermission("Random.*")) {
+                            regionManager.teleportRandomlyInRegion(p, Bukkit.getWorld(regionList.get(region)), regionManager.getSelectionFromRegion(p, region, Bukkit.getWorld(regionList.get(region))));
+                            messages.teleportedWithinRegion(sender, region);
+                        } else {
+                            messages.noPermission(sender);
+                            return;
+                        }
+                    } else {
+                        messages.noPermission(sender);
+                        return;
+                    }
+                } else {
+                    messages.noPermission(sender);
+                    return;
+                }
+            } else {
+                if(region != null && !regionList.containsKey(region)) {
+                    messages.regionNotExist(sender, region);
+                }
+                messages.incorrectUsage(sender, "/RC region [regionName] {player} -> {} = Optional");
+                return;
+            }
 
         }
     }

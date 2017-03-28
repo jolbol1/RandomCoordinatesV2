@@ -482,5 +482,22 @@ public class MessageManager {
         sender.sendMessage(prefix() + messages);
     }
 
+    public void regionNotExist(CommandSender sender, String region) {
+        String message = RandomCoords.getPlugin().language.getString("RegionNotExist");
+        String finalMess = message.replaceAll("%region", region);
+        String messages = ChatColor.translateAlternateColorCodes('&', finalMess);
+        sender.sendMessage(prefix() + messages);
+
+    }
+
+
+    public void teleportedWithinRegion(CommandSender sender, String region) {
+        String message = RandomCoords.getPlugin().language.getString("TeleportedInRegion");
+        String finalMess = message.replaceAll("%region", region);
+        String messages = ChatColor.translateAlternateColorCodes('&', finalMess);
+        sender.sendMessage(prefix() + messages);
+
+    }
+
 
 }

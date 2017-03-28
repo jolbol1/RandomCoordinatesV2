@@ -147,7 +147,7 @@ public class Coordinates {
      * @param sender Who asked for the random number.
      * @return Random number within the range, Min Max.
      */
-    private int getRandomNumberInRange(final int min, final int max, final CommandSender sender) {
+    public int getRandomNumberInRange(final int min, final int max, final CommandSender sender) {
         /**
          * Checks if the minimum is greater than the max, thus would return an error.
          */
@@ -1494,6 +1494,25 @@ public class Coordinates {
     }
 
 
+    public boolean isMinTooBig(int min, int max, int key, String toWorldName, CommandSender sender) {
+        if((min > max && max != key && min != key)) {
+            messages.minTooLarge(sender);
+            return true;
+        } else if(max != key &&  min == key) {
+            int minimum = getMin(Bukkit.getWorld(toWorldName));
+            if(max > minimum) {
+                messages.minTooLarge(sender);
+                return true;
+            }
+        } else if(max == key &&  min != key) {
+            int maximum = getMax(Bukkit.getWorld(toWorldName));
+            if(min > maximum) {
+                messages.minTooLarge(sender);
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 

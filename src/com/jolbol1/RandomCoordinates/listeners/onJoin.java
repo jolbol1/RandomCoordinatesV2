@@ -23,6 +23,15 @@ public class onJoin implements Listener {
      */
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
+
+        if(e.getPlayer().hasPermission("Random.*") || e.getPlayer().hasPermission("Random.Admin.*") || e.getPlayer().isOp()) {
+            if(RandomCoords.getPlugin().config.getString("UpdateMessage").equalsIgnoreCase("true")) {
+                RandomCoords.getPlugin().updater(e.getPlayer());
+            }
+        }
+
+
+
         /**
          * If the onJoin config option is false, then dont run the code.
          */

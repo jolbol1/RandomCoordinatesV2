@@ -28,6 +28,37 @@ public final class RandomTeleportEvent extends Event implements Cancellable {
         this.coordType = coordType;
         this.cooldown = cooldown;
 
+        switch (coordType) {
+            case ALL:
+                RandomCoords.getPlugin().allTeleport++;
+                break;
+            case JOIN:
+                RandomCoords.getPlugin().onJoin++;
+                break;
+            case JOINWORLD:
+                RandomCoords.getPlugin().onJoin++;
+                break;
+            case WARPS:
+                RandomCoords.getPlugin().warpTeleport++;
+                break;
+            case WARPWORLD:
+                RandomCoords.getPlugin().warpTeleport++;
+                break;
+            case COMMAND:
+                RandomCoords.getPlugin().commandTeleport++;
+                break;
+            case PLAYER:
+                RandomCoords.getPlugin().otherTeleport++;
+                break;
+            case PORTAL:
+                RandomCoords.getPlugin().portalTeleport++;
+                break;
+            case SIGN:
+                RandomCoords.getPlugin().signTeleport++;
+                break;
+
+        }
+
     }
 
     public Player getPlayer() {

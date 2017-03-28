@@ -27,7 +27,7 @@ public class Warp implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        if(args.length >= 1 && args[0].equalsIgnoreCase("warp") && sender.hasPermission("Random.*") && sender.hasPermission("Random.Admin.*") && sender.hasPermission("Random.Admin.Portals")) {
+        if(args.length >= 1 && args[0].equalsIgnoreCase("warp") && sender.hasPermission("Random.*") && sender.hasPermission("Random.Admin.*") && sender.hasPermission("Random.Admin.Warp")) {
             String mode = null;
             String name = null;
             String playerName = null;

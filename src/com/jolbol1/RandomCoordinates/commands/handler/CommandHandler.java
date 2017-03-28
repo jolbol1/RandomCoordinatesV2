@@ -1,10 +1,16 @@
 package com.jolbol1.RandomCoordinates.commands.handler;
 
 
+import com.jolbol1.RandomCoordinates.commands.CommonMethods;
+import com.jolbol1.RandomCoordinates.managers.ArgMode;
+import com.jolbol1.RandomCoordinates.managers.CoordType;
+import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,7 +21,8 @@ public class CommandHandler implements CommandExecutor {
     //This is where we will store the commands
     private static final Map<String, CommandInterface> commands = new ConcurrentHashMap<>();
     private final MessageManager messages = new MessageManager();
-
+    private CommonMethods commonMethods = new CommonMethods();
+    private Coordinates coordinates = new Coordinates();
 
     //Register method. When we register commands in our onEnable() we will use this.
     public void register(final String name, final CommandInterface cmd) {
@@ -54,6 +61,62 @@ public class CommandHandler implements CommandExecutor {
 
         //What if there are arguments in the command? Such as /example args
         if (args.length > 0) {
+
+            if(Bukkit.getPlayer(args[0]) != null) {
+                Player p = Bukkit.getPlayer(args[0]);
+                Map modeUsed = commonMethods.processCommonArguments(args, true);
+                int max = commonMethods.key;
+                int min = commonMethods.key;
+                String toWorldName = null;
+
+                if(modeUsed.containsKey(ArgMode.WORLDNOTEXIST)) {
+                    messages.invalidWorld(sender, (String) modeUsed.get(ArgMode.WORLDNOTEXIST));
+                    return true;
+                }
+
+                if(modeUsed.containsKey(ArgMode.INCORRECT)) {
+                    messages.incorrectUsage(sender, "/RC [playerName] {toWorld} {Max} {Min} -> {} = Optional.");
+                    return true;
+                }
+
+
+                if(modeUsed.containsKey(ArgMode.MAX)) {
+                    max = (int) modeUsed.get(ArgMode.MAX);
+                }
+
+                if(modeUsed.containsKey(ArgMode.MIN)) {
+                    min = (int) modeUsed.get(ArgMode.MIN);
+                }
+
+                if(modeUsed.containsKey(ArgMode.WORLD)) {
+                    toWorldName = (String) modeUsed.get(ArgMode.WORLD);
+                }
+
+                if(toWorldName == null) {
+                    toWorldName = p.getWorld().getName();
+                }
+
+                if(!commonMethods.minToLarge(sender, min, max, Bukkit.getWorld(toWorldName))) {
+                    return true;
+                }
+
+                if(sender.hasPermission("Random.Admin.Others") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
+                    messages.teleportedBy(sender, p);
+                    //Send the teleported player message to the sender.
+                    messages.teleportedPlayer(sender, p);
+
+                    coordinates.finalCoordinates(p, max, min, Bukkit.getWorld(toWorldName), CoordType.PLAYER, 0);
+                    return true;
+                } else {
+                    messages.noPermission(sender);
+                    return true;
+                }
+
+
+
+
+
+            }
 
             //If that argument exists in our registration in the onEnable();
             if (exists(args[0])) {
