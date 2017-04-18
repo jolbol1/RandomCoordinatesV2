@@ -1,3 +1,22 @@
+/*
+ *     RandomCoords, Provding the best Bukkit Random Teleport Plugin
+ *     Copyright (C) 2014  James Shopland
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.jolbol1.RandomCoordinates.managers;
 
 
@@ -5,6 +24,7 @@ import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.checks.*;
 import com.jolbol1.RandomCoordinates.cooldown.Cooldown;
 import com.jolbol1.RandomCoordinates.event.RandomTeleportEvent;
+import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.*;
 import org.bukkit.block.Biome;
@@ -129,7 +149,7 @@ public class Coordinates {
          * This is to avoid .getHighestBlockAt returning the bedrock on top of the nether. (Will take longer to grab coordinate)
          */
         if (world.getBiome(centerX, centerZ).equals(Biome.HELL)) {
-            highestPoint = nether.netherY(preRandom);
+            highestPoint = nether.getSafeNetherY(preRandom);
 
         } else {
             highestPoint = world.getHighestBlockYAt(preRandom);
@@ -165,19 +185,8 @@ public class Coordinates {
      * @return Randomly, Either 1 or -1.
      */
     private int modulus() {
-        //Grab a random number either 0 and 1.
-        int modulus = random.nextInt((1) + 1);
-
-        /**
-         * If the number is 0, set it to -1.
-         * This is so we can multiply the coordinates to get positive and negative ones.
-         */
-        if (modulus == 0) {
-            modulus = -1;
-        }
-
-        //Return randomly either 1 or -1.
-        return modulus;
+        //Grabs a random boolean, then returns -1 or 1 based on the
+        return  (random.nextBoolean() ? -1 : 1);
     }
 
 

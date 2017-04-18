@@ -1,11 +1,12 @@
 package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.managers.CoordType;
+import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
+import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
@@ -23,6 +24,7 @@ public class SignClick implements Listener {
 
     private final MessageManager messages = new MessageManager();
     private final Coordinates coordinates = new Coordinates();
+    private final CoordinatesManager coordinatesManager = new CoordinatesManager();
 
     /**
      * Gets when a player clicks a sign, and if its a RC sign.
@@ -63,7 +65,11 @@ public class SignClick implements Listener {
 
                         }
                         if (coordinates.hasMoney(e.getPlayer(), cost)) {
-                            coordinates.finalCoordinates(e.getPlayer(), 574272099, 574272099, world, CoordType.SIGN, cost);
+                            if(!RandomCoords.getPlugin().config.getString("Experimental").equalsIgnoreCase("true")) {
+                                coordinates.finalCoordinates(e.getPlayer(), 574272099, 574272099, world, CoordType.SIGN, cost);
+                            } else {
+                                coordinatesManager.randomlyTeleportPlayer(e.getPlayer(), world, coordinatesManager.key, coordinatesManager.key, CoordType.SIGN, cost);
+                            }
                         } else {
                             messages.cost(e.getPlayer(), cost);
                         }

@@ -1,10 +1,29 @@
+/*
+ *     RandomCoords, Provding the best Bukkit Random Teleport Plugin
+ *     Copyright (C) 2014  James Shopland
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.Portals;
 import com.jolbol1.RandomCoordinates.commands.WandGive;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
-import net.md_5.bungee.api.ChatColor;
+import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +53,7 @@ public class Wand implements Listener {
             return;
         }
         final Player p = e.getPlayer();
-        if (p.getInventory().getItemInMainHand().equals(wandGive.wand())) {
+        if (p.getInventory().getItemInHand().equals(wandGive.wand())) {
             if (RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.Portals") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.Admin.*") || RandomCoords.getPlugin().hasPermission(e.getPlayer(), "Random.*")) {
 
                 if (e.getAction() == Action.LEFT_CLICK_BLOCK) {

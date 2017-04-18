@@ -1,3 +1,22 @@
+/*
+ *     RandomCoords, Provding the best Bukkit Random Teleport Plugin
+ *     Copyright (C) 2014  James Shopland
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.jolbol1.RandomCoordinates.managers;
 
 
@@ -42,7 +61,7 @@ public class MessageManager {
      * @param player Who we're sending the message to.
      * @param location The location the player ended up at.
      */
-    void teleportMessage(final Player player, final Location location) {
+    public void teleportMessage(final Player player, final Location location) {
         final String message = RandomCoords.getPlugin().language.getString("TeleportMessage");
         final String locX = String.valueOf(location.getX());
         final String locY = String.valueOf(location.getBlockY());
@@ -109,7 +128,7 @@ public class MessageManager {
      * Message thats sent if no safe location is found.
      * @param sender Who we're sending the message to.
      */
-    void couldntFind(final CommandSender sender) {
+    public void couldntFind(final CommandSender sender) {
         final String message = ChatColor.translateAlternateColorCodes('&', RandomCoords.getPlugin().language.getString("TooManyAttempts"));
         sender.sendMessage(prefix() + message);
     }

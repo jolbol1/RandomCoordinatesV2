@@ -1,13 +1,38 @@
+/*
+ *     RandomCoords, Provding the best Bukkit Random Teleport Plugin
+ *     Copyright (C) 2014  James Shopland
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.managers.CoordType;
+import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
+import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+
+import java.util.Random;
+import java.util.logging.Level;
 
 /**
  * Created by James on 04/07/2016.
@@ -16,6 +41,7 @@ public class onJoin implements Listener {
 
     private final Coordinates coordinates = new Coordinates();
     private final MessageManager messages = new MessageManager();
+    private final CoordinatesManager coordinatesManager = new CoordinatesManager();
 
     /**
      * The event that checks wheter to teleport the player on join.
@@ -24,9 +50,10 @@ public class onJoin implements Listener {
     @EventHandler
     public void onPlayerJoin(final PlayerJoinEvent e) {
 
-        if(e.getPlayer().hasPermission("Random.*") || e.getPlayer().hasPermission("Random.Admin.*") || e.getPlayer().isOp()) {
-            if(RandomCoords.getPlugin().config.getString("UpdateMessage").equalsIgnoreCase("true")) {
-                RandomCoords.getPlugin().updater(e.getPlayer());
+        //ONLY SEND UPDATE MESSAGE TO OP's
+        if(e.getPlayer().isOp()) {
+            if(RandomCoords.getPlugin().updateNeeded == true) {
+                e.getPlayer().setDisplayName(ChatColor.GOLD + "[RandomCoords]" + ChatColor.RED + " A new version is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
             }
         }
 
@@ -52,7 +79,9 @@ public class onJoin implements Listener {
             }
             //Get the command that should be run on join. Plans to change this to a list.
             //Initiate the coordinates function which will handle the random teleport. Notice the secret key to get default values.
-            coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.JOIN, 0);
+            //coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.JOIN, 0);
+            coordinatesManager.randomlyTeleportPlayer(p, p.getWorld(), coordinatesManager.key, coordinatesManager.key, CoordType.JOIN, 0);
+            ;
             //Message them to let them know that they have been teleported.
             messages.onJoin(p);
 

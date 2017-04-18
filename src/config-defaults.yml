@@ -73,4 +73,6 @@ debug: false
 UpdateMessage: true
 OnJoinWorlds:
  - example
+Experimental: true
+
 

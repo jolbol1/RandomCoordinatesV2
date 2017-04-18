@@ -17,15 +17,48 @@
  *
  */
 
-package com.jolbol1.RandomCoordinates.commands.handler;
+package com.jolbol1.RandomCoordinates.managers.Util;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+/**
+ * Created by James on 22/03/2017. May or may not use this command.
+ *
+ */
+public enum ArgMode {
 
-//IMPORTANT: This is an interface, not a class.
-public interface CommandInterface {
+    MAX,
 
-    //Every time I make a command, I will use this same method.
-    void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args);
+    MIN,
+
+    CENTER,
+
+    PLAYER,
+
+    ALL,
+
+    DELETE,
+
+    CREATE,
+
+    LIST,
+
+    WORLD,
+
+    NONE,
+
+    WORLDNOTEXIST,
+
+    INCORRECT,
+
+    PORTAL,
+
+    WARP,
+
+
+
+
+
+
+
+
 
 }

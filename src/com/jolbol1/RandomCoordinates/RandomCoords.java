@@ -1,3 +1,22 @@
+/*
+ *     RandomCoords, Provding the best Bukkit Random Teleport Plugin
+ *     Copyright (C) 2014  James Shopland
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.jolbol1.RandomCoordinates;
 
 import com.jolbol1.RandomCoordinates.commands.*;
@@ -5,13 +24,13 @@ import com.jolbol1.RandomCoordinates.commands.handler.CommandHandler;
 import com.jolbol1.RandomCoordinates.listeners.*;
 import com.jolbol1.RandomCoordinates.managers.ConstructTabCompleter;
 import com.jolbol1.RandomCoordinates.managers.Metrics;
+import com.jolbol1.RandomCoordinates.managers.Util.PortalLoaded;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
-import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -23,9 +42,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.*;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +74,8 @@ public class RandomCoords extends JavaPlugin {
     public FileConfiguration blacklist;
     public FileConfiguration skyBlockSave;
     public HashMap<UUID, Location> skyBlock = new HashMap<>();
+    public List<PortalLoaded> loadedPortalList;
+
     private File languageFile;
     public File configFile;
     public File limiterFile;
@@ -79,6 +98,8 @@ public class RandomCoords extends JavaPlugin {
     public int allTeleport;
     public int portalTeleport;
     public int warpTeleport;
+
+    public boolean updateNeeded = false;
 
 
     /**
@@ -158,12 +179,13 @@ public class RandomCoords extends JavaPlugin {
         handler.register("wand", new WandGive());
         handler.register("reload", new Reload());
         handler.register("all", new All());
-        handler.register("warp", new Warp());
         handler.register("help", new HelpCommand());
         handler.register("player", new Others());
         handler.register("portal", new Portals());
         handler.register("set", new WorldSettings());
         handler.register("region", new RegionCommand());
+        handler.register("warp", new WarpsNew());
+        handler.register("radius", new RadiusCommand());
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
         if (RandomCoords.getPlugin().config.getString("Metrics").equalsIgnoreCase("true")) {
@@ -173,15 +195,16 @@ public class RandomCoords extends JavaPlugin {
 
 
         final PortalEnter pe = new PortalEnter();
+        loadedPortalList = loadedPortals();
         pe.runTaskTimer(this, 0L, 20L);
 
         if(config.getString("UpdateMessage").equalsIgnoreCase("true")) {
-            updater(null);
+            updateNeeded = updater();
         }
 
         for(String str: skyBlockSave.getKeys(true)) {
 
-            if(str.equalsIgnoreCase("SkyBlock") || str.equalsIgnoreCase("AutoRemove") || str.equalsIgnoreCase("SkyBlockWorlds")) {
+            if(str.equalsIgnoreCase("SkyBlock") || str.equalsIgnoreCase("AutoRemove") || str.equalsIgnoreCase("SkyBlockWorlds") || str.equalsIgnoreCase("DefaultY")) {
             //For some reason this wouldnt work when reversed... Not to sure why... I have had 4hrs sleep.
             } else {
 
@@ -202,6 +225,7 @@ public class RandomCoords extends JavaPlugin {
             for(Map.Entry<UUID, Location> map : skyBlock.entrySet()) {
                 skyBlockSave.set(map.getKey().toString(), map.getValue());
                 saveFile(skyBlockSave, skyBlockSaveFile);
+                loadedPortalList = null;
 
             }
 
@@ -377,7 +401,10 @@ public class RandomCoords extends JavaPlugin {
 
     }
 
-    public void updater(Player p) {
+    public boolean updater() {
+        if(!config.getString("UpdateMessage").equalsIgnoreCase("true")) {
+            return false;
+        }
         //Gets the site URL we're reading from.
         URL site;
         //Sets the string as null, until its changed when we read.
@@ -412,21 +439,103 @@ public class RandomCoords extends JavaPlugin {
             RandomCoords.logger.severe("Couldnt grab the update.yml from the web.");
         }
         //Return the number as a string.
-        if(versionOnFile == null ) { return; }
+        if(versionOnFile == null ) { return false; }
         if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
-            Bukkit.getLogger().log(Level.INFO, ANSI_BLUE + ANSI_BOLD + "[RandomCoords] A new version: "  + versionOnFile +  " is now available on Spigot. http://bit.ly/RandomTeleportSpigot" + ANSI_RESET);
-           if(p == null) {
-               for (final Player pl : Bukkit.getOnlinePlayers()) {
-                   if (pl.isOp()) {
-                       pl.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
-                   }
-               }
-           } else {
-               if (p.isOp()) {
-                   p.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "A new version: " + ChatColor.GREEN + versionOnFile + ChatColor.RED + " is now available on Spigot. http://bit.ly/RandomTeleportSpigot");
-               }
-           }
+          return true;
         }
+
+        return false;
+    }
+
+
+    public List<PortalLoaded> loadedPortals() {
+        if (RandomCoords.getPlugin().portals.get("Portal") == null) {
+            return null;
+        }
+
+        //Gets a list of the portals now that we know its not null.
+        final Set<String> portals = RandomCoords.getPlugin().portals.getConfigurationSection("Portal").getKeys(false);
+
+        List<PortalLoaded> portalLoadedList = new ArrayList<PortalLoaded>();
+
+        /**
+         * For all of these portals, Check if anyone online is within the portal.
+         */
+
+
+
+        for (final String name : portals) {
+
+            //Gets the world that the portal will go to.
+            final String world = RandomCoords.getPlugin().portals.getString("Portal." + name + ".world");
+            /**
+             * If this is null then return and log.
+             */
+            if (Bukkit.getServer().getWorld(world) == null) {
+                //Log the fact that the world is non existent.
+                Bukkit.getServer().getLogger().severe(world + " is an invalid world, Change this portal!");
+                return null;
+
+            }
+            //Get the world that the portal is in.
+            final String portalWorld = RandomCoords.getPlugin().portals.getString("Portal." + name + ".PortalWorld");
+            /**
+             * Checks if the world the portal is in is null, If so return and log.
+             */
+            if (Bukkit.getServer().getWorld(portalWorld) == null) {
+                //Log the fact that the world is null.
+                Bukkit.getServer().getLogger().severe(portalWorld + "no longer exists");
+                return null;
+
+            }
+            //Get the world that the portal is in.
+            final World w = Bukkit.getServer().getWorld(portalWorld);
+            /**
+             * Get one corner of the portal.
+             */
+            final int p1y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1y");
+            final int p1z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1z");
+            final int p1x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p1x");
+
+            /**
+             * Get another corner of the portal.
+             */
+            final int p2y = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2y");
+            final int p2z = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2z");
+            final int p2x = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".p2x");
+
+
+            int max = 574272099;
+            int min = 574272099;
+
+            if (RandomCoords.getPlugin().portals.get("Portal." + name + ".max") != null) {
+                max = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".max");
+            }
+
+            if (RandomCoords.getPlugin().portals.get("Portal." + name + ".min") != null) {
+                min = RandomCoords.getPlugin().portals.getInt("Portal." + name + ".min");
+            }
+
+            final World worldW = Bukkit.getServer().getWorld(world);
+
+
+
+            /**
+             * Get the locations of these corners.
+             */
+            final Location l1 = new Location(w, p1x, p1y, p1z);//NOPMD
+            final Location l2 = new Location(w, p2x, p2y, p2z);//NOPMD
+
+            portalLoadedList.add(new PortalLoaded(name, l1, l2, max, min, worldW.getName(), w.getName()));
+        }
+
+        return portalLoadedList;
+
+
+    }
+
+    public void reloadPortals() {
+        loadedPortalList = loadedPortals();
     }
 
 
@@ -434,7 +543,7 @@ public class RandomCoords extends JavaPlugin {
 
 
 
-  
+
 
 }
 

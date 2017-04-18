@@ -1,9 +1,29 @@
+/*
+ *     RandomCoords, Provding the best Bukkit Random Teleport Plugin
+ *     Copyright (C) 2014  James Shopland
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package com.jolbol1.RandomCoordinates.commands.handler;
 
 
 import com.jolbol1.RandomCoordinates.commands.CommonMethods;
-import com.jolbol1.RandomCoordinates.managers.ArgMode;
-import com.jolbol1.RandomCoordinates.managers.CoordType;
+import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
+import com.jolbol1.RandomCoordinates.managers.Util.ArgMode;
+import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import org.bukkit.Bukkit;
@@ -23,6 +43,7 @@ public class CommandHandler implements CommandExecutor {
     private final MessageManager messages = new MessageManager();
     private CommonMethods commonMethods = new CommonMethods();
     private Coordinates coordinates = new Coordinates();
+    private CoordinatesManager coordinatesManager = new CoordinatesManager();
 
     //Register method. When we register commands in our onEnable() we will use this.
     public void register(final String name, final CommandInterface cmd) {
@@ -105,7 +126,9 @@ public class CommandHandler implements CommandExecutor {
                     //Send the teleported player message to the sender.
                     messages.teleportedPlayer(sender, p);
 
-                    coordinates.finalCoordinates(p, max, min, Bukkit.getWorld(toWorldName), CoordType.PLAYER, 0);
+                    //coordinates.finalCoordinates(p, max, min, Bukkit.getWorld(toWorldName), CoordType.PLAYER, 0);
+                    coordinatesManager.randomlyTeleportPlayer(p, Bukkit.getWorld(toWorldName), max, min, CoordType.PLAYER, 0);
+
                     return true;
                 } else {
                     messages.noPermission(sender);
