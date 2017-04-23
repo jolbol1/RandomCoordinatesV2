@@ -20,9 +20,6 @@
 package com.jolbol1.RandomCoordinates.managers;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
-import com.jolbol1.RandomCoordinates.managers.Coordinates;
-import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -40,12 +37,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.logging.Level;
 
 /**
  * Created by James on 23/03/2017.
@@ -62,9 +57,14 @@ public class RegionManager {
         }
         Map regionList = new HashMap<String, World>();
         for(World w : Bukkit.getServer().getWorlds()) {
-            com.sk89q.worldguard.protection.managers.RegionManager regionManager = RandomCoords.getPlugin().getWorldGuard().getRegionManager(w);
-            for(ProtectedRegion region : regionManager.getRegions().values()) {
-               regionList.put(region.getId(), w.getName());
+            if(RandomCoords.getPlugin().getWorldGuard().getRegionManager(w) != null) {
+                com.sk89q.worldguard.protection.managers.RegionManager regionManager = RandomCoords.getPlugin().getWorldGuard().getRegionManager(w);
+                if(regionManager.getRegions().values() == null || regionManager.getRegions() == null || regionManager.getRegions().isEmpty()) {
+                    return null;
+                }
+                for (ProtectedRegion region : regionManager.getRegions().values()) {
+                    regionList.put(region.getId(), w.getName());
+                }
             }
         }
 

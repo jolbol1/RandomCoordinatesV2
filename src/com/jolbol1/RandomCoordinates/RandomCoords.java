@@ -76,6 +76,7 @@ public class RandomCoords extends JavaPlugin {
     public HashMap<UUID, Location> skyBlock = new HashMap<>();
     public List<PortalLoaded> loadedPortalList;
 
+
     private File languageFile;
     public File configFile;
     public File limiterFile;
@@ -100,7 +101,6 @@ public class RandomCoords extends JavaPlugin {
     public int warpTeleport;
 
     public boolean updateNeeded = false;
-
 
     /**
      * Used to grab the plugin instance from this clas

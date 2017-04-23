@@ -21,9 +21,9 @@ package com.jolbol1.RandomCoordinates.commands;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
-import com.jolbol1.RandomCoordinates.managers.Util.ArgMode;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
+import com.jolbol1.RandomCoordinates.managers.Util.ArgMode;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -118,9 +118,9 @@ public class WorldSettings implements CommandInterface {
 
             if(center != null) {
                 messages.centerSet(sender);
-                RandomCoords.getPlugin().config.set(worldName + ".Center.X", center.getBlockX());
+                RandomCoords.getPlugin().config.set(worldName + ".Center.X", center.getBlockX() + 0.5);
                 RandomCoords.getPlugin().config.set(worldName + ".Center.Y", center.getBlockY());
-                RandomCoords.getPlugin().config.set(worldName + ".Center.Z", center.getBlockZ());
+                RandomCoords.getPlugin().config.set(worldName + ".Center.Z", center.getBlockZ() + 0.5);
             }
 
 

@@ -24,7 +24,6 @@ import br.net.fabiozumbi12.RedProtect.Region;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 
 /**
  * Created by JamesShopland on 14/04/15.
@@ -52,7 +51,7 @@ public class RedProtect {
                 final int bz = z;
 
 
-                for (int i = 0; i < r * 2 + 1; i++) {
+              //  for (int i = 0; i < r * 2 + 1; i++) {
                     for (int j = 0; j < r * 2 + 1; j++) {
                         for (int k = 0; k < r * 2 + 1; k++) {
                             Region reg = RedProtectAPI.getRegion(l);
@@ -61,15 +60,17 @@ public class RedProtect {
                             }
 
 
-                            x++;
+                           // x++;
+                            x = x + 16;
                         }
-                        z++;
+                       // z++;
+                        z = z + 16;
                         x = bx;
                     }
-                    z = bz;
+                /*    z = bz;
                     x = bx;
                     y++;
-                }
+                }*/
             }
 
             return true;
@@ -78,6 +79,44 @@ public class RedProtect {
             return true;
 
         }
+    }
+
+
+    /**
+     * Is there a redProtect claim nearby?
+     * @param l
+     * @return True if yes, False if no.
+     */
+    public boolean redProtectClaimNearby(Location l) {
+        if (Bukkit.getServer().getPluginManager().getPlugin("RedProtect") == null) {
+            return false;
+        }
+        if(!RandomCoords.getPlugin().getConfig().getString("RedProtect").equalsIgnoreCase("true")) {
+            return false;
+        }
+
+
+        int radius = RandomCoords.getPlugin().getConfig().getInt("CheckingRadius");
+        int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
+        int x;
+        int y;
+        int z;
+
+
+        for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
+            for (int chZ = 0 - chunkRadius; chZ <= chunkRadius; chZ++) {
+                x = l.getBlockX();
+                y = l.getBlockY();
+                z = l.getBlockZ();
+                Region reg = RedProtectAPI.getRegion(l.getWorld().getBlockAt(x + (chX * 16), y, z + (chZ * 16)).getLocation());
+                if (reg != null) {
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
     }
 
 

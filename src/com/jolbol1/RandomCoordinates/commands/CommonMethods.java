@@ -20,9 +20,9 @@
 package com.jolbol1.RandomCoordinates.commands;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.managers.Util.ArgMode;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
+import com.jolbol1.RandomCoordinates.managers.Util.ArgMode;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;

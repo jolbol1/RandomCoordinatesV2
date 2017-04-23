@@ -18,12 +18,14 @@
  */
 
 package com.jolbol1.RandomCoordinates.commands;
-
 import com.jolbol1.RandomCoordinates.RandomCoords;
+import com.jolbol1.RandomCoordinates.checks.GriefPreventionCheck;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 
 /**
  * Created by James on 02/07/2016.
@@ -54,4 +56,7 @@ public class Reload implements CommandInterface {
             }
         }
     }
+
+
+
 }

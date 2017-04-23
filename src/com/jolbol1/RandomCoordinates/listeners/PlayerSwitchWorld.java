@@ -20,9 +20,9 @@
 package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
+import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
 import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
-import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

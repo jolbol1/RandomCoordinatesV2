@@ -52,7 +52,7 @@ public class TownyChecker {
                 final int bz = z;
 
 
-                for (int i = 0; i < r * 2 + 1; i++) {
+             //   for (int i = 0; i < r * 2 + 1; i++) {
                     for (int j = 0; j < r * 2 + 1; j++) {
                         for (int k = 0; k < r * 2 + 1; k++) {
                             final Block b = l.getWorld().getBlockAt(x, y, z);
@@ -62,15 +62,17 @@ public class TownyChecker {
                             }
 
 
-                            x++;
+                            //x++;
+                            x = x + 16;
                         }
-                        z++;
+                       // z++;
+                        z = z + 16;
                         x = bx;
                     }
-                    z = bz;
+              /*      z = bz;
                     x = bx;
                     y++;
-                }
+                }*/
             }
 
             return true;
@@ -79,6 +81,45 @@ public class TownyChecker {
             return true;
 
         }
+    }
+
+
+    /**
+     * Is there a towny claim nearby
+     * @param l
+     * @return True if yes, False if no
+     */
+    public boolean townyClaimNearby(Location l) {
+        if (Bukkit.getServer().getPluginManager().getPlugin("Towny") == null) {
+            return false;
+        }
+        if(!RandomCoords.getPlugin().getConfig().getString("Towny").equalsIgnoreCase("true")) {
+            return false;
+        }
+
+
+        int radius = RandomCoords.getPlugin().getConfig().getInt("CheckingRadius");
+        int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
+        int x;
+        int y;
+        int z;
+
+
+        for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
+            for (int chZ = 0 - chunkRadius; chZ <= chunkRadius; chZ++) {
+                x = l.getBlockX();
+                y = l.getBlockY();
+                z = l.getBlockZ();
+                Block b = l.getWorld().getBlockAt(x + (chX * 16), y, z + (chZ * 16));
+                final TownBlock tb = TownyUniverse.getTownBlock(b.getLocation());
+                if (tb != null) {
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
     }
 
 

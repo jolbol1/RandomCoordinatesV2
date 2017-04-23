@@ -22,11 +22,11 @@ package com.jolbol1.RandomCoordinates.commands;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
+import com.jolbol1.RandomCoordinates.managers.Coordinates;
 import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
+import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import com.jolbol1.RandomCoordinates.managers.Util.ArgMode;
 import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
-import com.jolbol1.RandomCoordinates.managers.Coordinates;
-import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

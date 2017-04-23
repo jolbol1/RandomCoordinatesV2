@@ -34,6 +34,7 @@ RedProtect: false
 Kingdoms: false
 VanillaBorder: true
 SkyBlock: false
+Residence: false
 Regions:
  - example
 

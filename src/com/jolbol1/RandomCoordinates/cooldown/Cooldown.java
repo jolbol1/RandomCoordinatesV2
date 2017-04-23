@@ -23,8 +23,6 @@ package com.jolbol1.RandomCoordinates.cooldown;
  * Created by James on 02/07/2016.
  */
 
-import com.jolbol1.RandomCoordinates.managers.MessageManager;
-
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

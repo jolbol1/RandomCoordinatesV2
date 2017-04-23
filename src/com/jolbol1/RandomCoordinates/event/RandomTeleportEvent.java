@@ -22,14 +22,15 @@ package com.jolbol1.RandomCoordinates.event;
 /**
  * Created by James on 16/03/2017.
  */
+
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
+import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.event.Cancellable;
 
 public final class RandomTeleportEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();

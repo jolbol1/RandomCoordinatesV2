@@ -64,7 +64,7 @@ public class MessageManager {
     public void teleportMessage(final Player player, final Location location) {
         final String message = RandomCoords.getPlugin().language.getString("TeleportMessage");
         final String locX = String.valueOf(location.getX());
-        final String locY = String.valueOf(location.getBlockY());
+        final String locY = String.valueOf(location.getBlockY() - 2);
         final String locZ = String.valueOf(location.getZ());
         final String newMessage = message.replaceAll("%coordinates", (locX + ", " + locY + ", "  + locZ));
         player.sendMessage(prefix() + ChatColor.translateAlternateColorCodes('&', newMessage));

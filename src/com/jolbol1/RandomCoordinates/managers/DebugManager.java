@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
 
 /**
  * Created by James on 03/02/2017.
@@ -39,13 +40,13 @@ public class DebugManager {
       }
         try
         {
-            final File dataFolder = RandomCoords.getPlugin().getDataFolder();
+            final File dataFolder = new File(RandomCoords.getPlugin().getDataFolder(), "Logs");
             if(!dataFolder.exists())
             {
                 dataFolder.mkdir();
             }
 
-            final File saveTo = new File(RandomCoords.getPlugin().getDataFolder(), "log.txt");
+            final File saveTo = new File(RandomCoords.getPlugin().getDataFolder() + "/Logs", "log_" + + LocalDateTime.now().getHour() + LocalDateTime.now().getMinute()+ ".txt");
             if (!saveTo.exists())
             {
                 saveTo.createNewFile();

@@ -23,8 +23,12 @@ import com.jolbol1.RandomCoordinates.RandomCoords;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by JamesShopland on 02/11/14.
@@ -62,8 +66,10 @@ public class GriefPreventionCheck {
                         for (int k = 0; k < r * 2 + 1; k++) {
 
                             final Block b = l.getWorld().getBlockAt(x, y, z);
+
                             final Claim myClaim = gp.dataStore
                                     .getClaimAt(b.getLocation(), false, null);
+
                             if (!(myClaim == null)) {
                                 return false;
                             }
@@ -84,5 +90,41 @@ public class GriefPreventionCheck {
             return true;
         }
     }
+
+    public boolean griefPrevNearby(Location l) {
+        if (Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention") == null) {
+            return false;
+        }
+        if(!RandomCoords.getPlugin().getConfig().getString("GriefPrevention").equalsIgnoreCase("true")) {
+            return false;
+        }
+        final GriefPrevention gp = GriefPrevention.instance;
+
+
+        int radius = RandomCoords.getPlugin().getConfig().getInt("CheckingRadius");
+        int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
+        int x;
+        int y;
+        int z;
+
+
+        for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
+
+            for (int chZ = 0 - chunkRadius; chZ <= chunkRadius; chZ++) {
+                x = l.getBlockX();
+                y = l.getBlockY();
+                z = l.getBlockZ();
+                Chunk chunk = l.getWorld().getBlockAt(x + (chX * 16), y, z + (chZ * 16)).getChunk();
+                Collection<Claim> claims = gp.dataStore.getClaims(chunk.getX(), chunk.getZ());
+                if(!claims.isEmpty() && claims != null) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
 }
 

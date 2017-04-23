@@ -56,7 +56,7 @@ public class KingdomsClaim {
                 String kingdoms;
 
 
-                for (int i = 0; i < r * 2 + 1; i++) {
+             //   for (int i = 0; i < r * 2 + 1; i++) {
                     for (int j = 0; j < r * 2 + 1; j++) {
                         for (int k = 0; k < r * 2 + 1; k++) {
                             Chunk chunk = l.getChunk();
@@ -68,15 +68,17 @@ public class KingdomsClaim {
                             }
 
 
-                            x++;
+                            //x++;
+                            x = x + 16;
                         }
-                        z++;
+                        z = z + 16;
+                        //z++;
                         x = bx;
                     }
-                    z = bz;
+            /*        z = bz;
                     x = bx;
                     y++;
-                }
+                }*/
             }
 
             return true;
@@ -86,6 +88,47 @@ public class KingdomsClaim {
 
         }
     }
+
+    /**
+     * Is there a Kingdom claim nearby?
+     * @param l
+     * @return True if kindom nearby, False if not.
+     */
+    public boolean kingdomClaimNearby(Location l) {
+        if (Bukkit.getServer().getPluginManager().getPlugin("Kingdoms") == null) {
+            return false;
+        }
+        if(!RandomCoords.getPlugin().getConfig().getString("Kingdoms").equalsIgnoreCase("true")) {
+            return false;
+        }
+
+
+        int radius = RandomCoords.getPlugin().getConfig().getInt("CheckingRadius");
+        int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
+        int x;
+        int y;
+        int z;
+        String kingdoms;
+
+
+        for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
+            for (int chZ = 0 - chunkRadius; chZ <= chunkRadius; chZ++) {
+                x = l.getBlockX();
+                y = l.getBlockY();
+                z = l.getBlockZ();
+                Chunk chunk = l.getWorld().getBlockAt(x + (chX * 16), y, z + (chZ * 16)).getChunk();
+                kingdoms = GameManagement.getLandManager().getOrLoadLand(new SimpleChunkLocation(chunk)).getOwner();
+                if (kingdoms != null) {
+                    return true;
+                }
+
+            }
+        }
+
+        return false;
+    }
+
+
 
 
 }

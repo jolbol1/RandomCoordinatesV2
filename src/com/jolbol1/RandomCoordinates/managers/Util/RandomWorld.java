@@ -41,7 +41,7 @@ public class RandomWorld {
         this.world = world;
         this.max = max;
         this.min = min;
-        this.center = world.getSpawnLocation();
+        this.center = world.getSpawnLocation().add(0.5, 0, 0.5);
         this.banned = RandomCoords.getPlugin().config.getList("BannedWorlds").contains(world.getName());
     }
 
@@ -70,14 +70,14 @@ public class RandomWorld {
 
     public Location getCenter(){
         if (RandomCoords.getPlugin().config.get(world.getName() + ".Center") != null) {
-            int x = RandomCoords.getPlugin().config.getInt(world.getName() + ".Center.X");
-            int y = RandomCoords.getPlugin().config.getInt(world.getName() + ".Center.Y");
-            int z = RandomCoords.getPlugin().config.getInt(world.getName() + ".Center.Z");
+            double x = RandomCoords.getPlugin().config.getDouble(world.getName() + ".Center.X");
+            double y = RandomCoords.getPlugin().config.getDouble(world.getName() + ".Center.Y");
+            double z = RandomCoords.getPlugin().config.getDouble(world.getName() + ".Center.Z");
 
-            center = new Location(world, x + 0.5, y, z + 0.5);
+            center = new Location(world, x , y, z);
         }
         if(center == null) {
-            center = new Location(world, 0, 0, 0);
+            center = new Location(world, 0.5, 0, 0.5);
         }
 
         return center;

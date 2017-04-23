@@ -19,10 +19,8 @@
 
 package com.jolbol1.RandomCoordinates.listeners;
 
-import com.apple.concurrent.Dispatch;
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.event.RandomTeleportEvent;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -58,10 +56,6 @@ public class RandomTeleportListener implements Listener {
                     }
                 }
                 int defY = RandomCoords.getPlugin().skyBlockSave.getInt("DefaultY");
-                double playerY = defY + 1.5;
-                Location loc = e.location();
-                loc.setY(playerY);
-                e.getPlayer().teleport(loc);
                 skyBlock.setY(defY);
                 skyBlock.getBlock().setType(material);
                 RandomCoords.getPlugin().skyBlock.put(e.getPlayer().getUniqueId(), skyBlock.getBlock().getLocation());

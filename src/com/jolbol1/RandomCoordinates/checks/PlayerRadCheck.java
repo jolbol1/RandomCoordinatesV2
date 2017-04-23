@@ -24,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 
@@ -74,4 +75,46 @@ public class PlayerRadCheck {
         }
         return true;
     }
+
+
+    /**
+     * Are there players nearby?
+     * @param l
+     * @return True if yes, False if no
+     */
+    public boolean areThereNearbyPlayers(Location l) {
+        if(!RandomCoords.getPlugin().getConfig().getString("AvoidPlayers").equalsIgnoreCase("true")) {
+            return false;
+        }
+
+        int radius = RandomCoords.getPlugin().getConfig().getInt("CheckingRadius");
+        if(radius < 16) {
+            for(Entity e : l.getChunk().getEntities()) {
+
+                if(e instanceof Player) {
+                    return true;
+                }
+
+            }
+
+        }
+        int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
+
+        for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
+            for (int chZ = 0 - chunkRadius; chZ <= chunkRadius; chZ++) {
+                int x = (int) l.getX(), y = (int) l.getY(), z = (int) l.getZ();
+                for (Entity e: new Location(l.getWorld(), x + (chX * 16), y, z + (chZ * 16)).getChunk().getEntities()) {
+                    if (e.getLocation().distance(l) <= radius && e.getLocation().getBlock() != l.getBlock())
+                        if(e instanceof Player){
+                            return true;
+                        }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+
 }

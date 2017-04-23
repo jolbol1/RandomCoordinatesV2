@@ -20,19 +20,15 @@
 package com.jolbol1.RandomCoordinates.listeners;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
-import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import com.jolbol1.RandomCoordinates.managers.Coordinates;
+import com.jolbol1.RandomCoordinates.managers.CoordinatesManager;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
-import org.bukkit.Bukkit;
+import com.jolbol1.RandomCoordinates.managers.Util.CoordType;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import java.util.Random;
-import java.util.logging.Level;
 
 /**
  * Created by James on 04/07/2016.

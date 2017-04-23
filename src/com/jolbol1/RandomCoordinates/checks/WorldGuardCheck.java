@@ -21,7 +21,6 @@ package com.jolbol1.RandomCoordinates.checks;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.sk89q.worldedit.BlockVector;
-
 import com.sk89q.worldguard.bukkit.RegionContainer;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;

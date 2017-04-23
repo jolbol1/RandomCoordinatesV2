@@ -32,19 +32,16 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Chest;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
@@ -82,6 +79,8 @@ public class CoordinatesManager {
     private final KingdomsClaim kingdomsClaim = new KingdomsClaim();
     //Grab an instance of the debug manager.
     private final DebugManager debugManager = new DebugManager();
+
+    private final ResidenceCheck residenceCheck = new ResidenceCheck();
 
     public int key = 574272099;
 
@@ -181,6 +180,7 @@ public class CoordinatesManager {
      */
     private boolean isTheLocationSafe(final Location location) {
 
+
         if(location == null) {
             return false;
         }
@@ -196,6 +196,14 @@ public class CoordinatesManager {
         Block surfaceBlock = blockAtLocation.getRelative(BlockFace.DOWN);
         //Get the blacklisted list.
         List<String> blacklisted = RandomCoords.getPlugin().blacklist.getStringList("Blacklisted");
+
+        if(RandomCoords.getPlugin().config.getString("ChunkLoader").equalsIgnoreCase("true")) {
+            boolean exit = false;
+            while (!exit) {
+                //The boolean thats used to cancel or continue the loop. If chunk loader is off, set as true. If chunk is generated set as trie.
+                exit = generateChunk(location);
+            }
+        }
         //Parse over all the blocks in the blacklist.
         for(String materialName : blacklisted) {
             //Make sure the material exists.
@@ -218,9 +226,11 @@ public class CoordinatesManager {
             }
 
         }
-
         //If its not one of the blacklisted blocks, Continue and check for the regions.
-        return kingdomsClaim.KingdomsClaim(location) && redProtect.RedProtect(location) && fc.FactionCheck(location) && gpc.griefPrevent(location) && prc.isPlayerNear(location) && tc.TownyCheck(location) && wbc.WorldBorderCheck(location) && worldGuardEnabled(location) && !isOutsideBorder(location);
+        return !kingdomsClaim.kingdomClaimNearby(location) && !redProtect.redProtectClaimNearby(location) &&
+                !fc.factionLandNearby(location) && !tc.townyClaimNearby(location) && !prc.areThereNearbyPlayers(location) &&
+                !gpc.griefPrevNearby(location) && wbc.WorldBorderCheck(location) && worldGuardEnabled(location) && !isOutsideBorder(location) &&
+                !residenceCheck.isChunkProtected(location);
     }
 
 
@@ -276,11 +286,6 @@ public class CoordinatesManager {
         boolean isItSafe = false;
         int attempts = 0;
         int maxAttempts = RandomCoords.getPlugin().config.getInt("MaxAttempts");
-
-        //
-        if(RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(world.getName())) {
-            return getRelativeRandomLocation(world, min, max).add(0.5, 0, 0.5);
-        }
 
 
         while(!isItSafe) {
@@ -362,13 +367,25 @@ public class CoordinatesManager {
             return false;
         }
 
-        if(safeLocation.getWorld().getBiome(safeLocation.getBlockX(), safeLocation.getBlockZ()) == Biome.SKY && !RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(world.getName())) {
-            safeLocation = end.endCoord(safeLocation);
+        if(!RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(world.getName())) {
             double y = getSafeY(safeLocation);
             safeLocation.setY(y);
         }
 
+        if(safeLocation.getWorld().getBiome(safeLocation.getBlockX(), safeLocation.getBlockZ()) == Biome.SKY ) {
+            safeLocation = end.endCoord(safeLocation);
+        }
+
+
+
+
         scheduleTeleport(player, safeLocation, coordType, timeBefore, cooldownTime, player.getLocation(), player.getHealth(), cost);
+
+            /**
+             * The loop that handles the loading of the chunk that they are teleporting into.
+             * If the config options false, Exit the loop. If the chunks generated, exit the loop.
+             */
+
         return true;
 
     }
@@ -392,7 +409,7 @@ public class CoordinatesManager {
         double timeBeforeTp = (double) timeBefore;
         //This is to ensure it teleports them, You need at least a tick delay to register the login.
         if(coordType == CoordType.JOIN || coordType == CoordType.JOINWORLD) {
-            timeBeforeTp = 0.05;
+            timeBeforeTp = 0.3;
         }
 
 
@@ -445,7 +462,7 @@ public class CoordinatesManager {
 
 
             //My definition of a tick/second here is shorter. This is due to a double tp bug with portals.
-        }, (long) (timeBeforeTp * 19.999999999));
+        }, (long) (timeBeforeTp * 20) - 1);
 
     }
 
@@ -723,8 +740,13 @@ public class CoordinatesManager {
      * @return Safe y value, plus a buffer. (2.5 = max before fall damage)
      */
     private double getSafeY(Location location) {
+
         if(location.getWorld().getBiome(location.getBlockX(), location.getBlockZ()) == Biome.HELL) {
-            return (nether.getSafeNetherY(location) + 0.5);
+            return (nether.getSafeNetherY(location) + 1);
+        }
+        if(RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(location.getWorld().getName())) {
+            return RandomCoords.getPlugin().skyBlockSave.getInt("DefaultY") + 3.5;
+
         }
 
 
@@ -917,7 +939,9 @@ public class CoordinatesManager {
              */
             if (RandomCoords.getPlugin().limiter.getString(player.getUniqueId() + ".Chest") == null) {
                 //Gets the location for the chest. Takes the teleport location and adds 1 to The X, -2 to add it to the ground and 1 to the Z.
-                final Location chestLoc = new Location(locationTP.getWorld(), locationTP.getBlockX() + 1.0, locationTP.getBlockY() - 2, locationTP.getBlockZ() + 1.0);
+                final Location chestLoc = locationTP.add(0.5, 0, 0.5);
+                final int maxY = chestLoc.getWorld().getHighestBlockAt(chestLoc).getY();
+                chestLoc.setY(maxY);
                 //This uses the chestloc location but adds 1 to the Y in order to allow opening of the chest wherever.
                 final Location airLoc = new Location(chestLoc.getWorld(), chestLoc.getBlockX(), chestLoc.getBlockY() + 1, chestLoc.getBlockZ());
                 //Gets the acual block at the location of the chest.
@@ -1021,6 +1045,27 @@ public class CoordinatesManager {
             return;
         }
 
+    }
+
+    /**
+     * Generates the chunk that the location is in. Seldom use.
+     * @param location The location in which to load.
+     * @return True or False, Is the chunk loaded yet?
+     */
+    private boolean generateChunk(final Location location) {
+        //The world that we're loading the chunk in.
+        final World world = location.getWorld();
+        //The chunk itself that we are loading.
+        final Chunk chunk = world.getChunkAt(location);
+        /**
+         * Checks if the chunk is loaded, if not an attempt is made to load.
+         */
+        if (chunk.isLoaded()) {
+            return true;
+        } else {
+            chunk.load();
+            return false;
+        }
     }
 
 

@@ -20,14 +20,14 @@
 package com.jolbol1.RandomCoordinates.commands;
 
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
-import com.jolbol1.RandomCoordinates.managers.*;
-
+import com.jolbol1.RandomCoordinates.managers.Coordinates;
+import com.jolbol1.RandomCoordinates.managers.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -53,8 +53,11 @@ public class RegionCommand implements CommandInterface {
 
             Player p = null;
             String region = null;
-
             Map<String, String> regionList = regionManager.allRegionList(sender);
+            if(regionList == null || regionList.values() == null || regionList.isEmpty()) {
+                messages.incorrectUsage(sender, "No WG regions exist!");
+                return;
+            }
             int i = 0;
             for(String s : args) {
                 if(i != 0) {

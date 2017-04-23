@@ -19,13 +19,10 @@
 
 package com.jolbol1.RandomCoordinates.commands;
 
-import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-
-import java.io.IOException;
 
 /**
  * Created by James on 07/07/2016.
