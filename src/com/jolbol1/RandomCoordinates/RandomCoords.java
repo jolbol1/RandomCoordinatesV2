@@ -73,11 +73,15 @@ public class RandomCoords extends JavaPlugin {
     public FileConfiguration warps;
     public FileConfiguration blacklist;
     public FileConfiguration skyBlockSave;
+    public FileConfiguration bonushChestExample;
+    public FileConfiguration bonusChest;
     public HashMap<UUID, Location> skyBlock = new HashMap<>();
     public List<PortalLoaded> loadedPortalList;
 
 
     private File languageFile;
+    public File bonusChestExample;
+    public File bonusChestFile;
     public File configFile;
     public File limiterFile;
     public File portalsFile;
@@ -130,7 +134,20 @@ public class RandomCoords extends JavaPlugin {
 
 
 
+        File bonusFolder;
+        try {
+            bonusFolder = new File(getDataFolder() + File.separator + "BonusChests");
+            if(!bonusFolder.exists()){
+                bonusFolder.mkdirs();
+            }
+        } catch(SecurityException e) {
+            // do something...
+            return;
+        }
         this.getDataFolder().mkdirs();
+
+
+
         //Setup Language File
         languageFile = new File(this.getDataFolder(), "language.yml");
         language = setupFile(languageFile);
@@ -143,6 +160,25 @@ public class RandomCoords extends JavaPlugin {
                 "This will explain everything you need to know about all the options. \n " +
                 "Developed by Jolbol1");
         matchFile(config, configFile, "config");
+
+
+        bonusChestFile = new File(this.getDataFolder(), "BonusChestFile.yml");
+        bonusChest = setupFile(bonusChestFile);
+        bonusChest.options().header("RandomCoords: Need Help Setting Up? See the Wiki! https://github.com/jolbol1/RandomCoordinatesV2/wiki \n " +
+                "This will explain everything you need to know about all the options. \n " +
+                "Developed by Jolbol1");
+        matchFile(bonusChest, bonusChestFile, "BonusChestFile");
+
+        File bonusChestFolder = new File(this.getDataFolder() + File.separator + "BonusChests");
+        if(!bonusChestFolder.exists()) {
+            bonusChestFolder.mkdirs();
+        }
+
+
+        bonusChestExample = new File(this.getDataFolder() + File.separator + "BonusChests", "BonusChestExample.yml");
+        bonushChestExample = setupFile(bonusChestExample);
+        matchFile(bonushChestExample, bonusChestExample, "BonusChestExample");
+
 
 
         limiterFile = new File(this.getDataFolder(), "limiter.yml");
@@ -186,6 +222,7 @@ public class RandomCoords extends JavaPlugin {
         handler.register("region", new RegionCommand());
         handler.register("warp", new WarpsNew());
         handler.register("radius", new RadiusCommand());
+        handler.register("chest", new BonusCommand());
         getCommand("rc").setExecutor(handler);
         getCommand("rc").setTabCompleter(new ConstructTabCompleter());
         if (RandomCoords.getPlugin().config.getString("Metrics").equalsIgnoreCase("true")) {
@@ -388,7 +425,7 @@ public class RandomCoords extends JavaPlugin {
         });
     }
 
-    private FileConfiguration setupFile(final File file) {
+    public FileConfiguration setupFile(final File file) {
         if (!file.exists()) {
             try {
                 file.createNewFile();

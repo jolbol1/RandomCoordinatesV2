@@ -52,30 +52,35 @@ public class RegionManager {
 
 
     public Map<String, String> allRegionList(CommandSender sender) {
-        if(!worldGuardInstalled(sender)) {
+        if (!worldGuardInstalled(sender)) {
             return null;
         }
         Map regionList = new HashMap<String, World>();
-        for(World w : Bukkit.getServer().getWorlds()) {
-            if(RandomCoords.getPlugin().getWorldGuard().getRegionManager(w) != null) {
+        for (World w : Bukkit.getServer().getWorlds()) {
+            if (RandomCoords.getPlugin().getWorldGuard().getRegionManager(w) != null) {
                 com.sk89q.worldguard.protection.managers.RegionManager regionManager = RandomCoords.getPlugin().getWorldGuard().getRegionManager(w);
-                if(regionManager.getRegions().values() == null || regionManager.getRegions() == null || regionManager.getRegions().isEmpty()) {
-                    return null;
+                if (regionManager.getRegions().values() != null || regionManager.getRegions() != null || !regionManager.getRegions().isEmpty()) {
+                    for (ProtectedRegion region : regionManager.getRegions().values()) {
+                        regionList.put(region.getId(), w.getName());
+
+                    }
+
                 }
-                for (ProtectedRegion region : regionManager.getRegions().values()) {
-                    regionList.put(region.getId(), w.getName());
-                }
+
+
             }
+        }
+        if (regionList.isEmpty() || regionList.values() == null || regionList == null) {
+            return null;
         }
 
         return regionList;
 
 
-
     }
 
     public boolean worldGuardInstalled(CommandSender sender) {
-        if(Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
             sender.sendMessage("WG not supported.");
             return false;
         }
@@ -110,7 +115,7 @@ public class RegionManager {
             Polygonal2DSelection selection = new Polygonal2DSelection(
                     world, poly2d.getPoints(),
                     poly2d.getMinimumPoint().getBlockY(),
-                    poly2d.getMaximumPoint().getBlockY() );
+                    poly2d.getMaximumPoint().getBlockY());
             //worldEdit.setSelection(player, selection);
             return selection;
 
@@ -127,7 +132,7 @@ public class RegionManager {
 
         World world = selection.getWorld();
 
-        if(selection instanceof Polygonal2DSelection) {
+        if (selection instanceof Polygonal2DSelection) {
             Polygonal2DRegion poly = null;
             try {
                 poly = (Polygonal2DRegion) selection.getRegionSelector().getRegion();
@@ -141,7 +146,7 @@ public class RegionManager {
                 blocks.add(b);
                 // Do something with the block
             }
-        } else if(selection instanceof CuboidSelection) {
+        } else if (selection instanceof CuboidSelection) {
             CuboidRegion cub = null;
             try {
                 cub = (CuboidRegion) selection.getRegionSelector().getRegion();
@@ -162,8 +167,6 @@ public class RegionManager {
     }
 
 
-
-
     public void teleportRandomlyInRegion(Player p, World w, Selection selection) {
         List<Block> blocks = blockList(p, selection);
         long seed = System.nanoTime();
@@ -173,7 +176,6 @@ public class RegionManager {
         int y = b.getLocation().getWorld().getHighestBlockYAt(b.getLocation());
         Location finalLoc = new Location(b.getWorld(), b.getX() + 0.5, y, b.getZ() + 0.5);
         p.teleport(finalLoc);
-
 
 
     }
