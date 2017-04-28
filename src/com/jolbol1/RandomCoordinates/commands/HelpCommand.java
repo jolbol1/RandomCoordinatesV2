@@ -37,7 +37,7 @@ public class HelpCommand implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-
+        
         if (args[0].equalsIgnoreCase("help")) {
             if (args.length == 1 || args.length == 2 && args[1].equalsIgnoreCase("1")) {
 

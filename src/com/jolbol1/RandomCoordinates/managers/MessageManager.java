@@ -519,4 +519,29 @@ public class MessageManager {
     }
 
 
+    public void inventoryContentsSaved(CommandSender sender, String fileName, boolean overwritten) {
+        if(!overwritten) {
+            String message = RandomCoords.getPlugin().language.getString("InventorySaved");
+            String finalMess = message.replaceAll("%file", fileName);
+            String messages = ChatColor.translateAlternateColorCodes('&', finalMess);
+            sender.sendMessage(prefix() + messages);
+        } else {
+            String message = RandomCoords.getPlugin().language.getString("InventorySavedOverride");
+            String finalMess = message.replaceAll("%file", fileName);
+            String messages = ChatColor.translateAlternateColorCodes('&', finalMess);
+            sender.sendMessage(prefix() + messages);
+        }
+    }
+
+    public void itemSaved(CommandSender sender, String fileName) {
+
+            String message = RandomCoords.getPlugin().language.getString("ItemSaved");
+            String finalMess = message.replaceAll("%file", fileName);
+            String messages = ChatColor.translateAlternateColorCodes('&', finalMess);
+            sender.sendMessage(prefix() + messages);
+
+
+    }
+
+
 }

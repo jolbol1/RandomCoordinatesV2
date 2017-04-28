@@ -114,4 +114,35 @@ class KitManager {
     }
 
 
+    public List<ItemStack> getEssentialsKits(Player p, String name) {
+        List<ItemStack> itemStacks = new ArrayList<>();
+        if (Bukkit.getPluginManager().getPlugin("Essentials") == null) {
+        } else {
+            final IEssentials ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
+                if (ess != null) {
+                    //  Map<String, Object> kit = ess.getSettings().getKit(name.toLowerCase());
+                    final User u = ess.getUser(p);
+                    List<String> items;
+                    try {
+                        final Kit kitMe = new Kit(name, ess);
+                        items = kitMe.getItems();
+
+                        for(ItemStack item : deSerialize(items, u).get()) {
+                            itemStacks.add(item);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        RandomCoords.logger.severe("Essnetials unable to deserialize kit.");
+
+                    }
+                } else {
+                    RandomCoords.logger.severe("Essnetials was null when getting kit.");
+                }
+        }
+        return itemStacks;
+
+    }
+
+
+
 }

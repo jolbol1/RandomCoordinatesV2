@@ -62,7 +62,7 @@ public enum CoordType {
 
 
     String methodName;
-    private CoordType(String methodName) {
+    CoordType(String methodName) {
         this.methodName = methodName;
     }
 

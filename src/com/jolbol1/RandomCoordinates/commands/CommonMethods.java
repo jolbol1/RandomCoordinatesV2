@@ -258,10 +258,7 @@ public class CommonMethods {
      * @return True if no banned, False is banned.
      */
     public boolean isWorldBanned(World world) {
-        if(RandomCoords.getPlugin().config.getStringList("BannedWorlds").contains(world.getName())) {
-            return false;
-        }
-        return true;
+        return !RandomCoords.getPlugin().config.getStringList("BannedWorlds").contains(world.getName());
     }
 
     /**
@@ -273,10 +270,7 @@ public class CommonMethods {
     public boolean doesWorldExist(CommandSender sender, String worldName) {
 
         World w = Bukkit.getWorld(worldName);
-        if(w == null) {
-            return false;
-        }
-        return true;
+        return w != null;
 
 
     }

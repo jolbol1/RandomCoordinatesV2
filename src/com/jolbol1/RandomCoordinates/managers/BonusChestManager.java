@@ -20,17 +20,21 @@
 package com.jolbol1.RandomCoordinates.managers;
 
 import com.jolbol1.RandomCoordinates.RandomCoords;
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.*;
-import org.bukkit.material.MaterialData;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Level;
 
 /**
@@ -38,11 +42,8 @@ import java.util.logging.Level;
  */
 public class BonusChestManager {
 
-    private CoordinatesManager coordinatesManager = new CoordinatesManager();
-
-    public String getFileName(World world) {
-        return getBonusChestFile(world).getName();
-    }
+    //private CoordinatesManager coordinatesManager = new CoordinatesManager();
+    private final ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
 
 
     public FileConfiguration getBonusChestFile(World world) {
@@ -67,108 +68,134 @@ public class BonusChestManager {
 
     }
 
-    public List<ItemStack> itemsToAdd(World world) {
+
+    public List<ItemStack> itemsToAdd(Player player, World world) {
         FileConfiguration configuration = getBonusChestFile(world);
+
         Map<String, Object> itemsPlusData = itemsPlusData(configuration);
         List<ItemStack> items = new ArrayList<>();
-        for(String item : itemsPlusData.keySet()) {
-            Map<String, Object> itemData = (Map<String, Object>) itemsPlusData.get(item);
-            int amount = (int) itemData.get("Amount");
-            int odd = 100;
+        Set<String> itemsPlusTheData = itemsPlusData.keySet();
+
+        if(itemsPlusTheData.contains("Essentials")) {
+            for(String kit : configuration.getStringList("Essentials")) {
+                KitManager kitManager = new KitManager();
+                for(ItemStack itemStack : kitManager.getEssentialsKits(player, kit)) {
+
+                    items.add(itemStack);
+
+                }
+
+            }
+        }
+
+        for(String item : itemsPlusTheData) {
             String itemType = item;
-            if(itemType.contains(":")) {
+            if (itemType.contains(":")) {
                 itemType = item.split(":")[0];
             }
-            byte data = 0;
-            if(itemData.containsKey("Data")) {
-                data = Byte.valueOf(String.valueOf(itemData.get("Data")));
-            }
-            ItemStack itemStack = new ItemStack(Material.getMaterial(itemType), amount, data);
-            ItemMeta itemMeta = itemStack.getItemMeta();
-            if(itemData.containsKey("Name")) {
-                itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', (String) itemData.get("Name")));
-            }
-            if(itemData.containsKey("Lore")) {
-                itemMeta.setLore((List<String>) itemData.get("Lore"));
-            }
-            if(itemData.containsKey("Enchantments")) {
-                for (String enchantment : (List<String>) itemData.get("Enchantments")) {
-                    String[] enchantmentSplitter = enchantment.split(":");
-                    int level = Integer.valueOf(enchantmentSplitter[1]);
-                    itemMeta.addEnchant(Enchantment.getByName(enchantmentSplitter[0]), level, true);
+            if (Material.getMaterial(itemType) != null) {
+                Map<String, Object> itemData = (Map<String, Object>) itemsPlusData.get(item);
+                int amount = (int) itemData.get("Amount");
+                int odd = 100;
+
+                byte data = 0;
+                if (itemData.containsKey("Data")) {
+                    data = Byte.valueOf(String.valueOf(itemData.get("Data")));
                 }
-            }
-
-
-
-            itemStack.setItemMeta(itemMeta);
-
-            if(itemData.containsKey("Author") || itemData.containsKey("Pages")) {
-                if(itemStack.getType().equals(Material.WRITTEN_BOOK)) {
-                    BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
-                    if(itemData.containsKey("Author")) {
-                        bookMeta.setAuthor(String.valueOf(itemData.get("Author")));
+                if (Material.getMaterial(itemType) == null) {
+                    Bukkit.getServer().getLogger().log(Level.WARNING, itemType + " is not a valid item.");
+                    return null;
+                }
+                ItemStack itemStack = new ItemStack(Material.getMaterial(itemType), amount, data);
+                ItemMeta itemMeta = itemStack.getItemMeta();
+                if (itemData.containsKey("Name")) {
+                    itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', (String) itemData.get("Name")));
+                }
+                if (itemData.containsKey("Lore")) {
+                    itemMeta.setLore((List<String>) itemData.get("Lore"));
+                }
+                if (itemData.containsKey("Enchantments")) {
+                    for (String enchantment : (List<String>) itemData.get("Enchantments")) {
+                        String[] enchantmentSplitter = enchantment.split(":");
+                        int level = Integer.valueOf(enchantmentSplitter[1]);
+                        itemMeta.addEnchant(Enchantment.getByName(enchantmentSplitter[0]), level, true);
                     }
-                    if(itemData.containsKey("Pages")) {
-                        bookMeta.setPages((List<String>) itemData.get("Pages"));
+                }
+
+
+                itemStack.setItemMeta(itemMeta);
+
+                if (itemData.containsKey("Author") || itemData.containsKey("Pages")) {
+                    if (itemStack.getType().equals(Material.WRITTEN_BOOK)) {
+                        BookMeta bookMeta = (BookMeta) itemStack.getItemMeta();
+                        if (itemData.containsKey("Author")) {
+                            bookMeta.setAuthor(String.valueOf(itemData.get("Author")));
+                        }
+                        if (itemData.containsKey("Pages")) {
+                            bookMeta.setPages((List<String>) itemData.get("Pages"));
+                        }
+                        if (itemData.containsKey("Name")) {
+                            bookMeta.setTitle(String.valueOf(itemData.get("Name")));
+                        }
+                        if (itemData.containsKey("Lore")) {
+                            bookMeta.setLore((List<String>) itemData.get("Lore"));
+                        }
+
+                        itemStack.setItemMeta(bookMeta);
                     }
-                    if(itemData.containsKey("Name")) {
-                        bookMeta.setTitle(String.valueOf(itemData.get("Name")));
+
+                }
+
+                if (itemData.containsKey("Colour")) {
+                    if (itemStack.getType().equals(Material.LEATHER_BOOTS) || itemStack.getType().equals(Material.LEATHER_CHESTPLATE) ||
+                            itemStack.getType().equals(Material.LEATHER_LEGGINGS) || itemStack.getType().equals(Material.LEATHER_HELMET)) {
+                        Color color = (Color) itemData.get("Colour");
+
+                        LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemMeta;
+                        leatherArmorMeta.setColor(color);
+                        itemStack.setItemMeta(leatherArmorMeta);
+
                     }
-                    if(itemData.containsKey("Lore")) {
-                        bookMeta.setLore((List<String>) itemData.get("Lore"));
+                }
+
+                if (itemData.containsKey("FireworkEffect")) {
+                    if (itemStack.getType().equals(Material.FIREWORK)) {
+                        FireworkMeta fireworkMeta = (FireworkMeta) itemMeta;
+                        fireworkMeta.addEffects((Iterable<FireworkEffect>) itemData.get("FireworkEffect"));
+                        itemStack.setItemMeta(fireworkMeta);
+
                     }
+                }
 
-                    itemStack.setItemMeta(bookMeta);
+                if (itemData.containsKey("SkullOwner")) {
+                    if (itemStack.getType().equals(Material.SKULL_ITEM)) {
+                        SkullMeta skullMeta = (SkullMeta) itemMeta;
+                        skullMeta.setOwner(String.valueOf(itemData.get("SkullOwner")));
+                        itemStack.setItemMeta(skullMeta);
+                    }
+                }
+
+
+                if (itemData.containsKey("Odds")) {
+                    odd = (int) itemData.get("Odds");
+                }
+
+                int randomChance = threadLocalRandom.nextInt(0, 100);
+                if (randomChance < 0) {
+                    randomChance = randomChance * -1;
+                }
+                if (randomChance <= odd) {
+                    items.add(itemStack);
+                }
+
+
+            } else {
+                if(!item.contains("Essentials")) {
+                    Bukkit.getServer().getLogger().log(Level.WARNING, itemType + " is not a valid item.");
                 }
             }
-
-            if(itemData.containsKey("Colour")) {
-                if(itemStack.getType().equals(Material.LEATHER_BOOTS) || itemStack.getType().equals(Material.LEATHER_CHESTPLATE) ||
-                        itemStack.getType().equals(Material.LEATHER_LEGGINGS) || itemStack.getType().equals(Material.LEATHER_HELMET)) {
-                    Color color = (Color) itemData.get("Colour");
-
-                    LeatherArmorMeta leatherArmorMeta = (LeatherArmorMeta) itemMeta;
-                    leatherArmorMeta.setColor(color);
-                    itemStack.setItemMeta(leatherArmorMeta);
-
-                }
-            }
-
-            if(itemData.containsKey("FireworkEffect")) {
-                Bukkit.broadcastMessage("Here");
-                if(itemStack.getType().equals(Material.FIREWORK)) {
-                    Bukkit.broadcastMessage("Firework");
-                    FireworkMeta fireworkMeta = (FireworkMeta) itemMeta;
-                    fireworkMeta.addEffects((Iterable<FireworkEffect>) itemData.get("FireworkEffect"));
-                    itemStack.setItemMeta(fireworkMeta);
-
-                }
-            }
-
-            if(itemData.containsKey("SkullOwner")) {
-                if(itemStack.getType().equals(Material.SKULL_ITEM)) {
-                    SkullMeta skullMeta = (SkullMeta) itemMeta;
-                    skullMeta.setOwner(String.valueOf(itemData.get("SkullOwner")));
-                    itemStack.setItemMeta(skullMeta);
-                }
-            }
-
-
-            if(itemData.containsKey("Odds")) {
-                odd = (int) itemData.get("Odds");
-            }
-
-            int randomChance = coordinatesManager.getRandomNumber(0, 100);
-            if(randomChance < 0) {
-                randomChance = randomChance * -1;
-            }
-            if(randomChance <= odd) {
-                items.add(itemStack);
-            }
-
-
         }
+
 
         return items;
 
@@ -176,9 +203,12 @@ public class BonusChestManager {
 
     public Map<String, Object> itemsPlusData(FileConfiguration bonusChestFile) {
         Map<String, Object> itemsPlusData = new LinkedHashMap<>();
-        for(String key : bonusChestFile.getKeys(false)) {
-            Bukkit.broadcastMessage(key);
-            itemsPlusData.put(key, parseItem(bonusChestFile, key));
+        if(bonusChestFile == null) {
+            Bukkit.getServer().getLogger().log(Level.WARNING, "Bonus Chest is on, but, no chest setup in BonusChestConfig.yml");
+        } else {
+            for (String key : bonusChestFile.getKeys(false)) {
+                itemsPlusData.put(key, parseItem(bonusChestFile, key));
+            }
         }
         return itemsPlusData;
 
@@ -188,7 +218,6 @@ public class BonusChestManager {
 
     public Map<String,Object> parseItem(FileConfiguration fileItems, String materialName) {
         Map<String, Object> itemData = new HashMap<>();
-        Bukkit.broadcastMessage(materialName);
         if(fileItems.getInt(materialName + ".Odds") != 0) {
             itemData.put("Odds", fileItems.getInt(materialName + ".Odds"));
         }
@@ -309,14 +338,91 @@ public class BonusChestManager {
 
         }
 
+    public void spawnBonusChest(Player player) {
+        //Get the location of the chest and set it to a chest.
+        Location chestLocation = player.getLocation().add(1, 0, 1);
+        chestLocation.setY(player.getWorld().getHighestBlockYAt(chestLocation));
+        Block chestBlock = chestLocation.getBlock();
+        chestBlock.setType(Material.CHEST);
+        //Get the Chest
+        final Chest chest = (Chest) chestBlock.getState();
+        //Get the inventory of this chest.
+        final Inventory chestInv = chest.getInventory();
+        int i = 0;
+        List<ItemStack> itemsToAdd =  itemsToAdd(player, player.getWorld());
+        List<Integer> singleChestShuffle = Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26);
+        Collections.shuffle(singleChestShuffle);
+        List<Integer> doubleChestShuffle = Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53);
+        Collections.shuffle(doubleChestShuffle);
+
+
+        Inventory doubleChestInventory = null;
+
+        if(itemsToAdd.size() >= 27) {
+            Block doubleChest = chestLocation.add(1,0,0).getBlock();
+            doubleChest.setType(Material.CHEST);
+            Chest chest1 = (Chest) doubleChest.getState();
+            Inventory inventory = chest1.getInventory();
+            DoubleChest doubleChest1 = (DoubleChest) inventory.getHolder();
+            doubleChestInventory = doubleChest1.getInventory();
+        }
+
+        String chestName = getBonusChestFileName(player.getWorld());
+        if(chestName != null) {
+            chest.setCustomName(ChatColor.DARK_RED + chestName);
+        }
+
+        for(ItemStack item : itemsToAdd) {
+            if(itemsToAdd.size() <= 27) {
+                chestInv.setItem(singleChestShuffle.get(i), item);
+                i++;
+            } else if(itemsToAdd.size() <= 54) {
+
+                    doubleChestInventory.setItem(doubleChestShuffle.get(i), item);
+                    i++;
+
+            }
+
+
+
+             else {
+                Bukkit.getServer().getLogger().log(Level.SEVERE, chestName + "contains too many items. Only 54 will be added.");
+            }
+
+
+
+
+        }
 
 
 
 
 
+    }
 
 
 
+    //File configuration .getName() wont work. So I use this instead.
+    public String getBonusChestFileName(World world) {
+        for(String key : RandomCoords.getPlugin().bonusChest.getKeys(false)) {
+            if(RandomCoords.getPlugin().bonusChest.getStringList(key) != null) {
+                for(String worldName: RandomCoords.getPlugin().bonusChest.getStringList(key)) {
+                    if(Bukkit.getServer().getWorld(worldName) != null) {
+                        if(Bukkit.getServer().getWorld(worldName) == world) {
+                            File file = new File(RandomCoords.getPlugin().getDataFolder() + File.separator + "BonusChests", key + ".yml");
+                            return file.getName().replaceAll("_", " ").replaceAll(".yml", "");
+                        }
+                    }
+
+
+
+                }
+            }
+
+        }
+        return null;
+
+    }
 
 
 

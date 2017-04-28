@@ -31,11 +31,8 @@ import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.BufferedReader;
@@ -79,6 +76,8 @@ public class CoordinatesManager {
     private final KingdomsClaim kingdomsClaim = new KingdomsClaim();
     //Grab an instance of the debug manager.
     private final DebugManager debugManager = new DebugManager();
+
+    private final BonusChestManager bonusChestManager = new BonusChestManager();
 
     private final ResidenceCheck residenceCheck = new ResidenceCheck();
 
@@ -497,10 +496,7 @@ public class CoordinatesManager {
      * @return True if it does, False if not.
      */
     public boolean doesLimiterApply(CoordType coordType) {
-        if(config.getStringList("LimiterApplys").contains(coordType.getName())) {
-            return true;
-        }
-        return false;
+        return config.getStringList("LimiterApplys").contains(coordType.getName());
     }
 
     /**
@@ -554,11 +550,7 @@ public class CoordinatesManager {
      * @return True they are in a cooldown
      */
     public boolean inCooldown(Player player, String cooldownName) {
-        if(Cooldown.isInCooldown(player.getUniqueId(), cooldownName)) {
-            return true;
-        } else {
-            return false;
-        }
+        return Cooldown.isInCooldown(player.getUniqueId(), cooldownName);
     }
 
     /**
@@ -570,11 +562,7 @@ public class CoordinatesManager {
         if(Cooldown.getTimeLeft(player.getUniqueId(), "TimeBefore") > 0) {
             return true;
         }
-        if(Cooldown.isInCooldown(player.getUniqueId(), "TimeBefore")) {
-            return true;
-        } else {
-            return false;
-        }
+        return Cooldown.isInCooldown(player.getUniqueId(), "TimeBefore");
     }
 
     /**
@@ -827,10 +815,7 @@ public class CoordinatesManager {
             return false;
         }
 
-        if(player.getLocation().distance(start) >= 1) {
-            return true;
-        }
-        return false;
+        return player.getLocation().distance(start) >= 1;
 
     }
 
@@ -845,10 +830,7 @@ public class CoordinatesManager {
             return false;
         }
 
-        if(player.getHealth() < startHealth) {
-            return true;
-        }
-        return false;
+        return player.getHealth() < startHealth;
     }
 
     /**
@@ -938,81 +920,7 @@ public class CoordinatesManager {
              * Else do nothing.
              */
             if (RandomCoords.getPlugin().limiter.getString(player.getUniqueId() + ".Chest") == null) {
-                //Gets the location for the chest. Takes the teleport location and adds 1 to The X, -2 to add it to the ground and 1 to the Z.
-                final Location chestLoc = locationTP.add(0.5, 0, 0.5);
-                final int maxY = chestLoc.getWorld().getHighestBlockAt(chestLoc).getY();
-                chestLoc.setY(maxY);
-                //This uses the chestloc location but adds 1 to the Y in order to allow opening of the chest wherever.
-                final Location airLoc = new Location(chestLoc.getWorld(), chestLoc.getBlockX(), chestLoc.getBlockY() + 1, chestLoc.getBlockZ());
-                //Gets the acual block at the location of the chest.
-                final Block chestBlock = chestLoc.getBlock();
-                //Gets the actual block at the location of the air block.
-                final Block airBlock = airLoc.getBlock();
-                //Sets the airblock to AIR.
-                airBlock.setType(Material.AIR);
-                //Sets the chest block to a chest.
-                chestBlock.setType(Material.CHEST);
-                //Get the chest at the location, Create an instance of it.
-                final Chest chest = (Chest) chestBlock.getState();
-                //Get the inventory of this chest.
-                final Inventory chestInv = chest.getInventory();
-                /**
-                 * For all the items in the config list: BonusChestItems, Create an itemstack and add it to the Chest.
-                 * This will also check for Essentials kits that may want to be put in the chest.
-                 */
-                for (final String material : RandomCoords.getPlugin().config.getStringList("BonusChestItems")) {
-                    /**
-                     * If the string in the list is an essentials kit, Check if essentials is enabled, and add it to the chest.
-                     */
-                    if (material.contains("Essentials,")) {
-                        /**
-                         * This checks that they actually are using essentials.
-                         */
-                        if (Bukkit.getPluginManager().getPlugin("Essentials") != null) {
-                            //This grabs an instance of the KitManager class, Where most essentials kit stuff is handled.
-                            final KitManager kitManager = new KitManager();
-                            //Seperate the Essentials bit from the kit name.
-                            final String[] kits = material.split(",");
-                            /**
-                             * For the kit names, Not the essentials bit, Get the kit from the kit manager class.
-                             */
-                            for (final String kit : kits) {
-                                /**
-                                 * If the Kit isnt the Essentials keyword, Add it to the chest.
-                                 */
-                                if (!kit.equals("Essentials")) {
-                                    //Get the kit from the kit manager class.
-                                    kitManager.getKit(player, chest, kit);
-                                    //Tell the limiter file that they have had a bonus chest.
-                                    RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
-                                    //Save these changes to the limiter file.
-                                    RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().limiter, RandomCoords.getPlugin().limiterFile);
-
-
-                                }
-                            }
-                        }
-                    } else {
-                        /**
-                         * If the material is not null, Create an itemstack and add it to the chest.
-                         * If not, log that the item isnt configured properly.
-                         */
-                        if (Material.getMaterial(material) != null) {
-                            //Create the itemstack for the listed item.
-                            final ItemStack itemStack = new ItemStack(Material.getMaterial(material), 1);
-                            //Add the item to the chest.
-                            chestInv.addItem(itemStack);
-                            //Tell the limiter file they have recieved a chest.
-                            RandomCoords.getPlugin().limiter.set(player.getUniqueId() + ".Chest", "true");
-                            //Save these changes.
-                            RandomCoords.getPlugin().saveFile(RandomCoords.getPlugin().limiter, RandomCoords.getPlugin().limiterFile);
-                        } else {
-                            //Log that it is not a material.
-                            Bukkit.getLogger().log(Level.WARNING, material + "  is not a material.");
-                        }
-                    }
-
-                }
+               bonusChestManager.spawnBonusChest(player);
             }
 
 

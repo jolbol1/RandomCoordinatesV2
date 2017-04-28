@@ -23,11 +23,8 @@ import com.jolbol1.RandomCoordinates.RandomCoords;
 import com.jolbol1.RandomCoordinates.commands.handler.CommandInterface;
 import com.jolbol1.RandomCoordinates.managers.BonusChestManager;
 import com.jolbol1.RandomCoordinates.managers.MessageManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -55,23 +52,32 @@ public class BonusCommand implements CommandInterface {
                 String fileName = args[1].toString();
                 for(ItemStack itemStack : player.getInventory().getContents()) {
                     if(itemStack != null) {
-                        Bukkit.broadcastMessage(itemStack.getType().toString());
                         bonusChestManager.itemStackToFile(fileName, itemStack);
                     }
                 }
+                messageManager.inventoryContentsSaved(sender, fileName, false);
             }
             if(args.length == 3) {
                 if (args[2].equalsIgnoreCase("-o")) {
-                    Bukkit.broadcastMessage("Overriding");
+
                     String fileName = args[1].toString();
                     File file = new File(RandomCoords.getPlugin().getDataFolder() + File.separator + "BonusChests", fileName + ".yml");
                     file.delete();
                     for (ItemStack itemStack : player.getInventory().getContents()) {
                         if (itemStack != null) {
-                            Bukkit.broadcastMessage(itemStack.getType().toString());
                             bonusChestManager.itemStackToFile(fileName, itemStack);
                         }
                     }
+
+                    messageManager.inventoryContentsSaved(sender, fileName, true);
+
+
+                } else if(args[2].equalsIgnoreCase("-i")) {
+                    String fileName = args[1].toString();
+                    bonusChestManager.itemStackToFile(fileName, player.getItemInHand());
+                    messageManager.itemSaved(sender, fileName);
+
+
                 }
             }
 

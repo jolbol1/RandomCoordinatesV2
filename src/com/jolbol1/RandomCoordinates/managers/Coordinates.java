@@ -1427,20 +1427,7 @@ public class Coordinates {
          * Otherwise, return a message that tells them how long they have left in the cooldown.
          * (Misleading cooldown name, Woops)
          */
-        if (!Cooldown.isInCooldown(player.getUniqueId(), "Command")) {
-            //Return false, they are not in the cooldown.
-            return false;
-
-        } else {
-            /**
-             *This code has been moved as of the v0.0.6
-             */
-            //Gets the second left in the cooldown.
-            //Sends the message.
-            //MESSAGE MOVED UP ABOVE.
-            //Return true, They are in the cooldown.
-            return true;
-        }
+        return Cooldown.isInCooldown(player.getUniqueId(), "Command");
     }
 
     /**

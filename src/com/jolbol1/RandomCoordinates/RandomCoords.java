@@ -162,12 +162,12 @@ public class RandomCoords extends JavaPlugin {
         matchFile(config, configFile, "config");
 
 
-        bonusChestFile = new File(this.getDataFolder(), "BonusChestFile.yml");
+        bonusChestFile = new File(this.getDataFolder(), "BonusChestConfig.yml");
         bonusChest = setupFile(bonusChestFile);
         bonusChest.options().header("RandomCoords: Need Help Setting Up? See the Wiki! https://github.com/jolbol1/RandomCoordinatesV2/wiki \n " +
                 "This will explain everything you need to know about all the options. \n " +
                 "Developed by Jolbol1");
-        matchFile(bonusChest, bonusChestFile, "BonusChestFile");
+        //matchFile(bonusChest, bonusChestFile, "BonusChestFile");
 
         File bonusChestFolder = new File(this.getDataFolder() + File.separator + "BonusChests");
         if(!bonusChestFolder.exists()) {
@@ -177,7 +177,7 @@ public class RandomCoords extends JavaPlugin {
 
         bonusChestExample = new File(this.getDataFolder() + File.separator + "BonusChests", "BonusChestExample.yml");
         bonushChestExample = setupFile(bonusChestExample);
-        matchFile(bonushChestExample, bonusChestExample, "BonusChestExample");
+        //matchFile(bonushChestExample, bonusChestExample, "BonusChestExample");
 
 
 
@@ -477,11 +477,8 @@ public class RandomCoords extends JavaPlugin {
         }
         //Return the number as a string.
         if(versionOnFile == null ) { return false; }
-        if(!versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion())) {
-          return true;
-        }
+        return !versionOnFile.equalsIgnoreCase(plugin.getDescription().getVersion());
 
-        return false;
     }
 
 

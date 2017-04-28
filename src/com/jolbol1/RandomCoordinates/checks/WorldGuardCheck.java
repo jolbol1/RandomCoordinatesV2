@@ -84,11 +84,7 @@ public class WorldGuardCheck {
                                         }
 
                                 }
-                                if(regionsToCheck == null || regionsToCheck.size() == 0) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
+                                return regionsToCheck == null || regionsToCheck.size() == 0;
 
 
                             }

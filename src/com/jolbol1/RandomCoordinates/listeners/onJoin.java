@@ -77,7 +77,6 @@ public class onJoin implements Listener {
             //Initiate the coordinates function which will handle the random teleport. Notice the secret key to get default values.
             //coordinates.finalCoordinates(p, 574272099, 574272099, p.getWorld(), CoordType.JOIN, 0);
             coordinatesManager.randomlyTeleportPlayer(p, p.getWorld(), coordinatesManager.key, coordinatesManager.key, CoordType.JOIN, 0);
-            ;
             //Message them to let them know that they have been teleported.
             messages.onJoin(p);
 
