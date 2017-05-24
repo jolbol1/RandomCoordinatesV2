@@ -72,7 +72,7 @@ public class BonusChestManager {
     public List<ItemStack> itemsToAdd(Player player, World world) {
         FileConfiguration configuration = getBonusChestFile(world);
 
-        Map<String, Object> itemsPlusData = itemsPlusData(configuration);
+        Map<String, Object> itemsPlusData = itemsPlusData(configuration, player);
         List<ItemStack> items = new ArrayList<>();
         Set<String> itemsPlusTheData = itemsPlusData.keySet();
 
@@ -119,6 +119,14 @@ public class BonusChestManager {
                         String[] enchantmentSplitter = enchantment.split(":");
                         int level = Integer.valueOf(enchantmentSplitter[1]);
                         itemMeta.addEnchant(Enchantment.getByName(enchantmentSplitter[0]), level, true);
+                    }
+                }
+
+                if(itemData.containsKey("Durability")) {
+                    short durab = Short.valueOf(String.valueOf(itemData.get("Durability")));
+                    if(durab < Material.getMaterial(itemType).getMaxDurability()) {
+                        int durabilityMod = itemStack.getType().getMaxDurability() - durab;
+                        itemStack.setDurability(Short.valueOf(String.valueOf(durabilityMod)));
                     }
                 }
 
@@ -201,13 +209,13 @@ public class BonusChestManager {
 
     }
 
-    public Map<String, Object> itemsPlusData(FileConfiguration bonusChestFile) {
+    public Map<String, Object> itemsPlusData(FileConfiguration bonusChestFile, Player player) {
         Map<String, Object> itemsPlusData = new LinkedHashMap<>();
         if(bonusChestFile == null) {
             Bukkit.getServer().getLogger().log(Level.WARNING, "Bonus Chest is on, but, no chest setup in BonusChestConfig.yml");
         } else {
             for (String key : bonusChestFile.getKeys(false)) {
-                itemsPlusData.put(key, parseItem(bonusChestFile, key));
+                itemsPlusData.put(key, parseItem(bonusChestFile, key, player));
             }
         }
         return itemsPlusData;
@@ -217,29 +225,80 @@ public class BonusChestManager {
     }
 
     public Map<String,Object> parseItem(FileConfiguration fileItems, String materialName) {
+        return parseItem(fileItems, materialName, null);
+    }
+
+    public Map<String,Object> parseItem(FileConfiguration fileItems, String materialName, Player player) {
         Map<String, Object> itemData = new HashMap<>();
         if(fileItems.getInt(materialName + ".Odds") != 0) {
             itemData.put("Odds", fileItems.getInt(materialName + ".Odds"));
         }
 
         if(fileItems.getString(materialName + ".Name") != null) {
-            itemData.put("Name",fileItems.getString(materialName + ".Name")  );
+            if(player == null) {
+                itemData.put("Name", ChatColor.translateAlternateColorCodes('&',fileItems.getString(materialName + ".Name")));
+            } else {
+                String text = fileItems.getString(materialName + ".Name").replaceAll("&p", ChatColor.stripColor(player.getName()));
+                itemData.put("Name", ChatColor.translateAlternateColorCodes('&', text));
+            }
         }
 
-        if(fileItems.getInt(materialName + ".Amount") != 0) {
-            itemData.put("Amount", fileItems.getInt(materialName + ".Amount"));
+        if(fileItems.get(materialName + ".Amount") != null) {
+            int amount = 1;
+            Object obj = fileItems.get(materialName + ".Amount");
+            if(String.valueOf(obj).contains(":")) {
+                String[] random = fileItems.getString(materialName + ".Amount").split(":");
+                amount = randomWithin(random[1], random[0], materialName);
+
+
+            } else {
+                amount = fileItems.getInt(materialName + ".Amount");
+            }
+            itemData.put("Amount", amount);
+        }
+
+        if(fileItems.get(materialName + ".Durability") != null) {
+            int durability = 1;
+            Object obj = fileItems.get(materialName + ".Durability");
+            if(String.valueOf(obj).contains(":")) {
+                String[] random = fileItems.getString(materialName + ".Durability").split(":");
+                durability = randomWithin(random[1], random[0], materialName);
+
+            } else {
+                durability = fileItems.getInt(materialName + ".Durability");
+            }
+            itemData.put("Durability", durability);
         }
 
         if(fileItems.getStringList(materialName + ".Lore") != null) {
-            List<String> lore = new ArrayList<>();
-            for(String name : fileItems.getStringList(materialName + ".Lore")) {
-                lore.add(ChatColor.translateAlternateColorCodes('&', name));
+            if(player == null) {
+                List<String> lore = new ArrayList<>();
+                for (String name : fileItems.getStringList(materialName + ".Lore")) {
+                    lore.add(ChatColor.translateAlternateColorCodes('&', name));
+                }
+                itemData.put("Lore", lore);
+            } else {
+                List<String> lore = new ArrayList<>();
+                for (String name : fileItems.getStringList(materialName + ".Lore")) {
+                    String nameReplace = name.replaceAll("&p", ChatColor.stripColor(player.getName()));
+                    lore.add(ChatColor.translateAlternateColorCodes('&', nameReplace));
+                }
+                itemData.put("Lore", lore);
             }
-            itemData.put("Lore", lore);
         }
 
         if(fileItems.get(materialName + ".Data") != null) {
-            itemData.put("Data", fileItems.getString(materialName + ".Data"));
+            int amount = 0;
+            Object obj = fileItems.get(materialName + ".Data");
+            if(String.valueOf(obj).contains(":")) {
+                String[] split = String.valueOf(obj).split(":");
+                amount = randomWithin(split[1], split[0], materialName);
+            } else {
+                amount = fileItems.getInt(materialName + ".Data");
+            }
+
+
+            itemData.put("Data", amount);
         }
 
         if(fileItems.getStringList(materialName + ".Enchantments") != null) {
@@ -248,7 +307,11 @@ public class BonusChestManager {
         }
 
         if(fileItems.getString(materialName + ".Author") != null && materialName.contains("WRITTEN_BOOK")) {
-            itemData.put("Author", fileItems.getString(materialName + ".Author"));
+            if(player == null) {
+                itemData.put("Author", fileItems.getString(materialName + ".Author"));
+            } else {
+                itemData.put("Author", fileItems.getString(materialName + ".Author").replaceAll("&p", player.getName()));
+            }
         }
 
         if(fileItems.get(materialName + ".Pages") != null && materialName.contains("WRITTEN_BOOK")) {
@@ -264,7 +327,13 @@ public class BonusChestManager {
         }
 
         if(materialName.contains("SKULL_ITEM")) {
-            itemData.put("SkullOwner", fileItems.get(materialName + ".SkullOwner"));
+            if(player == null) {
+                itemData.put("SkullOwner", fileItems.get(materialName + ".SkullOwner"));
+            } else {
+                String name = ChatColor.stripColor(player.getName());
+                itemData.put("SkullOwner", String.valueOf(fileItems.get(materialName + ".SkullOwner")).replaceAll("&p", name));
+
+            }
         }
 
 
@@ -274,6 +343,10 @@ public class BonusChestManager {
     }
 
     public void itemStackToFile(String fileName, ItemStack item) {
+        itemStackToFile(fileName, item, false);
+    }
+
+    public void itemStackToFile(String fileName, ItemStack item, boolean durability) {
         File file = new File(RandomCoords.getPlugin().getDataFolder() + File.separator + "BonusChests", fileName + ".yml");
         FileConfiguration yamlFile = RandomCoords.getPlugin().setupFile(file);
         ItemMeta itemMeta = item.getItemMeta();
@@ -296,6 +369,9 @@ public class BonusChestManager {
             yamlFile.set(itemName + ".Name", displayName);
         yamlFile.set(itemName + ".Amount", amount);
         yamlFile.set(itemName + ".Lore", itemMeta.getLore());
+        if(durability) {
+            yamlFile.set(itemName + ".Durability", item.getDurability());
+        }
 
         yamlFile.set(itemName + ".Data", item.getData().getData());
         List<String> enchanting = new ArrayList<>();
@@ -340,10 +416,18 @@ public class BonusChestManager {
 
     public void spawnBonusChest(Player player) {
         //Get the location of the chest and set it to a chest.
-        Location chestLocation = player.getLocation().add(1, 0, 1);
-        chestLocation.setY(player.getWorld().getHighestBlockYAt(chestLocation));
+        Location chestLocation = new Location(player.getWorld(), player.getLocation().getX() + 1, player.getLocation().getY() - 2, player.getLocation().getZ() + 1);
+        Location chestTwo = new Location(player.getWorld(), player.getLocation().getX() + 2, player.getLocation().getY() - 2, player.getLocation().getZ() + 1);
+
+        if((chestLocation.getY() + 3) > chestLocation.getWorld().getHighestBlockAt(chestLocation).getY() || (chestLocation.getY() - 3) < chestLocation.getWorld().getHighestBlockAt(chestLocation).getY()) {
+            int chestHeight = chestLocation.getWorld().getHighestBlockAt(chestLocation).getY();
+            chestLocation.setY(chestHeight);
+            chestTwo.setY(chestHeight);
+        }
         Block chestBlock = chestLocation.getBlock();
         chestBlock.setType(Material.CHEST);
+        Location airLoc = chestLocation.add(0,1,0);
+        airLoc.getBlock().setType(Material.AIR);
         //Get the Chest
         final Chest chest = (Chest) chestBlock.getState();
         //Get the inventory of this chest.
@@ -358,9 +442,10 @@ public class BonusChestManager {
 
         Inventory doubleChestInventory = null;
 
-        if(itemsToAdd.size() >= 27) {
-            Block doubleChest = chestLocation.add(1,0,0).getBlock();
+        if(itemsToAdd.size() > 27) {
+            Block doubleChest = chestTwo.getBlock();
             doubleChest.setType(Material.CHEST);
+            chestTwo.add(0,1,0).getBlock().setType(Material.AIR);
             Chest chest1 = (Chest) doubleChest.getState();
             Inventory inventory = chest1.getInventory();
             DoubleChest doubleChest1 = (DoubleChest) inventory.getHolder();
@@ -422,6 +507,22 @@ public class BonusChestManager {
         }
         return null;
 
+    }
+
+    public int randomWithin(String upperS, String lowerS, String materialName) {
+        int lower = 1;
+        int upper = 1;
+        try {
+            lower = Integer.parseInt(lowerS);
+            upper = Integer.parseInt(upperS);
+        } catch (NumberFormatException e) {
+            Bukkit.getLogger().log(Level.WARNING, "Could not parse random bounds for material: " + materialName);
+        }
+        if(lower > upper) {
+            Bukkit.getLogger().log(Level.WARNING, "The lower bound is larger than the upper bound for material: " + materialName);
+        }
+        int amount = threadLocalRandom.nextInt((upper - lower) + 1) + lower;
+        return amount;
     }
 
 

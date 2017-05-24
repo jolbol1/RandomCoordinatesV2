@@ -37,7 +37,7 @@ public class HelpCommand implements CommandInterface {
 
     @Override
     public void onCommand(final CommandSender sender, final Command cmd, final String commandLabel, final String[] args) {
-        
+
         if (args[0].equalsIgnoreCase("help")) {
             if (args.length == 1 || args.length == 2 && args[1].equalsIgnoreCase("1")) {
 
@@ -68,6 +68,7 @@ public class HelpCommand implements CommandInterface {
 
                 }
 
+
                 if (sender.hasPermission("Random.Admin.Portals") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*")) {
                     sender.sendMessage(prefix + good + "/RC Wand" + desc +  " Gives you the Random Wand for portal selection.");
                     sender.sendMessage(prefix + good + "/RC Portal Create" + un + " {Name}" + desc + " Creates a portal from the RandomWand selection with name {Name}");
@@ -85,7 +86,19 @@ public class HelpCommand implements CommandInterface {
                     sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Max Global" + desc + " Sets the max to the default in config.");
                     sender.sendMessage(prefix + good + "/RC Set" + un + " {World}" + good + " Min Global"  + desc + " Sets the min to the default in config.");
                 }
-            } else if(args.length == 2) {
+            } else if(args.length == 2 && args[1].equalsIgnoreCase("4")) {
+                if(sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*") || sender.hasPermission("Random.Admin.Chest")) {
+                    sender.sendMessage(prefix + good + "/RC chest" + un + " {FileToSave}" + desc + " Saves the content of your inventory to {FileToSave}");
+                    sender.sendMessage(prefix + good + "/RC chest" + un + " {FileToSave}" + good + " -i" + desc + " Saves the item you're holding to {FileToSave}");
+                    sender.sendMessage(prefix + good + "/RC chest" + un + " {FileToSave}" + good + " -o" + desc + "Overwrites {FileToSave} with the contents of your inventory.");
+
+
+                }
+            }
+
+
+
+            else if(args.length == 2) {
                 sender.sendMessage(ChatColor.GOLD + "[RandomCoords] " + ChatColor.RED + "Invalid Page, Must be between 1 and 3!");
             }
         }

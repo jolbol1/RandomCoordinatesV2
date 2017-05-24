@@ -41,7 +41,7 @@ public class PlayerSwitchWorld implements Listener {
     @EventHandler
     public void onPlayerSwitch(final PlayerTeleportEvent e) {
         if(RandomCoords.getPlugin().config.getStringList("OnJoinWorlds") == null )  { return; }
-        if(e.getCause() == PlayerTeleportEvent.TeleportCause.END_GATEWAY || e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL || e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
+        if(e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL || e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
             return;
         }
         final List<String> list = RandomCoords.getPlugin().config.getStringList("OnJoinWorlds");

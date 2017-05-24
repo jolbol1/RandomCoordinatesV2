@@ -39,7 +39,7 @@ public class BonusCommand implements CommandInterface {
 
     @Override
     public void onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if(args.length >= 1 && args[0].equalsIgnoreCase("chest")) {
+        if(args.length >= 1 && args[0].equalsIgnoreCase("chest") && (sender.hasPermission("Random.Admin.Chest") || sender.hasPermission("Random.Admin.*") || sender.hasPermission("Random.*"))) {
             if(!(sender instanceof Player)) {
                 messageManager.notPlayer(sender);
                 return;
@@ -78,6 +78,14 @@ public class BonusCommand implements CommandInterface {
                     messageManager.itemSaved(sender, fileName);
 
 
+                } else if(args[2].equalsIgnoreCase("-d")) {
+                    String fileName = args[1].toString();
+                    for(ItemStack itemStack : player.getInventory().getContents()) {
+                        if(itemStack != null) {
+                            bonusChestManager.itemStackToFile(fileName, itemStack, true);
+                        }
+                    }
+                    messageManager.inventoryContentsSaved(sender, fileName, false);
                 }
             }
 

@@ -177,7 +177,7 @@ public class RandomCoords extends JavaPlugin {
 
         bonusChestExample = new File(this.getDataFolder() + File.separator + "BonusChests", "BonusChestExample.yml");
         bonushChestExample = setupFile(bonusChestExample);
-        //matchFile(bonushChestExample, bonusChestExample, "BonusChestExample");
+        matchFile(bonushChestExample, bonusChestExample, "BonusChestExample");
 
 
 

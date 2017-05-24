@@ -20,6 +20,7 @@
 package com.jolbol1.RandomCoordinates.checks;
 
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -35,6 +36,7 @@ public class Nether {
     private static final int key = 574272099;
 
     /**
+     * !OLD SYSTEM! SO BAD! WTF!
      * Takes the location and aims to find a 2 block gap that the player can teleport to on the Y value.
      * @param l Takes in the initial location
      * @return The new Y level.
@@ -47,6 +49,7 @@ public class Nether {
         final int r = 126;
 
         int y = Y - r;
+
 
 
         for (int i = 0; i < r * 2 + 1; i++) {
@@ -67,6 +70,34 @@ public class Nether {
         }
 
         return key;
+    }
+
+
+
+    public int getSafeYNether(Location location) {
+        int x = location.getBlockX();
+        int z = location.getBlockZ();
+
+        int air = 0;
+
+        for(int y = 2; y < 126; y++) {
+            if(location.getWorld().getBlockAt(x, y, z).getType() == Material.AIR) {
+                if(y - air == 1) {
+                    if (location.getWorld().getBlockAt(x, air - 1, z).getType() == Material.NETHERRACK) {
+                        return air;
+                    }
+                }
+                air = y;
+            }
+        }
+
+        return 0;
+
+
+
+
+
+
     }
 
 

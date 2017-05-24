@@ -179,7 +179,6 @@ public class CoordinatesManager {
      */
     private boolean isTheLocationSafe(final Location location) {
 
-
         if(location == null) {
             return false;
         }
@@ -305,6 +304,7 @@ public class CoordinatesManager {
 
     public boolean randomlyTeleportPlayer(Player player, World world, int max, int min, CoordType coordType, double cost) {
 
+
         if(inTimeBefore(player)) {
             messages.TeleportingIn(player, Cooldown.getTimeLeft(player.getUniqueId(), "TimeBefore"));
             return false;
@@ -358,6 +358,10 @@ public class CoordinatesManager {
             safeLocation = getRandomWarp(player, world, coordType);
         } else {
             safeLocation = getSafeRandomLocation(world, max, min);
+            if(!RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(world.getName())) {
+                double y = getSafeY(safeLocation);
+                safeLocation.setY(y);
+            }
         }
 
         //Is the location not actually safe?
@@ -366,10 +370,7 @@ public class CoordinatesManager {
             return false;
         }
 
-        if(!RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(world.getName())) {
-            double y = getSafeY(safeLocation);
-            safeLocation.setY(y);
-        }
+
 
         if(safeLocation.getWorld().getBiome(safeLocation.getBlockX(), safeLocation.getBlockZ()) == Biome.SKY ) {
             safeLocation = end.endCoord(safeLocation);
@@ -730,7 +731,7 @@ public class CoordinatesManager {
     private double getSafeY(Location location) {
 
         if(location.getWorld().getBiome(location.getBlockX(), location.getBlockZ()) == Biome.HELL) {
-            return (nether.getSafeNetherY(location) + 1);
+            return (nether.getSafeYNether(location));
         }
         if(RandomCoords.getPlugin().skyBlockSave.getStringList("SkyBlockWorlds").contains(location.getWorld().getName())) {
             return RandomCoords.getPlugin().skyBlockSave.getInt("DefaultY") + 3.5;
